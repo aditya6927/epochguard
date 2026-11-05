@@ -1,4 +1,4 @@
-module github.com/epochguard/epochguard/plugins/epochguard
+module github.com/aditya6927/epochguard/plugins/epochguard
 
 go 1.27.3
 

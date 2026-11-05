@@ -3,6 +3,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"strings"
 	"sync"
@@ -67,11 +68,19 @@ func PostLLMHook(ctx *schemas.BifrostContext, resp *schemas.BifrostResponse, bif
 
 // These headers prove execution on this response; they do not certify freshness.
 func HTTPTransportPostHook(ctx *schemas.BifrostContext, _ *schemas.HTTPRequest, resp *schemas.HTTPResponse) error {
+	// An ordinary HTTP post-hook error is diagnostic, not a client refusal.
+	// Avoid panicking if a future transport path supplies no response.
+	if resp == nil {
+		return errors.New("epochguard: HTTP post-hook received nil response")
+	}
 	record(ctx, "http_post")
 	if resp.Headers == nil {
 		resp.Headers = make(map[string]string)
 	}
 	trace, _ := ctx.Value(hookSequenceKey).(*hookTrace)
+	if trace == nil {
+		return errors.New("epochguard: HTTP post-hook missing trace")
+	}
 	trace.mu.Lock()
 	resp.Headers["X-EpochGuard-Hooks"] = strings.Join(trace.phases, ",")
 	trace.mu.Unlock()

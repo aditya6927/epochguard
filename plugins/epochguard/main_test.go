@@ -33,3 +33,13 @@ func TestHookTraceSurvivesCoreChildContext(t *testing.T) {
 		t.Fatalf("core child phases did not reach transport parent: %q", got)
 	}
 }
+
+func TestHTTPTransportPostHookNilResponse(t *testing.T) {
+	ctx := schemas.NewBifrostContext(context.Background(), schemas.NoDeadline)
+	defer ctx.Cancel()
+
+	// The diagnostic hook must not panic when a response is absent.
+	if err := HTTPTransportPostHook(ctx, nil, nil); err == nil {
+		t.Fatal("expected an error for nil HTTP response")
+	}
+}
