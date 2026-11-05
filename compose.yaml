@@ -1,0 +1,62 @@
+name: epochguard-002a
+
+x-image: &image
+  image: epochguard-dev:002a
+  platform: linux/amd64
+  build:
+    context: .
+    dockerfile: dev/Dockerfile
+
+services:
+  provider:
+    <<: *image
+    command: ["/app/provider-fixture"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9000/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  gateway:
+    <<: *image
+    environment:
+      BIFROST_SETUP_TOKEN: epochguard-local-dev-only
+    depends_on:
+      provider:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+      start_period: 10s
+  smoke:
+    <<: *image
+    profiles: ["test"]
+    command: ["/app/smoke.test", "-test.v", "-test.timeout=90s"]
+    environment:
+      EPOCHGUARD_GATEWAY_URL: http://gateway:8080
+      EPOCHGUARD_PROVIDER_URL: http://provider:9000
+      EPOCHGUARD_CONTROL_URL: http://gateway-control:8080
+      EPOCHGUARD_SETUP_TOKEN: epochguard-local-dev-only
+    depends_on:
+      gateway:
+        condition: service_healthy
+      gateway-control:
+        condition: service_healthy
+  gateway-control:
+    <<: *image
+    environment:
+      BIFROST_SETUP_TOKEN: epochguard-local-dev-only
+    profiles: ["test"]
+    command: ["/app/bifrost-http", "-app-dir", "/app/control", "-host", "0.0.0.0", "-port", "8080"]
+    depends_on:
+      provider:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+      start_period: 10s

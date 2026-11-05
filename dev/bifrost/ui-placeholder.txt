@@ -1,0 +1,2 @@
+EpochGuard Task 002A builds Bifrost's HTTP API only. No dashboard assets are bundled.
+This file satisfies upstream's go:embed all:ui pattern without changing Go source.

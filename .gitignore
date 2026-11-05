@@ -1,0 +1,7 @@
+.env
+artifacts/
+*.so
+*.db
+*.db-shm
+*.db-wal
+git 

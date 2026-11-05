@@ -1,0 +1,4 @@
+# Optional project builder for hosts where Docker's default DNS cannot resolve
+# GitHub or the Go module proxy. Does not change Docker daemon configuration.
+[dns]
+  nameservers = ["1.1.1.1", "8.8.8.8"]
