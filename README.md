@@ -1,8 +1,10 @@
 # EpochGuard
 
-Task 002B extends the working native Go plugin with synchronous response enforcement inside the real Bifrost HTTP gateway. Controlled, **test-only** ALLOW / REJECT / UNAVAILABLE decisions permit a buffered answer or replace it with a terminal refusal. No claims or freshness evidence are checked yet; caching and a dashboard are not implemented.
+Task 002B extends the working native Go plugin with synchronous response enforcement inside the real Bifrost HTTP gateway. Controlled, **test-only** ALLOW / REJECT / UNAVAILABLE decisions permit a buffered answer or replace it with a terminal refusal. No claims or freshness evidence are checked yet; the EpochGuard-owned protected cache and a dashboard are not implemented.
 
-The upstream investigation is in [docs/bifrost-integration-spike.md](docs/bifrost-integration-spike.md). Current behavior, Go code walkthrough, test evidence, and limitations are in [docs/task-002b.md](docs/task-002b.md). [Task 002A](docs/task-002a.md) records the original loader qualification.
+Task 002C qualifies the real built-in cache lifecycle in an isolated test deployment. It reproduces unsafe write ordering, a cache-hit enforcement bypass under incorrect placement, and pending writes repopulating invalidated entries. **The default deployment still has caching disabled.** The future EpochGuard-owned verified cache is not implemented.
+
+The upstream investigation is in [docs/bifrost-integration-spike.md](docs/bifrost-integration-spike.md). Enforcement behavior is in [Task 002B](docs/task-002b.md); cache experiments, observed traces/counters, exact commands, and limitations are in [Task 002C](docs/task-002c.md). [Task 002A](docs/task-002a.md) records the original loader qualification.
 
 Requires Docker Desktop running Linux containers (or Docker Engine on Linux) and Docker Compose. No host Go installation or paid provider API key is required. Run from this repository root:
 
@@ -50,3 +52,13 @@ $result.Content
 Expected diagnostic headers are `X-EpochGuard-Plugin: epochguard` and `X-EpochGuard-Hooks: http_pre,pre_request,pre_llm,post_llm,http_post`. These headers report hook execution; they are not a freshness verdict.
 
 The loopback gateway uses the test-only ALLOW configuration so the example still returns the fixture answer. REJECT and UNAVAILABLE run only on the internal test network. Decisions come from plugin configuration, never request headers or prompts. Protected inference is limited to buffered `POST /openai/v1/chat/completions`; streaming and asynchronous modes are refused. Production authentication and an external readiness gate remain unimplemented, so this development stack must remain local.
+
+Run the separate cache qualification after building the image:
+
+```sh
+docker compose -f compose.cache.yaml up -d --wait provider store-proxy writer reader reject safe unavailable post-reject post-allow
+docker compose -f compose.cache.yaml run --rm --no-deps cache-tests
+docker compose -f compose.cache.yaml down --volumes --remove-orphans
+```
+
+This stack uses a digest-pinned Redis Stack backend, publishes no host ports, and includes deliberately unsafe negative controls. Its test proxy can pause real cache writes to reproduce invalidation races; it is not a production component. Server `cache_no_store` suppresses writes but retains reads. Neither this flag, a cache hit, nor successful physical deletion is a freshness verdict. [ADR 0003](docs/decisions/0003-protected-cache-ownership.md) records the proposed future admission/revocation design.

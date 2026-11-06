@@ -4,7 +4,9 @@ Investigation date: 2026-11-06 (Asia/Calcutta). Scope: official `maximhq/bifrost
 
 Runtime follow-up: [Task 002A](task-002a.md) subsequently built and loaded a minimal native plugin on this pin and exercised real provider requests. It also records configuration requirements and corrections discovered at runtime. The investigation and smoke-test design below remain broader than the integration qualified in Task 002A.
 
-Enforcement follow-up: [Task 002B](task-002b.md) re-inspected the exact core v1.14.1 source and pinned transport, then qualified synchronous typed post-hook refusals, explicit fallback suppression, provider-error preservation, and pre-dispatch streaming rejection against the real gateway. Cache and safe streaming delivery investigations below remain unimplemented.
+Enforcement follow-up: [Task 002B](task-002b.md) re-inspected the exact core v1.14.1 source and pinned transport, then qualified synchronous typed post-hook refusals, explicit fallback suppression, provider-error preservation, and pre-dispatch streaming rejection against the real gateway. At that milestone, cache and safe streaming delivery investigations below remained unimplemented.
+
+Cache follow-up: [Task 002C](task-002c.md) subsequently qualified direct misses/hits on real Redis Stack, early/late placement, refusal of cached candidates, unsafe pre-refusal writes, server no-store, supported physical deletion, and deterministic pending-write repopulation. Those experiments are isolated; the default deployment keeps caching disabled. Embedding similarity mode, a protected cache, and safe streaming delivery remain unimplemented.
 
 ## Decision
 

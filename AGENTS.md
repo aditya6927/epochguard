@@ -4,8 +4,8 @@ This repository is both a hackathon project and a long-term engineering portfoli
 
 ## Current status
 
-- **Current milestone (Task 002B):** the dynamically linked Bifrost HTTP v2.4.0 gateway loads the native plugin and enforces configured test-only ALLOW / REJECT / UNAVAILABLE decisions for buffered `/openai/v1/chat/completions` responses. Terminal typed refusals discard the answer and prohibit fallback; unsupported streaming is rejected before dispatch. See `docs/task-002b.md` for executed qualification evidence and its limits.
-- **Not yet implemented:** freshness verification, Tavily integration, a protected response cache, cache invalidation, safe streaming delivery, production authentication, and an external readiness gate.
+- **Current milestone (Task 002C):** Task 002B typed enforcement is preserved. Isolated real built-in direct-cache experiments qualify misses/hits, placement, cached-candidate refusal, server no-store, physical invalidation APIs, and pending-write repopulation. Incorrect placement and unrestricted cache writes are demonstrated unsafe controls. See `docs/task-002c.md`; the default deployment keeps caching disabled.
+- **Not yet implemented:** freshness verification, Tavily integration, an EpochGuard-owned protected cache, logically atomic revocation, safe streaming delivery, production authentication, and an external readiness gate.
 - The diagnostic `X-EpochGuard-*` headers are **not** evidence of response freshness or a security authorization mechanism.
 
 ## Constraints and invariants
@@ -14,7 +14,7 @@ This repository is both a hackathon project and a long-term engineering portfoli
 2. Preserve true provider errors and request identity. Never report a failed operation as successful.
 3. No response may be described as verified unless its evidence has been checked under an explicit policy. Logging or adding a header is not verification.
 4. For future enforcement, use the actual typed `BifrostError` / short-circuit mechanisms demonstrated in upstream code. Ordinary Go hook errors must not be assumed to block responses.
-5. Account for cache ordering and asynchronous writes. Do not enable the built-in semantic cache for protected traffic until its interaction with EpochGuard has been tested.
+5. Account for cache ordering and asynchronous writes. Task 002C proves that early enforcement can follow a built-in cache write, late enforcement can be skipped on a hit, and deletion is not a write barrier. Keep cache experiments isolated; this qualification does not authorize unrestricted built-in cache writes for protected deployment.
 6. Treat retrieved web content and LLM responses as untrusted data. Do not allow content from either to bypass an enforcement decision.
 7. Never embed API keys, auth tokens, or private source code in tests, log output, examples, or commits. The known test setup token is explicitly **local-development-only**.
 8. Never expose the fixture's no-auth HTTP gateway beyond loopback. Streaming, passthrough, asynchronous, and other unqualified routes are not protected.
@@ -44,11 +44,22 @@ docker compose --profile test down --remove-orphans
 
 Go plugin unit tests and `go test -race` run inside `dev/Dockerfile` during the image build. The race detector covers unit execution, not the real gateway process. Do not substitute a mocked plugin loader for the real gateway smoke test.
 
+The isolated cache lifecycle suite uses the same built image and has no host ports:
+
+```sh
+docker compose -f compose.cache.yaml up -d --wait provider store-proxy writer reader reject safe unavailable post-reject post-allow
+docker compose -f compose.cache.yaml run --rm --no-deps cache-tests
+docker compose -f compose.cache.yaml down --volumes --remove-orphans
+```
+
+It contains explicitly unsafe ordering/write controls and a test-only Redis transport gate. Consult `docs/task-002c.md` and ADR 0003 before changing cache behavior. No client header or prompt may select a decision, enable server writes, or shorten a server-enforced decision delay.
+
 ## Source layout and ownership
 
 - `plugins/epochguard/`: Go native plugin and its unit tests.
 - `cmd/provider-fixture/`: controlled upstream provider test double.
 - `tests/smoke/`: gateway end-to-end acceptance tests.
+- `tests/cachelifecycle/`, `cmd/cache-store-proxy/`: isolated real cache qualification and deterministic Redis write scheduling.
 - `dev/`, `compose.yaml`: pinned gateway build and development deployment.
 - `docs/`: upstream findings, executed test evidence, design decisions, and later product specifications.
 

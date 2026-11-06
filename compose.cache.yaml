@@ -1,0 +1,94 @@
+# Isolated qualification deployment. Even the deliberately unsafe ordering
+# controls have no host ports. The normal compose.yaml keeps caching disabled.
+name: epochguard-002c
+
+x-image: &image
+  image: epochguard-dev:002a
+  platform: linux/amd64
+
+x-gateway: &gateway
+  <<: *image
+  command: ["/app/bifrost-http", "-app-dir", "/app/cache", "-host", "0.0.0.0", "-port", "8080"]
+  environment:
+    BIFROST_SETUP_TOKEN: epochguard-local-dev-only
+    LOG_LEVEL: debug
+  depends_on:
+    provider:
+      condition: service_healthy
+    store-proxy:
+      condition: service_healthy
+  healthcheck:
+    test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+    interval: 2s
+    timeout: 2s
+    retries: 60
+    start_period: 10s
+
+services:
+  redis:
+    image: redis/redis-stack-server:7.4.0-v8@sha256:798ab84d9f266936b034ab11c4d04a2b8e4b441884c5aa7d17ac951eefdf742a
+    platform: linux/amd64
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  store-proxy:
+    <<: *image
+    command: ["/app/cache-store-proxy"]
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9001/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  provider:
+    <<: *image
+    command: ["/app/provider-fixture"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9000/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  writer:
+    <<: *gateway
+    volumes: ["./dev/bifrost/cache/writer.json:/app/cache/config.json:ro"]
+  reader:
+    <<: *gateway
+    depends_on: {writer: {condition: service_healthy}}
+    volumes: ["./dev/bifrost/cache/reader.json:/app/cache/config.json:ro"]
+  reject:
+    <<: *gateway
+    depends_on: {writer: {condition: service_healthy}}
+    volumes: ["./dev/bifrost/cache/reject.json:/app/cache/config.json:ro"]
+  safe:
+    <<: *gateway
+    depends_on: {writer: {condition: service_healthy}}
+    volumes: ["./dev/bifrost/cache/safe.json:/app/cache/config.json:ro"]
+  unavailable:
+    <<: *gateway
+    depends_on: {writer: {condition: service_healthy}}
+    volumes: ["./dev/bifrost/cache/unavailable.json:/app/cache/config.json:ro"]
+  post-reject:
+    <<: *gateway
+    depends_on: {writer: {condition: service_healthy}}
+    volumes: ["./dev/bifrost/cache/post-reject.json:/app/cache/config.json:ro"]
+  post-allow:
+    <<: *gateway
+    depends_on: {writer: {condition: service_healthy}}
+    volumes: ["./dev/bifrost/cache/post-allow.json:/app/cache/config.json:ro"]
+  cache-tests:
+    <<: *image
+    command: ["/app/cache.test", "-test.v", "-test.timeout=120s"]
+    environment:
+      EPOCHGUARD_SETUP_TOKEN: epochguard-local-dev-only
+    depends_on:
+      writer: {condition: service_healthy}
+      reader: {condition: service_healthy}
+      reject: {condition: service_healthy}
+      safe: {condition: service_healthy}
+      unavailable: {condition: service_healthy}
+      post-reject: {condition: service_healthy}
+      post-allow: {condition: service_healthy}

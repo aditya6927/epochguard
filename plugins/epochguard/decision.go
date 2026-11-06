@@ -7,6 +7,7 @@ import (
 	"errors"
 	"log"
 	"sync/atomic"
+	"time"
 
 	"github.com/maximhq/bifrost/core/schemas"
 )
@@ -34,7 +35,28 @@ func (d fixedDecision) Decide(context.Context, *schemas.BifrostResponse) (Decisi
 	return Decision(d), nil
 }
 
-type policy struct{ source DecisionSource }
+// delayedDecision is a bounded test fixture for observing cache writes while
+// the synchronous decision is pending. No client input selects this delay.
+type delayedDecision struct {
+	decision fixedDecision
+	delay    time.Duration
+}
+
+func (d delayedDecision) Decide(ctx context.Context, resp *schemas.BifrostResponse) (Decision, error) {
+	timer := time.NewTimer(d.delay)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+		return Unavailable, ctx.Err()
+	case <-timer.C:
+		return d.decision.Decide(ctx, resp)
+	}
+}
+
+type policy struct {
+	source       DecisionSource
+	cacheNoStore bool
+}
 
 // Publication is atomic for concurrent hooks/reconfiguration. A policy and its
 // source are immutable; request data is never stored in this process-level slot.
@@ -44,8 +66,10 @@ func configure(config any) error {
 	// Even a failed reconfiguration must not leave an earlier ALLOW installed.
 	activePolicy.Store(nil)
 	var cfg struct {
-		TestOnly bool     `json:"test_only"`
-		Decision Decision `json:"decision"`
+		TestOnly            bool     `json:"test_only"`
+		Decision            Decision `json:"decision"`
+		CacheNoStore        bool     `json:"cache_no_store"`
+		TestDecisionDelayMS int      `json:"test_decision_delay_ms"`
 	}
 	data, err := json.Marshal(config)
 	if err != nil {
@@ -65,7 +89,17 @@ func configure(config any) error {
 	if cfg.Decision != Unavailable && !cfg.TestOnly {
 		return errors.New("epochguard: deterministic decisions require test_only=true")
 	}
-	activePolicy.Store(&policy{source: fixedDecision(cfg.Decision)})
+	if (cfg.CacheNoStore || cfg.TestDecisionDelayMS != 0) && !cfg.TestOnly {
+		return errors.New("epochguard: cache qualification requires test_only=true")
+	}
+	if cfg.TestDecisionDelayMS < 0 || cfg.TestDecisionDelayMS > 2000 {
+		return errors.New("epochguard: test decision delay must be between 0 and 2000ms")
+	}
+	var source DecisionSource = fixedDecision(cfg.Decision)
+	if cfg.TestDecisionDelayMS != 0 {
+		source = delayedDecision{decision: fixedDecision(cfg.Decision), delay: time.Duration(cfg.TestDecisionDelayMS) * time.Millisecond}
+	}
+	activePolicy.Store(&policy{source: source, cacheNoStore: cfg.CacheNoStore})
 	log.Printf("epochguard event=init task=002b test_only=%t decision=%s", cfg.TestOnly, cfg.Decision)
 	return nil
 }

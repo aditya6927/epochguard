@@ -1,0 +1,74 @@
+{
+  "client": {
+    "enable_logging": false,
+    "enforce_auth_on_inference": false
+  },
+  "config_store": {
+    "enabled": true,
+    "type": "sqlite",
+    "config": {
+      "path": "/app/cache/config.db"
+    }
+  },
+  "logs_store": {
+    "enabled": false
+  },
+  "providers": {
+    "fixture": {
+      "custom_provider_config": {
+        "base_provider_type": "openai"
+      },
+      "network_config": {
+        "base_url": "http://provider:9000",
+        "allow_private_network": true,
+        "max_retries": 0,
+        "default_request_timeout_in_seconds": 10
+      },
+      "keys": [
+        {
+          "name": "local-fixture",
+          "value": "not-a-real-secret",
+          "models": [
+            "epochguard-test",
+            "epochguard-fallback"
+          ],
+          "weight": 1
+        }
+      ]
+    }
+  },
+  "plugins": [
+    {
+      "name": "epochguard",
+      "enabled": true,
+      "path": "/app/plugins/epochguard.so",
+      "placement": "post_builtin",
+      "order": 0,
+      "config": {
+        "test_only": true,
+        "decision": "REJECT",
+        "cache_no_store": false
+      }
+    },
+    {
+      "name": "semantic_cache",
+      "enabled": true,
+      "config": {
+        "dimension": 1,
+        "ttl": "30m",
+        "vector_store_namespace": "EpochGuard002C",
+        "cache_by_model": true,
+        "cache_by_provider": true
+      }
+    }
+  ],
+  "vector_store": {
+    "enabled": true,
+    "type": "redis",
+    "config": {
+      "addr": "store-proxy:6380",
+      "read_timeout": "12s",
+      "context_timeout": "15s"
+    }
+  }
+}

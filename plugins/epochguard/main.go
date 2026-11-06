@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/maximhq/bifrost/core/schemas"
+	"github.com/maximhq/bifrost/plugins/semanticcache"
 )
 
 const hookSequenceKey schemas.BifrostContextKey = "epochguard.002a.hooks"
@@ -16,8 +17,9 @@ const hookSequenceKey schemas.BifrostContextKey = "epochguard.002a.hooks"
 // HTTP hooks and core hooks can receive parent/child contexts. Sharing a
 // request-owned pointer makes phases recorded in the child visible to HTTP post.
 type hookTrace struct {
-	mu     sync.Mutex
-	phases []string
+	mu          sync.Mutex
+	phases      []string
+	cacheAtPost string
 }
 
 func GetName() string { return "epochguard" }
@@ -63,6 +65,11 @@ func PreRequestHook(ctx *schemas.BifrostContext, _ *schemas.BifrostRequest) erro
 
 func PreLLMHook(ctx *schemas.BifrostContext, req *schemas.BifrostRequest) (*schemas.BifrostRequest, *schemas.LLMPluginShortCircuit, error) {
 	record(ctx, "pre_llm")
+	if policy := activePolicy.Load(); policy != nil && policy.cacheNoStore {
+		// Set the actual public key before cache lookup/post-processing. The
+		// transport has already parsed client headers; false cannot override us.
+		ctx.SetValue(semanticcache.CacheNoStoreKey, true)
+	}
 	if req == nil || req.RequestType != schemas.ChatCompletionRequest || req.ChatRequest == nil {
 		return req, &schemas.LLMPluginShortCircuit{Error: refusal(400, "epochguard_unsupported_request", "EpochGuard supports buffered chat completions only.")}, nil
 	}
@@ -71,6 +78,20 @@ func PreLLMHook(ctx *schemas.BifrostContext, req *schemas.BifrostRequest) (*sche
 
 func PostLLMHook(ctx *schemas.BifrostContext, resp *schemas.BifrostResponse, bifrostErr *schemas.BifrostError) (*schemas.BifrostResponse, *schemas.BifrostError, error) {
 	record(ctx, "post_llm")
+	cacheState := "none"
+	if resp != nil && resp.GetExtraFields() != nil && resp.GetExtraFields().CacheDebug != nil {
+		cacheState = "miss"
+		if resp.GetExtraFields().CacheDebug.CacheHit {
+			cacheState = "hit"
+		}
+	}
+	trace, _ := ctx.Value(hookSequenceKey).(*hookTrace)
+	if trace != nil {
+		trace.mu.Lock()
+		trace.cacheAtPost = cacheState
+		trace.mu.Unlock()
+	}
+	log.Printf("epochguard cache_at_post=%s request_id=%v", cacheState, ctx.Value(schemas.BifrostContextKeyRequestID))
 	var source DecisionSource
 	if policy := activePolicy.Load(); policy != nil {
 		source = policy.source
@@ -95,6 +116,9 @@ func HTTPTransportPostHook(ctx *schemas.BifrostContext, _ *schemas.HTTPRequest, 
 	}
 	trace.mu.Lock()
 	resp.Headers["X-EpochGuard-Hooks"] = strings.Join(trace.phases, ",")
+	if trace.cacheAtPost != "" {
+		resp.Headers["X-EpochGuard-Cache-At-Post"] = trace.cacheAtPost
+	}
 	trace.mu.Unlock()
 	resp.Headers["X-EpochGuard-Plugin"] = GetName()
 	return nil
