@@ -93,8 +93,8 @@ func newHTTPDecisionSource(config HTTPVerificationConfig) (*httpDecisionSource, 
 	if config.TimeoutMS == 0 {
 		config.TimeoutMS = 6000
 	}
-	if config.TimeoutMS < 100 || config.TimeoutMS > 10000 {
-		return nil, errors.New("epochguard: verifier timeout must be 100..10000ms")
+	if config.TimeoutMS < 100 || config.TimeoutMS > 30000 {
+		return nil, errors.New("epochguard: verifier timeout must be 100..30000ms")
 	}
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	transport.Proxy = nil

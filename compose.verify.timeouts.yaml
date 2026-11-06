@@ -1,0 +1,15 @@
+# Deterministic offline qualification of the opt-in live timeout hierarchy.
+# The real verifier/gateway wait beyond the provider's 10s network timeout.
+name: epochguard-003a-timeouts
+services:
+  verifier-supported:
+    environment:
+      EPOCHGUARD_TIMEOUT_PROFILE: live
+      EPOCHGUARD_TEST_TAVILY_ENDPOINT: http://evidence-fixture:9002/slow-supported/extract
+  gateway-supported:
+    volumes: ["./dev/bifrost/verification/timeouts.json:/app/verify/config.json:ro"]
+  verification-tests:
+    command: ["/app/verification.test", "-test.v", "-test.run=^TestLongVerificationDeadlineProfile$", "-test.timeout=60s"]
+    environment:
+      EPOCHGUARD_TIMEOUT_QUALIFICATION: "1"
+      EPOCHGUARD_GATEWAY_CLIENT_TIMEOUT_MS: "30000"

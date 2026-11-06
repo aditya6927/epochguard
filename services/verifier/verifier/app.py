@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from .contract import VerificationRequest, VerificationResponse
 from .policy import verify
 from .retrieval import TavilyRetriever
+from .settings import TimeoutSettings
 
 
 class RequestBound:
@@ -44,7 +45,8 @@ class RequestBound:
         return await self.app(scope, replay, send)
 
 
-def create_app(retriever=None) -> FastAPI:
+def create_app(retriever=None, *, timeouts: TimeoutSettings | None = None) -> FastAPI:
+    budgets = timeouts if timeouts is not None else TimeoutSettings.from_environment()
     app = FastAPI(title="EpochGuard 003A narrow verifier")
     app.add_middleware(RequestBound)
 
@@ -56,8 +58,8 @@ def create_app(retriever=None) -> FastAPI:
     async def check(request: VerificationRequest):
         try:
             # No retries; the Go caller also imposes its own total deadline.
-            async with asyncio.timeout(4.5):
-                source = retriever if retriever is not None else TavilyRetriever.from_environment()
+            async with asyncio.timeout(budgets.verification_seconds):
+                source = retriever if retriever is not None else TavilyRetriever.from_environment(timeouts=budgets)
                 return await verify(request, source)
         except Exception:
             return VerificationResponse(request_id=request.request_id,

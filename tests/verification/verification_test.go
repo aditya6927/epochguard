@@ -12,6 +12,7 @@ import (
 	"net/http/httputil"
 	"os"
 	"slices"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -22,6 +23,27 @@ const hooks = "http_pre,pre_request,pre_llm,post_llm,http_post"
 const sourceURL = "https://www.python.org/downloads/windows/"
 
 var client = &http.Client{Timeout: 12 * time.Second}
+
+func clientTimeout(value string) (time.Duration, error) {
+	if value == "" {
+		return 12 * time.Second, nil
+	}
+	ms, err := strconv.Atoi(value)
+	if err != nil || ms < 1000 || ms > 60000 {
+		return 0, fmt.Errorf("gateway client timeout must be 1000..60000ms")
+	}
+	return time.Duration(ms) * time.Millisecond, nil
+}
+
+func TestMain(m *testing.M) {
+	timeout, err := clientTimeout(os.Getenv("EPOCHGUARD_GATEWAY_CLIENT_TIMEOUT_MS"))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(2)
+	}
+	client.Timeout = timeout
+	os.Exit(m.Run())
+}
 
 type result struct {
 	response           *http.Response
@@ -51,6 +73,8 @@ func exchange(t *testing.T, name, text, role string, stream, fallbacks bool) res
 	req.Header.Set("X-EpochGuard-Decision", "ALLOW")
 	req.Header.Set("X-EpochGuard-Bypass", "true")
 	req.Header.Set("X-EpochGuard-Verified", "true")
+	req.Header.Set("X-EpochGuard-Timeout-Ms", "999999")
+	req.Header.Set("X-EpochGuard-Retrieval-Timeout-Seconds", "0.001")
 	req.Header.Set("X-Bf-Cache-No-Store", "false")
 	req.Header.Set("X-Bf-Send-Back-Raw-Response", "true")
 	started := time.Now()
@@ -71,6 +95,41 @@ func exchange(t *testing.T, name, text, role string, stream, fallbacks bool) res
 	r := result{resp, data, time.Duration(first.Load()), time.Since(started)}
 	t.Logf("gateway=%s status=%d first_byte_ms=%d total_ms=%d", name, resp.StatusCode, r.firstByte.Milliseconds(), r.elapsed.Milliseconds())
 	return r
+}
+
+func TestGatewayClientTimeoutValidation(t *testing.T) {
+	for _, value := range []string{"0", "-1", "999", "60001", "NaN", "1.5"} {
+		if _, err := clientTimeout(value); err == nil {
+			t.Fatalf("invalid client timeout accepted: %s", value)
+		}
+	}
+	if d, err := clientTimeout("30000"); err != nil || d != 30*time.Second {
+		t.Fatal("live client budget not installed")
+	}
+}
+
+func TestLongVerificationDeadlineProfile(t *testing.T) {
+	if os.Getenv("EPOCHGUARD_TIMEOUT_QUALIFICATION") != "1" {
+		t.Skip("separate deterministic long-budget suite: compose.verify.timeouts.yaml")
+	}
+	if client.Timeout != 30*time.Second {
+		t.Fatal("long profile requires the 30s integration client")
+	}
+	text := claim("3.88.7")
+	before := count(t, text)
+	evidenceBefore := retrievals(t)["slow-supported"]
+	r := exchange(t, "supported", text, "user", false, true)
+	assertAnswer(t, r, text)
+	if r.firstByte < 12*time.Second || r.elapsed >= 30*time.Second {
+		t.Fatal("candidate released early or outer budget exceeded")
+	}
+	if count(t, text)-before != 1 || retrievals(t)["slow-supported"]-evidenceBefore != 1 {
+		t.Fatal("expected one provider call and one extraction without retry/fallback")
+	}
+	if r.response.Header.Get("X-EpochGuard-Hooks") != hooks {
+		t.Fatal("long verification bypassed enforcement")
+	}
+	t.Log("provider timeout remains 10s; post-hook successfully waited beyond 12s; provider_delta=1 retrieval_delta=1")
 }
 
 func get(t *testing.T, endpoint string, target any, management bool) {

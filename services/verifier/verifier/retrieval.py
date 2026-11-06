@@ -9,6 +9,7 @@ import os
 import httpx
 
 from .contract import SOURCE_URL
+from .settings import TimeoutSettings
 
 
 class RetrievalFailure(Exception):
@@ -40,14 +41,14 @@ def unique_object(pairs):
 class TavilyRetriever:
     def __init__(self, *, client: httpx.AsyncClient | None = None,
                  endpoint: str = "https://api.tavily.com/extract",
-                 api_key: str = "", timeout: float = 4.0):
+                 api_key: str = "", timeouts: TimeoutSettings | None = None):
         self.client = client
         self.endpoint = endpoint
         self.api_key = api_key
-        self.timeout = timeout
+        self.timeouts = timeouts if timeouts is not None else TimeoutSettings()
 
     @classmethod
-    def from_environment(cls):
+    def from_environment(cls, *, timeouts: TimeoutSettings | None = None):
         endpoint = "https://api.tavily.com/extract"
         key = os.getenv("TAVILY_API_KEY", "")
         override = os.getenv("EPOCHGUARD_TEST_TAVILY_ENDPOINT")
@@ -57,17 +58,18 @@ class TavilyRetriever:
             if key != "local-fixture-only":
                 raise ValueError("test endpoints accept only the local fixture credential")
             endpoint = override
-        return cls(endpoint=endpoint, api_key=key)
+        return cls(endpoint=endpoint, api_key=key,
+                   timeouts=timeouts if timeouts is not None else TimeoutSettings.from_environment())
 
     async def retrieve(self) -> Page:
         if not self.api_key:
             raise RetrievalFailure("credential unavailable")
         try:
             # asyncio bounds the whole operation, not only individual socket reads.
-            async with asyncio.timeout(self.timeout):
+            async with asyncio.timeout(self.timeouts.retrieval_seconds):
                 if self.client is not None:
                     return await self._request(self.client)
-                async with httpx.AsyncClient(timeout=self.timeout, follow_redirects=False,
+                async with httpx.AsyncClient(timeout=self.timeouts.retrieval_seconds, follow_redirects=False,
                                              trust_env=False) as client:
                     return await self._request(client)
         except (TimeoutError, httpx.TimeoutException):
@@ -79,8 +81,9 @@ class TavilyRetriever:
         async with client.stream("POST", self.endpoint,
                                  headers={"Authorization": "Bearer " + self.api_key},
                                  json={"urls": [SOURCE_URL], "extract_depth": "basic",
-                                       "format": "text", "timeout": 3.0,
-                                       "include_images": False}) as response:
+                                       "format": "text", "timeout": self.timeouts.tavily_api_seconds,
+                                       "include_images": False},
+                                 timeout=self.timeouts.retrieval_seconds) as response:
             if response.status_code != 200:
                 raise RetrievalFailure("retrieval status")
             data = bytearray()

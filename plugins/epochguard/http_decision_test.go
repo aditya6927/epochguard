@@ -228,3 +228,24 @@ func TestVerifierConfigurationIsExclusiveAndTrusted(t *testing.T) {
 		}
 	}
 }
+
+func TestHTTPDecisionTimeoutBounds(t *testing.T) {
+	for _, ms := range []int{-1, 1, 99, 30001} {
+		if _, err := newHTTPDecisionSource(HTTPVerificationConfig{URL: "http://verifier/v1/verify", TimeoutMS: ms}); err == nil {
+			t.Fatalf("invalid timeout accepted: %d", ms)
+		}
+	}
+	for _, ms := range []int{0, 100, 6000, 25000, 30000} {
+		source, err := newHTTPDecisionSource(HTTPVerificationConfig{URL: "http://verifier/v1/verify", TimeoutMS: ms})
+		if err != nil {
+			t.Fatal(err)
+		}
+		want := ms
+		if want == 0 {
+			want = 6000
+		}
+		if source.client.Timeout != time.Duration(want)*time.Millisecond {
+			t.Fatal("configured HTTP deadline not propagated")
+		}
+	}
+}

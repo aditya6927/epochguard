@@ -47,7 +47,7 @@
       "config": {
         "verifier": {
           "url": "http://verifier-supported:8000/v1/verify",
-          "timeout_ms": 6000,
+          "timeout_ms": 25000,
           "evidence_mode": "tavily_live"
         }
       }

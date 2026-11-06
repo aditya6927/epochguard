@@ -35,10 +35,12 @@ async def malformed_verifier():
 async def extract(mode: str, request: Request):
     body = await request.json()
     expected = {"urls": [SOURCE_URL], "extract_depth": "basic", "format": "text",
-                "timeout": 3.0, "include_images": False}
+                "timeout": 19.0 if mode == "slow-supported" else 3.0, "include_images": False}
     if body != expected:
         return PlainTextResponse("unexpected retrieval request", status_code=400)
     calls[mode] += 1
+    if mode == "slow-supported":
+        await asyncio.sleep(12.2)
     if mode == "timeout":
         await asyncio.sleep(6)
     if mode == "failure":

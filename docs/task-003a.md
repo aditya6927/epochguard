@@ -1,6 +1,6 @@
 # Task 003A — first evidence-backed verification slice
 
-Implemented and exercised on 2026-11-06. This is a narrow policy implementation with offline end-to-end qualification, **not general factual verification or completed live Tavily qualification**. No live credential or explicit live opt-in was available in this session. No live factual verdict is claimed below.
+Implemented and exercised on 2026-11-06; timeout follow-up exercised on 2026-11-07. This is a narrow policy implementation with offline end-to-end qualification, **not general factual verification or completed live Tavily qualification**. The maintainer subsequently reported successful live raw extraction and a failed four-second live test; see the follow-up below. No passing live full-policy verdict is claimed here.
 
 ## Supported claim and rules
 
@@ -51,9 +51,9 @@ The current [official Tavily Extract API](https://docs.tavily.com/documentation/
 {"urls":["https://www.python.org/downloads/windows/"],"extract_depth":"basic","format":"text","timeout":3.0,"include_images":false}
 ```
 
-The candidate and prompt are never sent to Tavily. There is no user-selected URL, query, reranking, or URL traversal. Redirects and environment proxy discovery are disabled. HTTP 200 with partial failures is a failure, not evidence. Duplicate JSON keys, excess results, unexpected URLs, and malformed/oversized results fail closed. The local client bounds the whole retrieval to four seconds, including streamed reads, with a 1 MiB response and 500,000-character extracted-text limit. No retries are added.
+The candidate and prompt are never sent to Tavily. There is no user-selected URL, query, reranking, or URL traversal. Redirects and environment proxy discovery are disabled. HTTP 200 with partial failures is a failure, not evidence. Duplicate JSON keys, excess results, unexpected URLs, and malformed/oversized results fail closed. The local client bounds the whole retrieval, including streamed reads, to four seconds by default or twenty seconds in the opt-in live profile, with a 1 MiB response and 500,000-character extracted-text limit. No retries are added.
 
-FastAPI exposes `POST /v1/verify` and a process-only `/health`. An ASGI boundary limits request bodies to 8 KiB and body receipt to two seconds. The typed candidate limit is 512 characters (Go accepts at most 512 bytes, which is equivalent for this ASCII grammar). Verification work has an independent 4.5-second deadline. The Go caller has a six-second total HTTP timeout by default, configurable only to 100..10,000 ms, and propagates its supplied context cancellation through `http.NewRequestWithContext`. It accepts only HTTP 200 JSON and at most 32 KiB of verifier response, with no redirects or proxy discovery. Connection concurrency per host is bounded to 16; this is not a production admission/rate-limit design.
+FastAPI exposes `POST /v1/verify` and a process-only `/health`. An ASGI boundary limits request bodies to 8 KiB and body receipt to two seconds. The typed candidate limit is 512 characters (Go accepts at most 512 bytes, which is equivalent for this ASCII grammar). Verification work has an independent deadline: 4.5 seconds by default or 22 seconds in the live profile. The Go caller has a six-second total HTTP timeout by default, configurable only to 100..30,000 ms, and propagates its supplied context cancellation through `http.NewRequestWithContext`. The live config uses 25 seconds. It accepts only HTTP 200 JSON and at most 32 KiB of verifier response, with no redirects or proxy discovery. Connection concurrency per host is bounded to 16; this is not a production admission/rate-limit design.
 
 The service has no durable resources per request. HTTP clients are closed after retrieval; Bifrost's borrowed response is never retained beyond synchronous `Decide`. Go shares an immutable configured source/client between calls and atomically publishes policy configuration. Invalid reconfiguration clears the previous policy and keeps the plugin installed in UNAVAILABLE mode. Parent cancellation and HTTP total deadlines are separately unit-tested. A browser disconnect is not proven to propagate from Bifrost's HTTP transport through every core context; FastAPI also does not immediately cancel all work when a downstream connection closes. Independent deadlines bound abandoned retrieval work. No claim of full disconnect propagation is made.
 
@@ -166,7 +166,9 @@ Ignored `artifacts/003a/` retains build/startup/test/runtime logs, copied toolch
 
 ## Opt-in live qualification
 
-`tests/test_live.py::test_live_tavily_evidence_metadata` makes two real Extract calls: one derives a current candidate from the actual primary label, then the service retrieves independently and emits an evidence record. It never freezes a live version as a permanent expected fact. It allows a matched/older/ahead comparison if the label changes between calls, and requires real `tavily_live` metadata. Strict layout or API incompatibility fails the live test; it must be investigated rather than silently relaxed.
+`tests/test_live.py::test_live_tavily_evidence_metadata` makes two real Extract calls: one derives a current candidate from the actual primary label, then a full FastAPI request retrieves independently and emits an evidence record. The follow-up selects the validated live timeout profile and invokes the production route/retriever factory without injecting a retriever or verdict. It checks the typed response, candidate hash/request binding, claim, verdict/reason consistency, and real `tavily_live` metadata. A real outer `asyncio.timeout(30)` bounds the ASGI request; HTTPX's socket timeout alone cannot enforce that bound on an in-process ASGI transport. This test exercises the FastAPI policy and real Tavily, not the Go gateway; separate real gateway tests cover the Go enforcement path.
+
+It never freezes a live version as a permanent expected fact. It allows a matched/older/ahead comparison if the label changes between calls. Strict layout or API incompatibility fails the live test; it must be investigated rather than silently relaxed.
 
 With a real key already in the shell's `TAVILY_API_KEY` environment, explicitly run:
 
@@ -189,7 +191,7 @@ It requires `TAVILY_API_KEY`, permits outbound retrieval, uses the live evidence
 ## Remaining limits and review boundary
 
 - ALLOW means this exact candidate matched the unique extracted primary label under this explicit policy. It does not establish general truth, installability, absence of newer announcements, publication freshness, or validity of provider metadata such as IDs/token counts. Extraction content, Tavily, Python.org, TLS, and clocks are trusted only within the stated assumptions; source compromise/vendor caching/layout changes remain risks.
-- No live latency, real extraction-format compatibility, quota behavior, or live factual outcome was established here. API-contract mocks and the real local network path do not substitute for the opt-in live test.
+- The maintainer's reported raw extraction establishes a live connectivity/parser observation, not a passing full-policy verdict or production latency characterization. No new credentialed live test was run during the follow-up. API-contract mocks and the real local network path do not substitute for the opt-in live test.
 - The qualified provider remains the deterministic local OpenAI-compatible fixture. Production providers, tools, multi-choice outputs, direct SDK/alternate transports, additional plugins, safe streaming delivery, and asynchronous jobs remain unqualified. Genuine upstream error bodies retain upstream semantics; they are not successful answers or factual verdicts.
 - The verifier is stateless; there is no durable decision/evidence log, final protected cache, invalidation/revalidation worker, PostgreSQL, Redis ownership, dashboard, Tavily search/LLM verifier, or autonomous verification. The built-in cache remains disabled in 003A and the default deployment. ADR 0003 remains the proposed future cache design.
 - The original `compose.yaml` intentionally remains the 002B **test-only fixed ALLOW** example, not the new verifier deployment. Switching to the narrow source is explicit in the separate 003A config.
@@ -197,3 +199,81 @@ It requires `TAVILY_API_KEY`, permits outbound retrieval, uses the live evidence
 - The race detector covers plugin unit execution, not an instrumented full gateway. Unit cancellation proves the source respects its supplied context; transport disconnect propagation, load saturation, and production performance are not qualified.
 
 Stop after Task 003A for review. Recommended commit, **not created**: `feat(verification): enforce narrow Python release evidence verdicts`.
+
+## 2026-11-07 follow-up: configurable live timeouts
+
+The maintainer reported that the credentialed opt-in test exceeded the original four-second retrieval deadline. Subsequent tests in the actual Docker container established working HTTPS, a successful fixed-URL extraction in **12.12 seconds**, **114,847 characters** of extracted text, and successful `primary_label()` parsing of **3.15.2**. These are maintainer-reported observations, not fresh calls executed by this follow-up. That version is not a permanent live expectation, and raw extraction success is not an ALLOW verdict. The content fits the existing size limits; those limits and the claim grammar are unchanged.
+
+### Timeout hierarchy and validation
+
+`verifier/settings.py::TimeoutSettings` is an immutable, validated process configuration, loaded when `create_app()` constructs the service. Invalid configuration prevents service startup; a Go caller cannot receive a successful verification from that service. There is no per-request timeout field or header. A shared settings instance supplies both the verification deadline and the retriever's HTTPX/API budgets.
+
+| Layer / trusted setting | Offline default | Opt-in live profile | Bounds / validation |
+| --- | --- | --- | --- |
+| Tavily Extract body `timeout` / `EPOCHGUARD_TAVILY_API_TIMEOUT_SECONDS` | 3s | 19s | Finite, 1..59s; below local retrieval |
+| Whole Tavily retrieval / `EPOCHGUARD_RETRIEVAL_TIMEOUT_SECONDS` | 4s | **20s** | Finite, >1..60s; below verification |
+| FastAPI policy work / `EPOCHGUARD_VERIFICATION_TIMEOUT_SECONDS` | 4.5s | **22s** | Finite, >1..65s; above retrieval |
+| Go source trusted `verifier.timeout_ms` | 6000ms | **25000ms** | Integer, 100..30000ms; zero/omission selects default |
+| Gateway integration client `EPOCHGUARD_GATEWAY_CLIENT_TIMEOUT_MS` | 12000ms | **30000ms** | Integer, 1000..60000ms; omission selects default |
+
+`EPOCHGUARD_TIMEOUT_PROFILE` accepts only `offline` (default) and `live`. The three numeric Python environment overrides are optional but must satisfy `Tavily API < retrieval < verification`; NaN, infinity, invalid strings, out-of-range values, and equal/reversed budgets are rejected. The documented [Tavily API timeout](https://docs.tavily.com/documentation/api-reference/endpoint/extract) is kept below the local HTTP/whole-operation deadline to leave room for receiving the result. The unchanged two-second request-body receipt bound is separate from policy work; even its worst case plus 22-second policy work fits under the live Go budget.
+
+The live Compose override sets `EPOCHGUARD_TIMEOUT_PROFILE=live`, selects `live.json` with Go 25s, and supplies the test client 30s. The live Python test explicitly selects the same service profile and a 30-second outer request bound. Offline deployments retain their original budgets and expected outcomes. Custom environment/config changes must keep outer-process budgets aligned; local validators do not discover configuration in other processes. In particular, a service setting above the Go budget will safely time out at Go rather than receive extra time. No timeout configuration is learned from client headers, prompt text, or evidence.
+
+These are phase budgets. The gateway client includes provider/queue/fallback time before the Go verification timer starts. A slow provider or external reverse proxy can consume that margin and abort earlier; this profile qualifies the fast local provider fixture, not arbitrary total latency or proxy settings. Earlier parent cancellation/deadlines are respected, never extended. No retries or caching were introduced.
+
+### Pinned Bifrost deadline inspection
+
+Inspection used actual pinned source, without modifying Bifrost core:
+
+- [HTTP server bootstrap](https://github.com/maximhq/bifrost/blob/e869c3f9adc96ea53c38694a21bb04a8e1085487/transports/bifrost-http/server/server.go): the `fasthttp.Server` initializer configures the handler/body/buffer limits and does not set `ReadTimeout`, `WriteTimeout`, or wrap inference in a short timeout handler.
+- [Transport context setup](https://github.com/maximhq/bifrost/blob/e869c3f9adc96ea53c38694a21bb04a8e1085487/transports/bifrost-http/lib/ctx.go): creates/reuses a cancellable request context, with a client-disconnect watcher; the middleware seed uses `schemas.NoDeadline`.
+- [Core context](https://github.com/maximhq/bifrost/blob/2975d142abcffc5783a60201394631b5576c748f/core/schemas/context.go): `NewBifrostContextWithCancel` adds cancellation with `NoDeadline`, and existing parent cancellation/deadlines remain effective. No new deadline is introduced by our plugin.
+- [OpenAI-compatible provider](https://github.com/maximhq/bifrost/blob/2975d142abcffc5783a60201394631b5576c748f/core/providers/openai/openai.go): the configured `default_request_timeout_in_seconds` becomes the provider client's read/write/connection-wait timeout. The buffered provider call uses `MakeRequestWithContext` and completes before returning its candidate.
+- [Provider helper](https://github.com/maximhq/bifrost/blob/2975d142abcffc5783a60201394631b5576c748f/core/providers/utils/utils.go) bounds/watches the upstream call; [core `tryRequest`](https://github.com/maximhq/bifrost/blob/2975d142abcffc5783a60201394631b5576c748f/core/bifrost.go) assigns the original request context to the channel message and calls `RunPostLLMHooks(msg.Context, ...)` after receiving the provider result. The provider network timeout is not a new ten-second deadline around post-hook verification.
+
+The fixture provider timeout stays **10 seconds**. A real gateway test waited **12.567 seconds** for successful verification, confirming no effective earlier ten-second cutoff on this qualified path. This is behavioral evidence for the inspected scope; it does not guarantee deadlines in other transports, plugins, reverse proxies, or production provider paths.
+
+### Tests and actual follow-up results
+
+Executed commands from the repository root:
+
+```sh
+.venv-003a/Scripts/python.exe -m pytest -q services/verifier/tests -c services/verifier/pytest.ini
+docker compose build --builder epochguard-002a gateway
+docker buildx build --builder epochguard-002a --load -t epochguard-verifier:003a services/verifier
+docker compose -f compose.verify.yaml up -d --force-recreate --wait provider evidence-fixture verifier-supported verifier-missing verifier-ambiguous verifier-timeout verifier-failure gateway-supported gateway-missing gateway-ambiguous gateway-timeout gateway-failure gateway-malformed
+docker compose -f compose.verify.yaml run --rm --no-deps verification-tests
+docker compose --profile test up -d --force-recreate --wait provider gateway gateway-control gateway-reject gateway-unavailable
+docker compose --profile test run --rm --no-deps smoke
+docker compose -f compose.verify.yaml down --remove-orphans
+docker compose --profile test down --remove-orphans
+docker compose -f compose.verify.yaml -f compose.verify.timeouts.yaml up -d --force-recreate --wait gateway-supported
+docker compose -f compose.verify.yaml -f compose.verify.timeouts.yaml run --rm --no-deps verification-tests
+docker compose -f compose.verify.yaml -f compose.verify.timeouts.yaml down --remove-orphans
+docker run --rm --network none epochguard-verifier:003a python -m pytest -m live -q -o cache_dir=/tmp/pytest-cache
+```
+
+| Executed check | Actual result |
+| --- | --- |
+| Host offline Python suite | Initial **41 passed in 3.20s**; final cleanup rerun **41 passed, 1 live deselected, 1 warning in 2.90s** |
+| Python image offline suite | **41 passed, 1 live deselected, 1 warning in 2.94s** |
+| Plugin unit tests in native image build | **18 top-level tests passed**, `ok ... 0.308s` |
+| Plugin race detector in native image build | `ok ... 1.257s`, exit 0, no reported races |
+| Native/plugin/test binary builds and formatting | Exit 0; pinned gateway/module layers reused unchanged |
+| Existing evidence gateway suite | **7 top-level passed, 31 subtests passed**; one explicitly separate long-profile test skipped here and run below; final PASS |
+| Existing 002B enforcement gateway suite | **10 top-level passed, 35 subtests passed**; final PASS |
+| Separate deterministic long-profile gateway suite | **1 passed in 12.58s**, first byte/total **12567/12567 ms**; provider delta 1, retrieval delta 1 |
+| Live test guard, no credentials/network/opt-in | **1 skipped, 41 deselected, 1 warning in 0.36s**; no credentialed live result |
+| Offline, long-profile, live-override and legacy Compose validation; `git diff --check` | Exit 0; live interpolation checked quietly with a temporary fake key |
+| Cleanup of all three disposable test stacks | Exit 0; no test containers left running |
+
+The original Starlette/HTTPX TestClient deprecation warning remains visible. All 26 original offline Python cases still pass. Added cases check bounds/order/nonfinite/invalid environment values, default/live profiles, startup rejection, factory propagation, Tavily body timeout, all HTTPX timeout phases, ineffective forged timeout headers, rejected request timeout fields, real service work timeout, and retrieval cancellation. Go tests check default/min/max/live budgets and invalid values, alongside existing total timeout and independent parent cancellation tests. The real four-second gateway timeout still fails closed: final follow-up measurement **4251 ms**, safe 503, exactly one provider/retrieval, no answer or fallback.
+
+`compose.verify.timeouts.yaml` is a separate **offline internal-network** experiment using synthetic fixture evidence and `test_only: true`, while selecting the same 20/22/25/30 budgets. Its fixed `slow-supported` endpoint waits 12.2 seconds before returning evidence. `TestLongVerificationDeadlineProfile` asserts no first byte before twelve seconds, one provider and one retrieval despite usable fallbacks, and the complete enforcement hook trace. The test is explicitly selected in that profile, not disabled or mistaken for a live call. The normal suite skips it because its six normal gateways intentionally retain short offline budgets.
+
+The observed long path was `http_pre,pre_request,pre_llm,post_llm,http_post`, followed by an ALLOW response. The network remained isolated, no cache was enabled, and forged client timeout headers could not shorten the server's wait or extend the normal timeout. Malformed evidence/verifier responses, unsupported claims, upstream error identity, terminal fallback refusals, and no-answer-leak checks all passed in the regressions.
+
+Local ignored `artifacts/003a-timeouts/` retains build logs, `python-final.log`, `verification.log`, `smoke.log`, `long-verification.log`, runtime traces, opt-in-guard output, and targeted pinned source files. Test deployments were removed after capture.
+
+The live test was **not run with credentials** during this follow-up: both `EPOCHGUARD_RUN_LIVE_TAVILY=1` and an environment credential were absent. The opt-in command in the preceding section now selects the longer profile automatically. A future passing run must report the full typed FastAPI policy outcome and evidence metadata; the reported raw extraction is not a substitute. Recommended follow-up commit, not created: `fix(verification): configure bounded live verification deadlines`. Stop for review.

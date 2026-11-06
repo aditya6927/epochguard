@@ -4,9 +4,13 @@ name: epochguard-003a-live
 services:
   verifier-supported:
     environment:
+      EPOCHGUARD_TIMEOUT_PROFILE: live
       EPOCHGUARD_TEST_MODE: ""
       EPOCHGUARD_TEST_TAVILY_ENDPOINT: ""
       TAVILY_API_KEY: ${TAVILY_API_KEY:?Set TAVILY_API_KEY for the opt-in live deployment}
+  verification-tests:
+    environment:
+      EPOCHGUARD_GATEWAY_CLIENT_TIMEOUT_MS: "30000"
   gateway-supported:
     volumes: ["./dev/bifrost/verification/live.json:/app/verify/config.json:ro"]
     ports: ["127.0.0.1:8081:8080"]

@@ -1,6 +1,6 @@
 # EpochGuard architecture
 
-**Status:** Task 003A implements a narrow Go → FastAPI → Tavily Extract evidence-comparison path, qualified end to end with deterministic HTTP evidence fixtures. The opt-in real Tavily test has not been run with credentials. Task 002B enforcement and Task 002C cache findings are preserved. Default and 003A deployments keep caching disabled; general verification and the protected cache remain proposed. Updated: 2026-11-06.
+**Status:** Task 003A implements a narrow Go → FastAPI → Tavily Extract evidence-comparison path, qualified end to end with deterministic HTTP evidence fixtures. A passing full-policy live Tavily test remains unqualified; the maintainer reported successful raw extraction before the timeout follow-up. Task 002B enforcement and Task 002C cache findings are preserved. Default and 003A deployments keep caching disabled; general verification and the protected cache remain proposed. Updated: 2026-11-07.
 
 ## Problem and system boundary
 
@@ -74,7 +74,7 @@ The only accepted sentence is `The latest stable Python 3 release for Windows li
 
 `services/verifier/verifier/contract.py` and `plugins/epochguard/http_decision.go` define schema `003a.v1`, policy `python-windows-latest-v1`, request/hash binding, typed claim/verdict/reasons, canonical evidence URL, content hash, retrieval ID/mode, and retrieval/observation/check times. Observation time is receipt of extracted text, not proof of origin publication time or Tavily's fetch age. The verifier and its network/configuration remain trusted; records are not signed attestations. `fixture` evidence requires explicit test configuration and is rejected in live mode.
 
-FastAPI bounds bodies, retrieval and work deadlines; Go independently bounds response size and total HTTP duration and respects the supplied cancellation context. Existing synchronous typed refusals, genuine upstream error preservation, and no-fallback behavior remain unchanged. No answer is released while the decision is pending. Actual transport disconnect propagation and production providers remain unqualified.
+FastAPI bounds bodies, retrieval and work deadlines; Go independently bounds response size and total HTTP duration and respects the supplied cancellation context. The 2026-11-07 follow-up makes service budgets validated process configuration: offline defaults remain 4/4.5/6 seconds, while the opt-in live profile uses 20/22/25 seconds and a 30-second integration client. Pinned source inspection and a real 12.567-second offline gateway test confirm that the fixture provider's ten-second network timeout does not bound post-hook work on this path. Existing synchronous typed refusals, genuine upstream error preservation, and no-fallback behavior remain unchanged. No answer is released while the decision is pending. Actual transport disconnect propagation and production providers remain unqualified.
 
 `compose.verify.yaml` runs real gateway/plugin/service instances on an internal network, using only an HTTP Tavily fixture. `compose.verify.live.yaml` explicitly enables egress and loopback gateway access with an environment key for manual live follow-up. Default `compose.yaml` remains the fixed test-only 002B example. [Task 003A](task-003a.md) records the contract, trust assumptions, experiments, actual counters, latencies, and live-test instructions. There is no new cache or persistent evidence database.
 
@@ -120,7 +120,7 @@ Task 002B exercises **ALLOW**, **REJECT**, and **UNAVAILABLE** decisions on *rea
 
 Task 002C extends that gate with isolated direct-cache lifecycle experiments and explicit unsafe controls. Its results qualify the documented experiments, not production cache safety or semantic similarity mode. The final protected cache remains outside this milestone.
 
-Task 003A adds 26 offline service tests and six real gateway acceptance groups with 31 subtests, including evidence comparisons, malformed/failed/timed-out verification, no answer leakage, upstream errors, fallback and streaming refusal. Live Tavily compatibility is explicitly pending the opt-in credentialed test. This qualifies one policy and a fixture-backed integration, not arbitrary response verification.
+Task 003A and its timeout follow-up cover 41 offline service tests, seven real gateway acceptance groups with 31 subtests, and a separate deterministic long-duration gateway test. These cover evidence comparisons, malformed/failed/timed-out verification, no answer leakage, upstream errors, fallback, streaming refusal, and timeout validation/propagation. Full-policy live Tavily qualification remains pending the opt-in credentialed test. This qualifies one policy and a fixture-backed integration, not arbitrary response verification.
 
 ## Primary references
 

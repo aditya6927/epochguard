@@ -11,6 +11,7 @@ from verifier.app import create_app
 from verifier.contract import POLICY, SCHEMA, SOURCE_URL, VerificationRequest
 from verifier.policy import claim_text, digest, verify
 from verifier.retrieval import Page, TavilyRetriever
+from verifier.settings import TimeoutSettings
 
 NOW = datetime(2026, 11, 6, 12, 0, tzinfo=timezone.utc)
 PRIMARY = (Path(__file__).parent / "fixtures" / "primary.txt").read_text()
@@ -114,7 +115,7 @@ def test_retrieval_failure_policy(mode):
             if mode == "timeout":
                 raise httpx.ReadTimeout("PRIVATE_ERROR_DO_NOT_RETURN")
             if mode == "slow":
-                await asyncio.sleep(1)
+                await asyncio.sleep(2)
             if mode == "failure":
                 return httpx.Response(503, text="PRIVATE_ERROR_DO_NOT_RETURN")
             if mode == "malformed":
@@ -125,7 +126,9 @@ def test_retrieval_failure_policy(mode):
                                              "failed_results": [] if mode != "partial" else [{"error": "PRIVATE_ERROR_DO_NOT_RETURN"}],
                                              "request_id": "offline-failure"})
         async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
-            record = await verify(request(claim_text("3.88.7")), TavilyRetriever(client=client, api_key="local-fixture-only", timeout=0.03))
+            record = await verify(request(claim_text("3.88.7")), TavilyRetriever(
+                client=client, api_key="local-fixture-only", timeouts=TimeoutSettings(
+                    tavily_api_seconds=1, retrieval_seconds=1.01, verification_seconds=1.1)))
             assert record.verdict == "INSUFFICIENT"
             assert record.reason_code == ("RETRIEVAL_TIMEOUT" if mode in ("timeout", "slow") else "RETRIEVAL_FAILURE")
             assert "PRIVATE_ERROR_DO_NOT_RETURN" not in record.model_dump_json()
