@@ -37,7 +37,7 @@ func main() {
 				Content string `json:"content"`
 			} `json:"messages"`
 		}
-		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20)).Decode(&req); err != nil || len(req.Messages) != 1 || req.Stream || req.Model != "epochguard-test" {
+		if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20)).Decode(&req); err != nil || len(req.Messages) != 1 || (req.Model != "epochguard-test" && req.Model != "epochguard-fallback") {
 			writeJSON(w, http.StatusBadRequest, map[string]any{"error": map[string]string{"message": "unexpected fixture request", "type": "invalid_request_error"}})
 			return
 		}
@@ -45,13 +45,24 @@ func main() {
 		mu.Lock()
 		calls[prompt]++
 		mu.Unlock()
-		if req.Messages[0].Role == "system" {
+		if req.Model == "epochguard-test" && req.Messages[0].Role == "system" {
 			writeJSON(w, http.StatusBadRequest, map[string]any{"error": map[string]string{"message": "fixture upstream failure", "type": "invalid_request_error"}})
+			return
+		}
+		if req.Stream {
+			// The control gateway can deliver real sentinel SSE bytes. A protected
+			// streaming request must never reach this branch (counter stays zero).
+			w.Header().Set("Content-Type", "text/event-stream")
+			chunk, _ := json.Marshal(map[string]any{
+				"id": "chatcmpl-epochguard-fixture", "object": "chat.completion.chunk", "created": 1, "model": req.Model,
+				"choices": []any{map[string]any{"index": 0, "delta": map[string]string{"role": "assistant", "content": "fixture: " + prompt}, "finish_reason": nil}},
+			})
+			_, _ = w.Write(append(append([]byte("data: "), chunk...), []byte("\n\ndata: [DONE]\n\n")...))
 			return
 		}
 		writeJSON(w, http.StatusOK, map[string]any{
 			"id": "chatcmpl-epochguard-fixture", "object": "chat.completion", "created": 1,
-			"model": "epochguard-test",
+			"model": req.Model,
 			"choices": []any{map[string]any{
 				"index": 0, "message": map[string]string{"role": "assistant", "content": "fixture: " + prompt}, "finish_reason": "stop",
 			}},

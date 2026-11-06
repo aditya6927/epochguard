@@ -25,12 +25,33 @@ func TestHookTraceSurvivesCoreChildContext(t *testing.T) {
 	core := schemas.NewBifrostContext(transport, schemas.NoDeadline)
 	defer core.Cancel()
 	_ = PreRequestHook(core, nil)
-	_, _, _ = PreLLMHook(core, &schemas.BifrostRequest{})
+	_, _, _ = PreLLMHook(core, &schemas.BifrostRequest{RequestType: schemas.ChatCompletionRequest, ChatRequest: &schemas.BifrostChatRequest{}})
 	_, _, _ = PostLLMHook(core, &schemas.BifrostResponse{}, nil)
 	resp := &schemas.HTTPResponse{}
 	_ = HTTPTransportPostHook(transport, nil, resp)
 	if got := resp.Headers["X-EpochGuard-Hooks"]; got != "http_pre,pre_request,pre_llm,post_llm,http_post" {
 		t.Fatalf("core child phases did not reach transport parent: %q", got)
+	}
+}
+
+func TestPreLLMGuard(t *testing.T) {
+	for _, kind := range []schemas.RequestType{schemas.ChatCompletionRequest, schemas.ChatCompletionStreamRequest, schemas.ResponsesRequest} {
+		t.Run(string(kind), func(t *testing.T) {
+			ctx := schemas.NewBifrostContext(context.Background(), schemas.NoDeadline)
+			defer ctx.Cancel()
+			req := &schemas.BifrostRequest{RequestType: kind, ChatRequest: &schemas.BifrostChatRequest{}}
+			got, stop, err := PreLLMHook(ctx, req)
+			if got != req || err != nil {
+				t.Fatal("request identity or ordinary hook error changed")
+			}
+			if kind == schemas.ChatCompletionRequest {
+				if stop != nil {
+					t.Fatal("buffered chat refused")
+				}
+			} else if stop == nil || stop.Error == nil || stop.Error.AllowFallbacks == nil || *stop.Error.AllowFallbacks {
+				t.Fatal("unsupported request did not get terminal typed refusal")
+			}
+		})
 	}
 }
 

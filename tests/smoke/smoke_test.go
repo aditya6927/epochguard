@@ -49,7 +49,11 @@ func getJSON(t *testing.T, url string, target any) {
 }
 
 func TestLoadedPlugin(t *testing.T) {
-	gateway := endpoint(t, "EPOCHGUARD_GATEWAY_URL")
+	assertLoadedPlugin(t, endpoint(t, "EPOCHGUARD_GATEWAY_URL"))
+}
+
+func assertLoadedPlugin(t *testing.T, gateway string) {
+	t.Helper()
 	var loaded struct {
 		Plugins []string `json:"plugins"`
 	}

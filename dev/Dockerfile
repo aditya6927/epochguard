@@ -26,6 +26,7 @@ COPY plugins/epochguard/ /src/epochguard/plugins/epochguard/
 WORKDIR /src/epochguard/plugins/epochguard
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
     test -z "$(gofmt -l .)" && go test -mod=readonly -trimpath -v ./... \
+    && go test -race -p=2 -mod=readonly -trimpath ./... \
     && go build -mod=readonly -trimpath -buildmode=plugin -o /out/epochguard.so .
 
 COPY go.mod /src/epochguard/go.mod
@@ -48,7 +49,8 @@ RUN --mount=type=cache,target=/go/pkg/mod mkdir -p /out/build-info \
 FROM golang:1.27.3-alpine3.24@sha256:f2c872bcee949b7be9c490efd02b48a8a2fbf947cdf533f1c58525ec9d8170fd AS runtime
 RUN apk add --no-cache libgcc ca-certificates \
     && addgroup -g 10001 epochguard && adduser -D -u 10001 -G epochguard epochguard \
-    && mkdir -p /app/data /app/control && chown epochguard:epochguard /app/data /app/control
+    && mkdir -p /app/data /app/control /app/reject /app/unavailable \
+    && chown epochguard:epochguard /app/data /app/control /app/reject /app/unavailable
 COPY --from=build /out/bifrost-http /app/bifrost-http
 COPY --from=build /out/epochguard.so /app/plugins/epochguard.so
 COPY --from=build /out/provider-fixture /app/provider-fixture
@@ -56,6 +58,8 @@ COPY --from=build /out/smoke.test /app/smoke.test
 COPY --from=build /out/build-info /app/build-info
 COPY dev/bifrost/config.json /app/data/config.json
 COPY dev/bifrost/config.no-plugin.json /app/control/config.json
+COPY dev/bifrost/config.reject.json /app/reject/config.json
+COPY dev/bifrost/config.unavailable.json /app/unavailable/config.json
 USER 10001:10001
 WORKDIR /app
 CMD ["/app/bifrost-http", "-app-dir", "/app/data", "-host", "0.0.0.0", "-port", "8080"]

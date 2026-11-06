@@ -39,11 +39,17 @@ services:
       EPOCHGUARD_GATEWAY_URL: http://gateway:8080
       EPOCHGUARD_PROVIDER_URL: http://provider:9000
       EPOCHGUARD_CONTROL_URL: http://gateway-control:8080
+      EPOCHGUARD_REJECT_URL: http://gateway-reject:8080
+      EPOCHGUARD_UNAVAILABLE_URL: http://gateway-unavailable:8080
       EPOCHGUARD_SETUP_TOKEN: epochguard-local-dev-only
     depends_on:
       gateway:
         condition: service_healthy
       gateway-control:
+        condition: service_healthy
+      gateway-reject:
+        condition: service_healthy
+      gateway-unavailable:
         condition: service_healthy
   gateway-control:
     <<: *image
@@ -51,6 +57,36 @@ services:
       BIFROST_SETUP_TOKEN: epochguard-local-dev-only
     profiles: ["test"]
     command: ["/app/bifrost-http", "-app-dir", "/app/control", "-host", "0.0.0.0", "-port", "8080"]
+    depends_on:
+      provider:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+      start_period: 10s
+  gateway-reject:
+    <<: *image
+    environment:
+      BIFROST_SETUP_TOKEN: epochguard-local-dev-only
+    profiles: ["test"]
+    command: ["/app/bifrost-http", "-app-dir", "/app/reject", "-host", "0.0.0.0", "-port", "8080"]
+    depends_on:
+      provider:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 60
+      start_period: 10s
+  gateway-unavailable:
+    <<: *image
+    environment:
+      BIFROST_SETUP_TOKEN: epochguard-local-dev-only
+    profiles: ["test"]
+    command: ["/app/bifrost-http", "-app-dir", "/app/unavailable", "-host", "0.0.0.0", "-port", "8080"]
     depends_on:
       provider:
         condition: service_healthy

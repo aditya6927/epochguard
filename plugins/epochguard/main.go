@@ -1,5 +1,5 @@
 // Package main exports the functions resolved by Bifrost's native plugin loader.
-// Task 002A observes hook execution; it makes no verification decisions.
+// Task 002B enforces deterministic test decisions on buffered chat responses.
 package main
 
 import (
@@ -22,13 +22,18 @@ type hookTrace struct {
 
 func GetName() string { return "epochguard" }
 
-func Init(_ any) error {
-	log.Print("epochguard event=init task=002a")
+func Init(config any) error {
+	if err := configure(config); err != nil {
+		// Returning an Init error would make the loader omit this plugin.
+		// Keep hooks installed with no source: successful candidates fail closed.
+		log.Printf("epochguard event=config_invalid decision=UNAVAILABLE error=%v", err)
+	}
 	return nil
 }
 
 func Cleanup() error {
-	log.Print("epochguard event=cleanup task=002a")
+	activePolicy.Store(nil)
+	log.Print("epochguard event=cleanup task=002b")
 	return nil
 }
 
@@ -46,9 +51,9 @@ func record(ctx *schemas.BifrostContext, phase string) {
 	log.Printf("epochguard hook=%s request_id=%v", phase, ctx.Value(schemas.BifrostContextKeyRequestID))
 }
 
-func HTTPTransportPreHook(ctx *schemas.BifrostContext, _ *schemas.HTTPRequest) (*schemas.HTTPResponse, error) {
+func HTTPTransportPreHook(ctx *schemas.BifrostContext, req *schemas.HTTPRequest) (*schemas.HTTPResponse, error) {
 	record(ctx, "http_pre")
-	return nil, nil
+	return guardHTTP(req), nil
 }
 
 func PreRequestHook(ctx *schemas.BifrostContext, _ *schemas.BifrostRequest) error {
@@ -58,12 +63,19 @@ func PreRequestHook(ctx *schemas.BifrostContext, _ *schemas.BifrostRequest) erro
 
 func PreLLMHook(ctx *schemas.BifrostContext, req *schemas.BifrostRequest) (*schemas.BifrostRequest, *schemas.LLMPluginShortCircuit, error) {
 	record(ctx, "pre_llm")
+	if req == nil || req.RequestType != schemas.ChatCompletionRequest || req.ChatRequest == nil {
+		return req, &schemas.LLMPluginShortCircuit{Error: refusal(400, "epochguard_unsupported_request", "EpochGuard supports buffered chat completions only.")}, nil
+	}
 	return req, nil, nil
 }
 
 func PostLLMHook(ctx *schemas.BifrostContext, resp *schemas.BifrostResponse, bifrostErr *schemas.BifrostError) (*schemas.BifrostResponse, *schemas.BifrostError, error) {
 	record(ctx, "post_llm")
-	return resp, bifrostErr, nil
+	var source DecisionSource
+	if policy := activePolicy.Load(); policy != nil {
+		source = policy.source
+	}
+	return enforce(ctx, resp, bifrostErr, source)
 }
 
 // These headers prove execution on this response; they do not certify freshness.

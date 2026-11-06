@@ -4,6 +4,8 @@ Investigation date: 2026-11-06 (Asia/Calcutta). Scope: official `maximhq/bifrost
 
 Runtime follow-up: [Task 002A](task-002a.md) subsequently built and loaded a minimal native plugin on this pin and exercised real provider requests. It also records configuration requirements and corrections discovered at runtime. The investigation and smoke-test design below remain broader than the integration qualified in Task 002A.
 
+Enforcement follow-up: [Task 002B](task-002b.md) re-inspected the exact core v1.14.1 source and pinned transport, then qualified synchronous typed post-hook refusals, explicit fallback suppression, provider-error preservation, and pre-dispatch streaming rejection against the real gateway. Cache and safe streaming delivery investigations below remain unimplemented.
+
 ## Decision
 
 **Proceed with a native Go plugin on a dynamically linked OSS Bifrost build, initially restricted to buffered, non-streaming chat completions. No core source changes are required. Do not describe this as a drop-in plugin for the default Linux distribution:** both the release executable build and the official Dockerfile use static linking, which prevents native plugin loading. The documented `DYNAMIC=1` build is the supported starting point. [Build guide][dynamic-doc], [Makefile][make], [release builder][release-build], [Dockerfile][docker].

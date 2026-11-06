@@ -14,10 +14,10 @@
         "max_retries": 0,
         "default_request_timeout_in_seconds": 10
       },
-      "keys": [{"name": "local-fixture", "value": "not-a-real-secret", "models": ["epochguard-test"], "weight": 1}]
+      "keys": [{"name": "local-fixture", "value": "not-a-real-secret", "models": ["epochguard-test", "epochguard-fallback"], "weight": 1}]
     }
   },
   "plugins": [
-    {"name": "epochguard", "enabled": true, "path": "/app/plugins/epochguard.so", "placement": "pre_builtin", "order": 0, "config": {}}
+    {"name": "epochguard", "enabled": true, "path": "/app/plugins/epochguard.so", "placement": "pre_builtin", "order": 0, "config": {"test_only": true, "decision": "ALLOW"}}
   ]
 }

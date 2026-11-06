@@ -4,8 +4,8 @@ This repository is both a hackathon project and a long-term engineering portfoli
 
 ## Current status
 
-- **Qualified so far (Task 002A):** a dynamically linked Bifrost HTTP v2.4.0 gateway loads the external Go plugin and runs its hooks for buffered `/openai/v1/chat/completions` requests sent to the local provider fixture.
-- **Not yet implemented:** freshness verification, Tavily integration, response refusal, a protected response cache, cache invalidation, safe streaming, production authentication, and an external readiness gate.
+- **Current milestone (Task 002B):** the dynamically linked Bifrost HTTP v2.4.0 gateway loads the native plugin and enforces configured test-only ALLOW / REJECT / UNAVAILABLE decisions for buffered `/openai/v1/chat/completions` responses. Terminal typed refusals discard the answer and prohibit fallback; unsupported streaming is rejected before dispatch. See `docs/task-002b.md` for executed qualification evidence and its limits.
+- **Not yet implemented:** freshness verification, Tavily integration, a protected response cache, cache invalidation, safe streaming delivery, production authentication, and an external readiness gate.
 - The diagnostic `X-EpochGuard-*` headers are **not** evidence of response freshness or a security authorization mechanism.
 
 ## Constraints and invariants
@@ -37,12 +37,12 @@ This repository is both a hackathon project and a long-term engineering portfoli
 # Docker Desktop / Linux; from repository root
 # Use --builder epochguard-002a if the default builder cannot resolve GitHub.
 docker compose build gateway
-docker compose --profile test up -d --force-recreate --wait provider gateway gateway-control
+docker compose --profile test up -d --force-recreate --wait provider gateway gateway-control gateway-reject gateway-unavailable
 docker compose --profile test run --rm --no-deps smoke
 docker compose --profile test down --remove-orphans
 ```
 
-Go plugin unit tests run inside `dev/Dockerfile` during the image build. Running `go test -race` against the plugin is a follow-up check, not a completed 002A qualification. Do not substitute a mocked plugin loader for the real gateway smoke test.
+Go plugin unit tests and `go test -race` run inside `dev/Dockerfile` during the image build. The race detector covers unit execution, not the real gateway process. Do not substitute a mocked plugin loader for the real gateway smoke test.
 
 ## Source layout and ownership
 
