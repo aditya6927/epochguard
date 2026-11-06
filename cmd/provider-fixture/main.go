@@ -4,6 +4,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"log"
 	"net/http"
 	"sync"
@@ -11,6 +12,11 @@ import (
 )
 
 func main() {
+	answerMode := flag.String("answer-mode", "echo", "local fixture output: echo or claim")
+	flag.Parse()
+	if *answerMode != "echo" && *answerMode != "claim" {
+		log.Fatal("unsupported fixture answer mode")
+	}
 	var mu sync.Mutex
 	calls := make(map[string]int)
 	mux := http.NewServeMux()
@@ -60,11 +66,17 @@ func main() {
 			_, _ = w.Write(append(append([]byte("data: "), chunk...), []byte("\n\ndata: [DONE]\n\n")...))
 			return
 		}
+		answer := "fixture: " + prompt
+		if *answerMode == "claim" {
+			// Trusted process configuration for 003A: emit the supplied test
+			// candidate verbatim. The real verifier, not this fixture, decides.
+			answer = prompt
+		}
 		writeJSON(w, http.StatusOK, map[string]any{
 			"id": "chatcmpl-epochguard-fixture", "object": "chat.completion", "created": 1,
 			"model": req.Model,
 			"choices": []any{map[string]any{
-				"index": 0, "message": map[string]string{"role": "assistant", "content": "fixture: " + prompt}, "finish_reason": "stop",
+				"index": 0, "message": map[string]string{"role": "assistant", "content": answer}, "finish_reason": "stop",
 			}},
 			"usage": map[string]int{"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2},
 		})

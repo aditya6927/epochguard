@@ -1,0 +1,66 @@
+{
+  "client": {
+    "enable_logging": false,
+    "enforce_auth_on_inference": false
+  },
+  "config_store": {
+    "enabled": true,
+    "type": "sqlite",
+    "config": {
+      "path": "/app/verify/config.db"
+    }
+  },
+  "logs_store": {
+    "enabled": false
+  },
+  "providers": {
+    "fixture": {
+      "custom_provider_config": {
+        "base_provider_type": "openai"
+      },
+      "network_config": {
+        "base_url": "http://provider:9000",
+        "allow_private_network": true,
+        "max_retries": 0,
+        "default_request_timeout_in_seconds": 10
+      },
+      "keys": [
+        {
+          "name": "local-fixture",
+          "value": "not-a-real-secret",
+          "models": [
+            "epochguard-test",
+            "epochguard-fallback"
+          ],
+          "weight": 1
+        }
+      ]
+    }
+  },
+  "plugins": [
+    {
+      "name": "epochguard",
+      "enabled": true,
+      "path": "/app/plugins/epochguard.so",
+      "placement": "pre_builtin",
+      "order": 0,
+      "config": {
+        "verifier": {
+          "url": "http://evidence-fixture:9002/v1/verify",
+          "timeout_ms": 6000,
+          "evidence_mode": "fixture"
+        },
+        "test_only": true
+      }
+    }
+  ],
+  "framework": {
+    "pricing": {
+      "pricing_url": "file:///app/catalogs/pricing.json",
+      "model_parameters_url": "file:///app/catalogs/model-parameters.json",
+      "mcp_library_url": "file:///app/catalogs/mcp-library.json",
+      "mcp_library_sync_interval": 0,
+      "live_models_sync_interval": 0
+    }
+  }
+}

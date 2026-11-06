@@ -20,7 +20,7 @@ const (
 	Unavailable Decision = "UNAVAILABLE"
 )
 
-// DecisionSource borrows the response for this synchronous call only. A future
+// DecisionSource borrows the response for this synchronous call only. An
 // external verifier must respect ctx cancellation and must not retain pooled
 // Bifrost objects. Its errors/reasons are untrusted and never become refusal text.
 type DecisionSource interface {
@@ -66,10 +66,11 @@ func configure(config any) error {
 	// Even a failed reconfiguration must not leave an earlier ALLOW installed.
 	activePolicy.Store(nil)
 	var cfg struct {
-		TestOnly            bool     `json:"test_only"`
-		Decision            Decision `json:"decision"`
-		CacheNoStore        bool     `json:"cache_no_store"`
-		TestDecisionDelayMS int      `json:"test_decision_delay_ms"`
+		TestOnly            bool                    `json:"test_only"`
+		Decision            Decision                `json:"decision"`
+		CacheNoStore        bool                    `json:"cache_no_store"`
+		TestDecisionDelayMS int                     `json:"test_decision_delay_ms"`
+		Verifier            *HTTPVerificationConfig `json:"verifier"`
 	}
 	data, err := json.Marshal(config)
 	if err != nil {
@@ -79,6 +80,23 @@ func configure(config any) error {
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&cfg); err != nil {
 		return errors.New("epochguard: invalid decision configuration")
+	}
+	if cfg.Verifier != nil {
+		if cfg.Decision != "" || cfg.TestDecisionDelayMS != 0 || cfg.CacheNoStore {
+			return errors.New("epochguard: verifier and test decision configuration cannot be mixed")
+		}
+		if cfg.TestOnly != (cfg.Verifier.EvidenceMode == "fixture") {
+			return errors.New("epochguard: fixture evidence requires explicit test_only configuration")
+		}
+		source, err := newHTTPDecisionSource(*cfg.Verifier)
+		if err != nil {
+			return err
+		}
+		// Cache is disabled in the 003A deployment. Suppress writes as defense
+		// in depth if a trusted deployment accidentally enables the built-in.
+		activePolicy.Store(&policy{source: source, cacheNoStore: true})
+		log.Print("epochguard event=init task=003a source=http policy=python-windows-latest-v1")
+		return nil
 	}
 	if cfg.Decision == "" {
 		cfg.Decision = Unavailable

@@ -1,0 +1,134 @@
+# Offline/CI qualification: no host ports and no internet route. Only the
+# Tavily HTTP fixture is substituted; FastAPI policy, gateway and loader are real.
+name: epochguard-003a
+
+x-go-image: &go-image
+  image: epochguard-dev:002a
+  platform: linux/amd64
+
+x-python-image: &python-image
+  image: epochguard-verifier:003a
+  platform: linux/amd64
+  build:
+    context: services/verifier
+
+x-verifier: &verifier
+  <<: *python-image
+  depends_on:
+    evidence-fixture: {condition: service_healthy}
+  healthcheck:
+    test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=2)"]
+    interval: 2s
+    timeout: 3s
+    retries: 30
+
+x-offline-env: &offline-env
+  EPOCHGUARD_TEST_MODE: "1"
+  TAVILY_API_KEY: local-fixture-only
+
+x-gateway: &gateway
+  <<: *go-image
+  command: ["/app/bifrost-http", "-app-dir", "/app/verify", "-host", "0.0.0.0", "-port", "8080"]
+  environment:
+    BIFROST_SETUP_TOKEN: epochguard-local-dev-only
+  healthcheck:
+    test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+    interval: 2s
+    timeout: 2s
+    retries: 60
+    start_period: 10s
+
+services:
+  provider:
+    <<: *go-image
+    command: ["/app/provider-fixture", "-answer-mode", "claim"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9000/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  evidence-fixture:
+    <<: *python-image
+    command: ["python", "-m", "uvicorn", "tests.fixture_server:app", "--host", "0.0.0.0", "--port", "9002", "--no-access-log"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9002/health',timeout=2)"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  verifier-supported:
+    <<: *verifier
+    environment:
+      <<: *offline-env
+      EPOCHGUARD_TEST_TAVILY_ENDPOINT: http://evidence-fixture:9002/supported/extract
+  verifier-missing:
+    <<: *verifier
+    environment:
+      <<: *offline-env
+      EPOCHGUARD_TEST_TAVILY_ENDPOINT: http://evidence-fixture:9002/missing/extract
+  verifier-ambiguous:
+    <<: *verifier
+    environment:
+      <<: *offline-env
+      EPOCHGUARD_TEST_TAVILY_ENDPOINT: http://evidence-fixture:9002/ambiguous/extract
+  verifier-timeout:
+    <<: *verifier
+    environment:
+      <<: *offline-env
+      EPOCHGUARD_TEST_TAVILY_ENDPOINT: http://evidence-fixture:9002/timeout/extract
+  verifier-failure:
+    <<: *verifier
+    environment:
+      <<: *offline-env
+      EPOCHGUARD_TEST_TAVILY_ENDPOINT: http://evidence-fixture:9002/failure/extract
+  gateway-supported:
+    <<: *gateway
+    volumes: ["./dev/bifrost/verification/supported.json:/app/verify/config.json:ro"]
+    depends_on:
+      provider: {condition: service_healthy}
+      verifier-supported: {condition: service_healthy}
+  gateway-missing:
+    <<: *gateway
+    volumes: ["./dev/bifrost/verification/missing.json:/app/verify/config.json:ro"]
+    depends_on:
+      provider: {condition: service_healthy}
+      verifier-missing: {condition: service_healthy}
+  gateway-ambiguous:
+    <<: *gateway
+    volumes: ["./dev/bifrost/verification/ambiguous.json:/app/verify/config.json:ro"]
+    depends_on:
+      provider: {condition: service_healthy}
+      verifier-ambiguous: {condition: service_healthy}
+  gateway-timeout:
+    <<: *gateway
+    volumes: ["./dev/bifrost/verification/timeout.json:/app/verify/config.json:ro"]
+    depends_on:
+      provider: {condition: service_healthy}
+      verifier-timeout: {condition: service_healthy}
+  gateway-failure:
+    <<: *gateway
+    volumes: ["./dev/bifrost/verification/failure.json:/app/verify/config.json:ro"]
+    depends_on:
+      provider: {condition: service_healthy}
+      verifier-failure: {condition: service_healthy}
+  gateway-malformed:
+    <<: *gateway
+    volumes: ["./dev/bifrost/verification/malformed.json:/app/verify/config.json:ro"]
+    depends_on:
+      provider: {condition: service_healthy}
+      evidence-fixture: {condition: service_healthy}
+  verification-tests:
+    <<: *go-image
+    command: ["/app/verification.test", "-test.v", "-test.timeout=120s"]
+    environment:
+      EPOCHGUARD_SETUP_TOKEN: epochguard-local-dev-only
+    depends_on:
+      gateway-supported: {condition: service_healthy}
+      gateway-missing: {condition: service_healthy}
+      gateway-ambiguous: {condition: service_healthy}
+      gateway-timeout: {condition: service_healthy}
+      gateway-failure: {condition: service_healthy}
+      gateway-malformed: {condition: service_healthy}
+
+networks:
+  default:
+    internal: true

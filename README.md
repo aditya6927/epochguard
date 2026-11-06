@@ -1,10 +1,23 @@
 # EpochGuard
 
-Task 002B extends the working native Go plugin with synchronous response enforcement inside the real Bifrost HTTP gateway. Controlled, **test-only** ALLOW / REJECT / UNAVAILABLE decisions permit a buffered answer or replace it with a terminal refusal. No claims or freshness evidence are checked yet; the EpochGuard-owned protected cache and a dashboard are not implemented.
+Task 003A adds a Python/FastAPI verification service behind the native Go enforcement plugin. One exact claim about the latest stable Python 3 Windows release listed on Python.org is compared with fixed-URL Tavily Extract evidence. Supported, contradicted, and insufficient evidence map to ALLOW, terminal REJECT, and terminal UNAVAILABLE. This is a narrow policy, not general factual verification. Offline end-to-end tests pass; the opt-in live Tavily test has not been run with credentials. See [Task 003A](docs/task-003a.md) for the grammar, evidence contract, executed tests, and limitations.
+
+Task 002B established synchronous enforcement inside the real Bifrost HTTP gateway using controlled, **test-only** ALLOW / REJECT / UNAVAILABLE decisions. The original `compose.yaml` below retains that test setup; use the separate 003A deployment to exercise evidence comparison.
 
 Task 002C qualifies the real built-in cache lifecycle in an isolated test deployment. It reproduces unsafe write ordering, a cache-hit enforcement bypass under incorrect placement, and pending writes repopulating invalidated entries. **The default deployment still has caching disabled.** The future EpochGuard-owned verified cache is not implemented.
 
-The upstream investigation is in [docs/bifrost-integration-spike.md](docs/bifrost-integration-spike.md). Enforcement behavior is in [Task 002B](docs/task-002b.md); cache experiments, observed traces/counters, exact commands, and limitations are in [Task 002C](docs/task-002c.md). [Task 002A](docs/task-002a.md) records the original loader qualification.
+The upstream investigation is in [docs/bifrost-integration-spike.md](docs/bifrost-integration-spike.md). Enforcement behavior is in [Task 002B](docs/task-002b.md); cache experiments, observed traces/counters, exact commands, and limitations are in [Task 002C](docs/task-002c.md). [Task 002A](docs/task-002a.md) records the original loader qualification. The EpochGuard-owned protected cache and dashboard remain unimplemented.
+
+Run the 003A offline verification qualification after building the native gateway image:
+
+```sh
+docker compose build gateway
+docker compose -f compose.verify.yaml build verifier-supported
+docker compose -f compose.verify.yaml run --rm verification-tests
+docker compose -f compose.verify.yaml down --remove-orphans
+```
+
+Use `--builder epochguard-002a` on the build commands if required by this host's DNS setup. The Python image build runs 26 offline tests; the gateway acceptance suite exercises the real plugin loader, FastAPI, and a deterministic Tavily HTTP fixture on an internal network without host ports. No paid API key is needed. Synthetic release numbers in these tests are not real factual evidence. Built-in caching remains disabled. [The live test instructions](docs/task-003a.md#opt-in-live-qualification) require explicit opt-in and an environment-provided Tavily key; observation timestamps do not prove origin freshness.
 
 Requires Docker Desktop running Linux containers (or Docker Engine on Linux) and Docker Compose. No host Go installation or paid provider API key is required. Run from this repository root:
 

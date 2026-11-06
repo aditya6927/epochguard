@@ -1,5 +1,8 @@
 .git
 .env
 artifacts
+.venv-003a
+.pytest_cache
+**/__pycache__
 **/*.so
 **/*.db*

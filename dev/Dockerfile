@@ -39,7 +39,8 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     && go build -mod=readonly -trimpath -o /out/provider-fixture ./cmd/provider-fixture \
     && go build -mod=readonly -trimpath -o /out/cache-store-proxy ./cmd/cache-store-proxy \
     && go test -mod=readonly -trimpath -c -o /out/smoke.test ./tests/smoke \
-    && go test -mod=readonly -trimpath -c -o /out/cache.test ./tests/cachelifecycle
+    && go test -mod=readonly -trimpath -c -o /out/cache.test ./tests/cachelifecycle \
+    && go test -mod=readonly -trimpath -c -o /out/verification.test ./tests/verification
 RUN --mount=type=cache,target=/go/pkg/mod mkdir -p /out/build-info \
     && go version > /out/build-info/toolchain.txt \
     && go version -m /out/bifrost-http > /out/build-info/gateway.txt \
@@ -52,19 +53,21 @@ RUN --mount=type=cache,target=/go/pkg/mod mkdir -p /out/build-info \
 FROM golang:1.27.3-alpine3.24@sha256:f2c872bcee949b7be9c490efd02b48a8a2fbf947cdf533f1c58525ec9d8170fd AS runtime
 RUN apk add --no-cache libgcc ca-certificates \
     && addgroup -g 10001 epochguard && adduser -D -u 10001 -G epochguard epochguard \
-    && mkdir -p /app/data /app/control /app/reject /app/unavailable /app/cache \
-    && chown epochguard:epochguard /app/data /app/control /app/reject /app/unavailable /app/cache
+    && mkdir -p /app/data /app/control /app/reject /app/unavailable /app/cache /app/verify \
+    && chown epochguard:epochguard /app/data /app/control /app/reject /app/unavailable /app/cache /app/verify
 COPY --from=build /out/bifrost-http /app/bifrost-http
 COPY --from=build /out/epochguard.so /app/plugins/epochguard.so
 COPY --from=build /out/provider-fixture /app/provider-fixture
 COPY --from=build /out/cache-store-proxy /app/cache-store-proxy
 COPY --from=build /out/cache.test /app/cache.test
+COPY --from=build /out/verification.test /app/verification.test
 COPY --from=build /out/smoke.test /app/smoke.test
 COPY --from=build /out/build-info /app/build-info
 COPY dev/bifrost/config.json /app/data/config.json
 COPY dev/bifrost/config.no-plugin.json /app/control/config.json
 COPY dev/bifrost/config.reject.json /app/reject/config.json
 COPY dev/bifrost/config.unavailable.json /app/unavailable/config.json
+COPY dev/bifrost/catalogs/ /app/catalogs/
 USER 10001:10001
 WORKDIR /app
 CMD ["/app/bifrost-http", "-app-dir", "/app/data", "-host", "0.0.0.0", "-port", "8080"]

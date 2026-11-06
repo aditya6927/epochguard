@@ -4,8 +4,8 @@ This repository is both a hackathon project and a long-term engineering portfoli
 
 ## Current status
 
-- **Current milestone (Task 002C):** Task 002B typed enforcement is preserved. Isolated real built-in direct-cache experiments qualify misses/hits, placement, cached-candidate refusal, server no-store, physical invalidation APIs, and pending-write repopulation. Incorrect placement and unrestricted cache writes are demonstrated unsafe controls. See `docs/task-002c.md`; the default deployment keeps caching disabled.
-- **Not yet implemented:** freshness verification, Tavily integration, an EpochGuard-owned protected cache, logically atomic revocation, safe streaming delivery, production authentication, and an external readiness gate.
+- **Current milestone (Task 003A):** a bounded Go HTTP DecisionSource calls a Python/FastAPI verifier implementing one exact Python.org Windows latest-release label comparison through Tavily Extract. Offline real gateway/service tests pass; live Tavily remains opt-in and has not been qualified with credentials. See `docs/task-003a.md`. Task 002B typed enforcement and the separate 002C cache experiments are preserved. Default and 003A deployments keep caching disabled; the default Compose example still uses fixed test decisions.
+- **Not yet implemented:** general factual/freshness verification, origin freshness attestation, an EpochGuard-owned protected cache, logically atomic revocation, safe streaming delivery, production authentication, and an external readiness gate.
 - The diagnostic `X-EpochGuard-*` headers are **not** evidence of response freshness or a security authorization mechanism.
 
 ## Constraints and invariants
@@ -54,11 +54,23 @@ docker compose -f compose.cache.yaml down --volumes --remove-orphans
 
 It contains explicitly unsafe ordering/write controls and a test-only Redis transport gate. Consult `docs/task-002c.md` and ADR 0003 before changing cache behavior. No client header or prompt may select a decision, enable server writes, or shorten a server-enforced decision delay.
 
+The isolated 003A verification suite uses no host ports or live API credentials:
+
+```sh
+docker compose -f compose.verify.yaml build verifier-supported
+docker compose -f compose.verify.yaml run --rm verification-tests
+docker compose -f compose.verify.yaml down --remove-orphans
+```
+
+Build the native gateway image first. The Python image runs offline tests during build. Only an explicitly selected live test/deployment may use `TAVILY_API_KEY`; never print resolved live Compose configuration. A fixture evidence record must not be accepted as live evidence or described as a real factual observation.
+
 ## Source layout and ownership
 
 - `plugins/epochguard/`: Go native plugin and its unit tests.
+- `services/verifier/`: narrow typed evidence policy, bounded Tavily client, FastAPI service, and offline/opt-in live tests.
 - `cmd/provider-fixture/`: controlled upstream provider test double.
 - `tests/smoke/`: gateway end-to-end acceptance tests.
+- `tests/verification/`, `compose.verify.yaml`: real gateway/service qualification with deterministic evidence fixtures.
 - `tests/cachelifecycle/`, `cmd/cache-store-proxy/`: isolated real cache qualification and deterministic Redis write scheduling.
 - `dev/`, `compose.yaml`: pinned gateway build and development deployment.
 - `docs/`: upstream findings, executed test evidence, design decisions, and later product specifications.

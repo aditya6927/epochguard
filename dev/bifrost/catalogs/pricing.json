@@ -1,0 +1,4 @@
+{
+  "epochguard-test": {"provider": "fixture", "mode": "chat", "input_cost_per_token": 0, "output_cost_per_token": 0},
+  "epochguard-fallback": {"provider": "fixture", "mode": "chat", "input_cost_per_token": 0, "output_cost_per_token": 0}
+}

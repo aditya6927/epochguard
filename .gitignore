@@ -1,5 +1,8 @@
 .env
 artifacts/
+.venv-003a/
+__pycache__/
+.pytest_cache/
 *.so
 *.db
 *.db-shm

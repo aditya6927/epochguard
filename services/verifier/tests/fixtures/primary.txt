@@ -1,0 +1,6 @@
+Python Releases for Windows
+Latest Python 3 Release - Python 3.88.7
+Stable Releases
+Python 3.88.7 - synthetic offline fixture
+Pre-releases
+Python 3.89.0a1 - synthetic offline fixture

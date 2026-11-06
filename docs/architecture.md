@@ -1,10 +1,10 @@
 # EpochGuard architecture
 
-**Status:** Task 002C qualifies the built-in direct-cache lifecycle in an isolated deployment, preserving Task 002B enforcement. Unsafe admission/order/race controls are reproduced; the default deployment keeps caching disabled. Live freshness verification and the protected cache remain *proposed*, not implemented. Updated: 2026-11-06.
+**Status:** Task 003A implements a narrow Go → FastAPI → Tavily Extract evidence-comparison path, qualified end to end with deterministic HTTP evidence fixtures. The opt-in real Tavily test has not been run with credentials. Task 002B enforcement and Task 002C cache findings are preserved. Default and 003A deployments keep caching disabled; general verification and the protected cache remain proposed. Updated: 2026-11-06.
 
 ## Problem and system boundary
 
-EpochGuard is intended to verify time-sensitive claims in AI-generated responses, track supporting evidence, and prevent known-stale responses from being returned or reused. The qualified engineering boundary is more limited: a native Go plugin enforces deterministic test decisions in Bifrost's gateway lifecycle for one buffered inference route.
+EpochGuard is intended to verify time-sensitive claims in AI-generated responses, track supporting evidence, and prevent known-stale responses from being returned or reused. The qualified engineering boundary is more limited: a native Go plugin enforces decisions on one buffered inference route. Its new HTTP source checks one exact Python Windows release-label claim through a narrow evidence policy; the network path is qualified with fixtures, not a live factual result.
 
 ### As implemented in Task 002B
 
@@ -32,7 +32,7 @@ Client sees allowed fixture response OR safe error
 
 `plugins/epochguard/main.go` exports the native hooks and keeps phase names in a request-owned `hookTrace`. A pointer created at the HTTP phase is visible in the child core context. A `sync.Mutex` protects the trace's slice. Request/response wrappers are borrowed and never retained beyond hook execution.
 
-`decision.go` defines `DecisionSource.Decide(context.Context, *schemas.BifrostResponse) (Decision, error)` and the enforcement policy. A fixed, test-only source ignores client input and provider content. Immutable process configuration is published through an atomic pointer; absent configuration defaults to UNAVAILABLE. ALLOW/REJECT configuration requires `test_only: true`. This switch acknowledges a fixture, not a production verification policy. A future external service can implement the interface; the gateway will still own the refusal decision. Source errors never become client-visible refusal text.
+`decision.go` defines `DecisionSource.Decide(context.Context, *schemas.BifrostResponse) (Decision, error)` and the enforcement policy. A fixed, test-only source ignores client input and provider content. Immutable process configuration is published through an atomic pointer; absent configuration defaults to UNAVAILABLE. Fixed ALLOW/REJECT configuration requires `test_only: true`. This switch acknowledges a fixture, not a production verification policy. Task 003A adds an HTTP implementation; the gateway still owns refusal. Source errors never become client-visible refusal text.
 
 On a successful candidate, the post-hook waits synchronously. REJECT, UNAVAILABLE, evaluation errors, unknown decisions, missing candidates, and cancelled evaluation never return the answer. Refusals use `BifrostError` with a fixed message and `AllowFallbacks: &false`, and return nil for the ordinary Go hook error. Genuine provider errors are preserved by pointer and skip evaluation, including their original fallback policy. Every successful fallback candidate is evaluated. No HTTP post-hook error or header is used to enforce this policy.
 
@@ -53,9 +53,30 @@ Observed order, with unrelated built-ins omitted:
 
 The cache serializes and launches its own writer before early EpochGuard evaluates the candidate. Experiments observed physical storage while a REJECT decision was pending. Moving EpochGuard late prevents writing rejected misses but lets cached answers bypass its LLM hooks. These are isolated unsafe controls, not approved protected configurations.
 
-The optional trusted `cache_no_store` flag sets the exported `semanticcache.CacheNoStoreKey` in EpochGuard's pre-hook, after transport parses headers. It suppresses all built-in writes, including allowed ones, while preserving reads. The tests prove a client false value cannot undo it and that cached candidates still receive safe early refusals. `test_decision_delay_ms` is a bounded, cancellation-aware test fixture; no external verification service exists. `X-EpochGuard-Cache-At-Post` snapshots cache telemetry for diagnostics only.
+The optional trusted `cache_no_store` flag sets the exported `semanticcache.CacheNoStoreKey` in EpochGuard's pre-hook, after transport parses headers. It suppresses all built-in writes, including allowed ones, while preserving reads. The tests prove a client false value cannot undo it and that cached candidates still receive safe early refusals. `test_decision_delay_ms` remains a bounded, cancellation-aware test fixture for 002C. Task 003A's HTTP source always sets server no-store as defense in depth and keeps caching disabled. `X-EpochGuard-Cache-At-Post` snapshots cache telemetry for diagnostics only.
 
 Both supported management deletion APIs removed settled entries, with scope and provider-counter controls. Both also allowed a held, older asynchronous writer to repopulate an absent entry after successful invalidation. Physical deletion and TTL do not establish logical revocation or factual freshness. [Task 002C](task-002c.md) records exact source, traces, counters, commands, and limitations; [ADR 0003](decisions/0003-protected-cache-ownership.md) proposes ownership of verified admission and generation-aware revocation for the future cache.
+
+### Task 003A narrow evidence path
+
+```text
+Buffered provider candidate inside Bifrost
+  -> Go exact whole-answer parser / request nonce / SHA-256
+  -> bounded, context-aware HTTP call to trusted FastAPI /v1/verify
+  -> fixed-URL Tavily Extract (candidate is not sent to Tavily)
+  -> unique Python.org Windows latest-stable label comparison
+  -> typed verdict + evidence reference + observation times + reason
+  -> Go validates binding, mode, timestamps and verdict consistency
+  -> original response OR nil response + terminal typed refusal
+```
+
+The only accepted sentence is `The latest stable Python 3 release for Windows listed on Python.org is X.Y.Z.` Equal numeric versions map to SUPPORTED/ALLOW, older candidates to CONTRADICTED/REJECT, and newer candidates to INSUFFICIENT/UNAVAILABLE because the source extraction may lag. Unsupported/additional claims, ambiguous/missing evidence, timeout, malformed records, and network/verifier failures are unavailable. No LLM interprets retrieved instructions. Only one complete plain assistant choice is covered.
+
+`services/verifier/verifier/contract.py` and `plugins/epochguard/http_decision.go` define schema `003a.v1`, policy `python-windows-latest-v1`, request/hash binding, typed claim/verdict/reasons, canonical evidence URL, content hash, retrieval ID/mode, and retrieval/observation/check times. Observation time is receipt of extracted text, not proof of origin publication time or Tavily's fetch age. The verifier and its network/configuration remain trusted; records are not signed attestations. `fixture` evidence requires explicit test configuration and is rejected in live mode.
+
+FastAPI bounds bodies, retrieval and work deadlines; Go independently bounds response size and total HTTP duration and respects the supplied cancellation context. Existing synchronous typed refusals, genuine upstream error preservation, and no-fallback behavior remain unchanged. No answer is released while the decision is pending. Actual transport disconnect propagation and production providers remain unqualified.
+
+`compose.verify.yaml` runs real gateway/plugin/service instances on an internal network, using only an HTTP Tavily fixture. `compose.verify.live.yaml` explicitly enables egress and loopback gateway access with an environment key for manual live follow-up. Default `compose.yaml` remains the fixed test-only 002B example. [Task 003A](task-003a.md) records the contract, trust assumptions, experiments, actual counters, latencies, and live-test instructions. There is no new cache or persistent evidence database.
 
 ### Supported and unsupported surface
 
@@ -89,15 +110,17 @@ Client -> Bifrost + EpochGuard enforcement -> verified response / safe refusal
                   Periodic revalidation / invalidation
 ```
 
-Task 002B establishes waiting, typed refusals, and no-leak behavior using deterministic fixtures. A future verification service may suggest actions; the trusted gateway policy chooses and enforces them. Verification may be unavailable; that is an explicit policy outcome, **not** a successful verdict.
+Task 002B establishes waiting, typed refusals, and no-leak behavior using deterministic fixtures. Task 003A implements the first narrow service policy above; the diagram's broader extraction, classification, durable evidence, and revalidation components remain proposed. The trusted gateway policy chooses and enforces actions. Verification may be unavailable; that is an explicit policy outcome, **not** a successful verdict.
 
 Future caching must bind a response to trusted request scope, policy version, evidence IDs/versions, and expiry. A stale physical cache entry must not become returnable after a concurrent write or invalidation race. Task 002C reproduced both the built-in cache's enforcement-order hazards and late-write repopulation; unrestricted built-in writes remain unsuitable for the protected deployment. A future EpochGuard-owned cache needs explicit admission and read/release validity checks plus atomic generation/version comparison, not deletion alone.
 
 ## Current acceptance boundary
 
-Task 002B exercises **ALLOW**, **REJECT**, and **UNAVAILABLE** decisions on *real* Bifrost provider responses. Its gate requires zero rejected fixture sentinel bytes in the client-visible HTTP response, no undesired fallback, and negative controls. Executed results, request-flow details, and limitations are recorded in [task-002b.md](task-002b.md). This milestone does not introduce claim extraction, Tavily, or a verified cache.
+Task 002B exercises **ALLOW**, **REJECT**, and **UNAVAILABLE** decisions on *real* Bifrost provider responses. Its gate requires zero rejected fixture sentinel bytes in the client-visible HTTP response, no undesired fallback, and negative controls. Executed results, request-flow details, and limitations are recorded in [task-002b.md](task-002b.md); 003A reruns that gate unchanged.
 
 Task 002C extends that gate with isolated direct-cache lifecycle experiments and explicit unsafe controls. Its results qualify the documented experiments, not production cache safety or semantic similarity mode. The final protected cache remains outside this milestone.
+
+Task 003A adds 26 offline service tests and six real gateway acceptance groups with 31 subtests, including evidence comparisons, malformed/failed/timed-out verification, no answer leakage, upstream errors, fallback and streaming refusal. Live Tavily compatibility is explicitly pending the opt-in credentialed test. This qualifies one policy and a fixture-backed integration, not arbitrary response verification.
 
 ## Primary references
 
@@ -105,5 +128,6 @@ Task 002C extends that gate with isolated direct-cache lifecycle experiments and
 - `docs/task-002a.md` — executed build and smoke-test evidence.
 - `docs/task-002b.md` — synchronous enforcement design and executed qualification evidence.
 - `docs/task-002c.md` — real direct-cache lifecycle and race evidence.
+- `docs/task-003a.md` — narrow evidence policy, typed service contract, executed offline integration and live-test boundary.
 - `docs/decisions/0003-protected-cache-ownership.md` — proposed verified admission/revocation design.
 - `docs/decisions/0001-native-bifrost-plugin.md` — rationale and alternatives.

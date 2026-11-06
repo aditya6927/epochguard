@@ -1,5 +1,5 @@
 // Package main exports the functions resolved by Bifrost's native plugin loader.
-// Task 002B enforces deterministic test decisions on buffered chat responses.
+// Buffered chat enforcement supports test decisions and the narrow 003A verifier.
 package main
 
 import (
