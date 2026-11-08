@@ -1,0 +1,67 @@
+# Offline route audit. Unsafe no-EpochGuard controls remain on an internal
+# network; the observer is a test-only plugin and no host port is published.
+name: epochguard-003c
+x-image: &image
+  image: epochguard-dev:002a
+  platform: linux/amd64
+x-gateway: &gateway
+  <<: *image
+  command: ["/app/bifrost-http", "-app-dir", "/app/route-audit", "-host", "0.0.0.0", "-port", "8080"]
+  environment:
+    BIFROST_SETUP_TOKEN: epochguard-local-dev-only
+  depends_on:
+    provider: {condition: service_healthy}
+    redis: {condition: service_healthy}
+  healthcheck:
+    test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+    interval: 2s
+    timeout: 2s
+    retries: 60
+services:
+  provider:
+    <<: *image
+    command: ["/app/route-provider-fixture"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9000/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  redis:
+    image: redis/redis-stack-server:7.4.0-v8@sha256:798ab84d9f266936b034ab11c4d04a2b8e4b441884c5aa7d17ac951eefdf742a
+    platform: linux/amd64
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  reject:
+    <<: *gateway
+    volumes: ["./dev/bifrost/routes/reject.json:/app/route-audit/config.json:ro"]
+  control:
+    <<: *gateway
+    volumes: ["./dev/bifrost/routes/control.json:/app/route-audit/config.json:ro"]
+  warp-control:
+    <<: *gateway
+    volumes: ["./dev/bifrost/routes/warp-control.json:/app/route-audit/config.json:ro"]
+  warp-reject:
+    <<: *gateway
+    depends_on:
+      warp-control: {condition: service_healthy}
+    volumes: ["./dev/bifrost/routes/warp-reject.json:/app/route-audit/config.json:ro"]
+  nolog:
+    <<: *gateway
+    depends_on:
+      warp-control: {condition: service_healthy}
+    volumes: ["./dev/bifrost/routes/nolog.json:/app/route-audit/config.json:ro"]
+  route-tests:
+    <<: *image
+    command: ["/app/routes.test", "-test.v", "-test.timeout=180s"]
+    depends_on:
+      reject: {condition: service_healthy}
+      control: {condition: service_healthy}
+      warp-reject: {condition: service_healthy}
+      warp-control: {condition: service_healthy}
+      nolog: {condition: service_healthy}
+networks:
+  default:
+    internal: true

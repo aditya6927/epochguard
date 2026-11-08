@@ -239,6 +239,7 @@ Remove-Variable tavilyKey
 ## Supported surface and limitations
 
 - The qualified inference route is buffered `POST /openai/v1/chat/completions`. Streaming and asynchronous requests are refused before provider dispatch; safe streaming delivery is not implemented. Other inference routes, direct SDK calls, and alternate transports are not qualified.
+- The [HTTP route audit](docs/task-003c.md) tests all eight registered passthrough prefixes and raw path variants against the pinned gateway. Tested passthrough, Responses, realtime/live and relay requests are refused before dispatch. Management routes bypass the HTTP transport hook: configured Warp chat is stopped by the core request-type guard, but wraps that refusal in HTTP 200 JSON/SSE. Warp background jobs can explicitly skip plugins and remain outside this qualification. Keep management/configuration trusted; the plugin is not an all-route ingress firewall.
 - Evidence verification requires one complete plain assistant choice with finish reason `stop`. Tools, reasoning extensions, multimodal content, multiple choices, partial completions, and additional claims are unsupported.
 - Timeouts, cancellation, invalid contracts, and insufficient evidence fail closed while the plugin is active. Refusals discard the provider answer and disallow model fallback. Genuine upstream errors are preserved rather than treated as successful candidates.
 - A missing or failed-to-load plugin can leave Bifrost healthy and serving. Tests detect this condition; an external ready-to-serve gate is not implemented. `/health` and diagnostic headers do not establish protection.
@@ -282,5 +283,6 @@ Development history and executed evidence:
 - [Real cache ordering, invalidation, and race experiments](docs/task-002c.md)
 - [Narrow evidence policy, live-test status, and timeout follow-up](docs/task-003a.md)
 - [Live gateway qualification and observed limits](docs/task-003b.md)
+- [HTTP routes, raw paths, and management enforcement boundaries](docs/task-003c.md)
 
 The reports retain exact commands, results, limitations, and historical scope. Current implementation status is summarized above; detailed milestone reports remain in `docs/`.

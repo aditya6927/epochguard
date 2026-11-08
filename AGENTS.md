@@ -7,6 +7,7 @@ This repository is both a hackathon project and a long-term engineering portfoli
 - **Current qualification (Task 003B):** narrow live Bifrost → Go → FastAPI → Tavily qualification is complete on the maintainer-supplied November 8, 2026 rerun: full `TestLiveGatewayQualification` passed in 18.16s with all five subtests. Supported delivery, older terminal 403 without answer leakage, unsupported refusal, upstream errors, streaming refusal, and plugin placement/cache absence were checked. Earlier blocked 401 attempts are preserved; their exact credential-mismatch cause is not proven. See `docs/task-003b.md`. This covers one explicit policy with the local provider fixture, not general verification or production readiness; live retrieval counts remain unavailable. Default and verification deployments keep caching disabled; the default Compose example still uses fixed test decisions.
 - **Not yet implemented:** general factual/freshness verification, origin freshness attestation, an EpochGuard-owned protected cache, logically atomic revocation, safe streaming delivery, production authentication, and an external readiness gate.
 - The diagnostic `X-EpochGuard-*` headers are **not** evidence of response freshness or a security authorization mechanism.
+- **Route boundary audit (Task 003C):** real gateway tests cover registered passthrough prefixes, raw/encoded targets, alternate inference entry points and configured Warp chat. No provider-answer bypass was reproduced on those paths. API routes skip HTTP transport hooks; Warp chat is refused by the core request-type guard but returns HTTP 200 with an error body/event. Router redirects and prerequisite failures are not EpochGuard enforcement. Warp background work explicitly skips plugins and remains unqualified. See `docs/task-003c.md`; do not describe the plugin as an all-route firewall.
 
 ## Constraints and invariants
 
@@ -66,6 +67,8 @@ Build the native gateway image first. The Python image runs offline tests during
 
 For the opt-in live gateway suite, start only `gateway-supported` with `compose.verify.yaml` plus `compose.verify.live.yaml`, then run `verification-tests` with `-e EPOCHGUARD_RUN_LIVE_TAVILY=1 --no-deps`. This runner gets no Tavily key and dynamically derives its candidate version from a direct verifier observation. Expect up to three extraction calls on a successful run; do not retry failed live assertions to manufacture a pass. See `docs/task-003b.md` for exact commands and retrieval-observability limits.
 
+The offline route audit uses `docker compose -f compose.routes.yaml up -d --wait reject control warp-control warp-reject nolog`, then `docker compose -f compose.routes.yaml run --rm --no-deps route-tests`. Build the native gateway image first. Stop it with `docker compose -f compose.routes.yaml down --volumes --remove-orphans`. No host ports or live keys are used. Its no-EpochGuard controls, native observer and Warp Redis vector backend are test-only; this does not enable the semantic response cache or qualify background jobs.
+
 ## Source layout and ownership
 
 - `plugins/epochguard/`: Go native plugin and its unit tests.
@@ -74,6 +77,7 @@ For the opt-in live gateway suite, start only `gateway-supported` with `compose.
 - `tests/smoke/`: gateway end-to-end acceptance tests.
 - `tests/verification/`, `compose.verify.yaml`: real gateway/service qualification with deterministic evidence fixtures.
 - `tests/cachelifecycle/`, `cmd/cache-store-proxy/`: isolated real cache qualification and deterministic Redis write scheduling.
+- `tests/routesurface/`, `tests/routeobserver/`, `cmd/route-provider-fixture/`, `compose.routes.yaml`: isolated raw HTTP route qualification, native hook observation and synthetic provider controls.
 - `dev/`, `compose.yaml`: pinned gateway build and development deployment.
 - `docs/`: upstream findings, executed test evidence, design decisions, and later product specifications.
 

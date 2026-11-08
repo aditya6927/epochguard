@@ -41,6 +41,10 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     && go test -mod=readonly -trimpath -c -o /out/smoke.test ./tests/smoke \
     && go test -mod=readonly -trimpath -c -o /out/cache.test ./tests/cachelifecycle \
     && go test -mod=readonly -trimpath -c -o /out/verification.test ./tests/verification
+RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
+    go -C /src/epochguard/plugins/epochguard build -mod=readonly -trimpath -tags routeaudit -buildmode=plugin -o /out/routeobserver.so /src/epochguard/tests/routeobserver/main.go \
+    && go build -mod=readonly -trimpath -o /out/route-provider-fixture ./cmd/route-provider-fixture \
+    && go test -mod=readonly -trimpath -c -o /out/routes.test ./tests/routesurface
 RUN --mount=type=cache,target=/go/pkg/mod mkdir -p /out/build-info \
     && go version > /out/build-info/toolchain.txt \
     && go version -m /out/bifrost-http > /out/build-info/gateway.txt \
@@ -53,14 +57,17 @@ RUN --mount=type=cache,target=/go/pkg/mod mkdir -p /out/build-info \
 FROM golang:1.27.3-alpine3.24@sha256:f2c872bcee949b7be9c490efd02b48a8a2fbf947cdf533f1c58525ec9d8170fd AS runtime
 RUN apk add --no-cache libgcc ca-certificates \
     && addgroup -g 10001 epochguard && adduser -D -u 10001 -G epochguard epochguard \
-    && mkdir -p /app/data /app/control /app/reject /app/unavailable /app/cache /app/verify \
-    && chown epochguard:epochguard /app/data /app/control /app/reject /app/unavailable /app/cache /app/verify
+    && mkdir -p /app/data /app/control /app/reject /app/unavailable /app/cache /app/verify /app/route-audit \
+    && chown epochguard:epochguard /app/data /app/control /app/reject /app/unavailable /app/cache /app/verify /app/route-audit
 COPY --from=build /out/bifrost-http /app/bifrost-http
 COPY --from=build /out/epochguard.so /app/plugins/epochguard.so
 COPY --from=build /out/provider-fixture /app/provider-fixture
 COPY --from=build /out/cache-store-proxy /app/cache-store-proxy
 COPY --from=build /out/cache.test /app/cache.test
 COPY --from=build /out/verification.test /app/verification.test
+COPY --from=build /out/routeobserver.so /app/plugins/routeobserver.so
+COPY --from=build /out/route-provider-fixture /app/route-provider-fixture
+COPY --from=build /out/routes.test /app/routes.test
 COPY --from=build /out/smoke.test /app/smoke.test
 COPY --from=build /out/build-info /app/build-info
 COPY dev/bifrost/config.json /app/data/config.json
