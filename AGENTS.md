@@ -8,6 +8,7 @@ This repository is both a hackathon project and a long-term engineering portfoli
 - **Not yet implemented:** general factual/freshness verification, origin freshness attestation, an EpochGuard-owned protected cache, logically atomic revocation, safe streaming delivery, production authentication, and an external readiness gate.
 - The diagnostic `X-EpochGuard-*` headers are **not** evidence of response freshness or a security authorization mechanism.
 - **Route boundary audit (Task 003C):** real gateway tests cover registered passthrough prefixes, raw/encoded targets, alternate inference entry points and configured Warp chat. No provider-answer bypass was reproduced on those paths. API routes skip HTTP transport hooks; Warp chat is refused by the core request-type guard but returns HTTP 200 with an error body/event. Router redirects and prerequisite failures are not EpochGuard enforcement. Warp background work explicitly skips plugins and remains unqualified. See `docs/task-003c.md`; do not describe the plugin as an all-route firewall.
+- **Experimental claim analysis (Task 004A):** `services/claim_analysis/` adds a separate strict span schema, sentence baseline, bounded opt-in Gemini adapter and evaluation CLI. Its 112 examples/184 factual annotations are agent-authored drafts, not human-reviewed gold; real-model quality remains pending. Baseline fresh-evidence recall is inadequate. This package is not imported by `/v1/verify` and never returns a release verdict. See `docs/task-004a.md` before changing its rules/splits or claiming quality.
 
 ## Constraints and invariants
 
@@ -73,6 +74,7 @@ The offline route audit uses `docker compose -f compose.routes.yaml up -d --wait
 
 - `plugins/epochguard/`: Go native plugin and its unit tests.
 - `services/verifier/`: narrow typed evidence policy, bounded Tavily client, FastAPI service, and offline/opt-in live tests.
+- `services/claim_analysis/`: experimental claim identification and evaluation only; reuses the verifier dependency lock. Set `PYTHONPATH=services/claim_analysis` and run Python `-m pytest -c services/claim_analysis/pytest.ini services/claim_analysis/tests -q`. Paid calls require explicit `EPOCHGUARD_ALLOW_MODEL_CALLS=1`, model/key/rates and a bounded request budget. Never describe fake-adapter output as model quality or pending annotations as human reviewed.
 - `cmd/provider-fixture/`: controlled upstream provider test double.
 - `tests/smoke/`: gateway end-to-end acceptance tests.
 - `tests/verification/`, `compose.verify.yaml`: real gateway/service qualification with deterministic evidence fixtures.

@@ -1,0 +1,5 @@
+Engine: baseline; split: dev; independent human review pending: 60
+Quality qualification: draft-label measurement; not human-reviewed quality
+all: responses=60; claim P/R/F1=0.972/0.981/0.976; temporal macro-F1=0.677; fresh P/R=0.966/0.824; dynamic omissions=1; dynamic nonfresh=0; failures=0
+mixed: responses=17; claim P/R/F1=1.000/0.944/0.971; temporal macro-F1=0.698; fresh P/R=1.000/0.810; dynamic omissions=1; dynamic nonfresh=0; failures=0
+adversarial: responses=2; claim P/R/F1=1.000/1.000/1.000; temporal macro-F1=0.250; fresh P/R=1.000/1.000; dynamic omissions=0; dynamic nonfresh=0; failures=0

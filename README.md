@@ -40,7 +40,8 @@ Offline verification tests substitute a deterministic HTTP fixture for Tavily. T
 | Evidence metadata | Implemented request/hash binding, source URL, content hash, retrieval identifier, observation timestamps, verdict, and reason codes; no durable evidence store |
 | Verified response cache | Proposed: evidence/policy-bound admission, trusted identity scope, read-time validity checks, and atomic generation/version checks |
 | Evidence persistence and revalidation | Proposed: retain evidence/decision state and recheck or revoke reusable answers when validity changes |
-| Broader claim handling | Proposed: additional explicit policies, claim extraction, and time-sensitivity classification |
+| Claim identification | Standalone experimental baseline/model adapter and draft evaluation set; not connected to gateway verification; human label review and real-model quality qualification pending |
+| Broader verification | Proposed: additional bounded evidence policies and response-level aggregation |
 
 Bifrost is pinned to HTTP `transports/v2.4.0`. The development build compiles a dynamically linked Linux/amd64 gateway and the external Go `.so` with the same pinned toolchain and dependency graph, without modifying Bifrost core. This is not a drop-in extension for the default statically linked Bifrost binary. See the [architecture](docs/architecture.md) and [integration investigation](docs/bifrost-integration-spike.md).
 
@@ -65,6 +66,10 @@ The version must be `3.<0..99>.<0..999>`, without leading zeros or prerelease su
 A newer candidate is unavailable because the extraction may lag a release announcement. Retrieval success alone never permits an answer. Retrieved instructions and model-generated text cannot select a decision. The candidate is sent to the internal verifier; it is not sent to Tavily.
 
 This policy compares an extracted source label. It does not prove general truth or origin freshness. Observation timestamps record receipt of the extraction, not the page's publication time or Tavily's origin-fetch time. [Verification policy and contract details](docs/task-003a.md) describe the parsing rules, trust assumptions, and failure cases.
+
+## Experimental claim identification
+
+A separate [Python analyzer and evaluation CLI](services/claim_analysis/README.md) identifies verbatim claim spans and temporal evidence requirements in ordinary responses. It includes a deterministic baseline, a bounded opt-in Gemini adapter, and 112 synthetic draft examples with 184 factual annotations. Independent human review and real-model performance qualification remain pending. The baseline's low held-out fresh-evidence recall is recorded in [the evaluation report](docs/task-004a.md). Identification is not verification and cannot authorize delivery; the gateway still accepts only the narrow policy above.
 
 ## Quick start: offline verification
 

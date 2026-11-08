@@ -96,6 +96,12 @@ The live override explicitly selects `TestLiveGatewayQualification` and requires
 
 The configured development fixture is intentionally unauthenticated on inference and bound to host loopback. It must not be deployed as a production service.
 
+## Experimental claim-identification boundary
+
+[Task 004A](task-004a.md) adds a stand-alone Python package/CLI under `services/claim_analysis/`, with schema `004a.v1`. Claims bind exact Unicode code-point spans to the original response and separate factuality, temporal scope, fresh-evidence requirement and uncertainty. A sentence/lexicon baseline and an actual opt-in Gemini HTTP adapter share strict output validation. The model receives original text, not baseline-selected claims. Neither engine produces a truth verdict or authorizes release.
+
+The 112-case/184-factual-annotation dataset is an agent-authored review draft with separate development/held-out files. Human review and real-model performance qualification remain pending; fake-adapter tests qualify plumbing only. Baseline held-out fresh-evidence recall is poor. This package is not wired into FastAPI, Go, Compose verification defaults or the cache. The existing `003a.v1` contract, single Python policy and all route/enforcement boundaries remain unchanged. Any future integration requires coverage and response-level aggregation: one verified claim cannot authorize other unsupported, omitted or uncertain claims, and STABLE/HISTORICAL classification is not proof of truth.
+
 ## Proposed product components — not yet delivered
 
 ```text
@@ -116,7 +122,7 @@ Client -> Bifrost + EpochGuard enforcement -> verified response / safe refusal
                   Periodic revalidation / invalidation
 ```
 
-Task 002B establishes waiting, typed refusals, and no-leak behavior using deterministic fixtures. Task 003A implements the first narrow service policy above; the diagram's broader extraction, classification, durable evidence, and revalidation components remain proposed. The trusted gateway policy chooses and enforces actions. Verification may be unavailable; that is an explicit policy outcome, **not** a successful verdict.
+Task 002B establishes waiting, typed refusals, and no-leak behavior using deterministic fixtures. Task 003A implements the first narrow service policy above. Task 004A prototypes identification/classification independently; their integration, broader evidence policies, durable evidence, and revalidation remain proposed. The trusted gateway policy chooses and enforces actions. Verification may be unavailable; that is an explicit policy outcome, **not** a successful verdict.
 
 Future caching must bind a response to trusted request scope, policy version, evidence IDs/versions, and expiry. A stale physical cache entry must not become returnable after a concurrent write or invalidation race. Task 002C reproduced both the built-in cache's enforcement-order hazards and late-write repopulation; unrestricted built-in writes remain unsuitable for the protected deployment. A future EpochGuard-owned cache needs explicit admission and read/release validity checks plus atomic generation/version comparison, not deletion alone.
 

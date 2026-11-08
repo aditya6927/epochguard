@@ -1,0 +1,2 @@
+# Reuse the existing locked Python environment; no new runtime dependency.
+-r ../verifier/requirements.lock

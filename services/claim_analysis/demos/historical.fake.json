@@ -1,0 +1,17 @@
+{
+  "schema_version": "004a.v1",
+  "claims": [
+    {
+      "claim_id": "c001",
+      "source_text": "In 2018 the Falcons won the cup.",
+      "start": 0,
+      "end": 32,
+      "normalized_proposition": null,
+      "factuality": "FACTUAL",
+      "temporal": "HISTORICAL",
+      "fresh_evidence": "NOT_REQUIRED",
+      "uncertainty": [],
+      "temporal_reference": null
+    }
+  ]
+}

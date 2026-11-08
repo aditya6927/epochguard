@@ -1,0 +1,17 @@
+{
+  "schema_version": "004a.v1",
+  "claims": [
+    {
+      "claim_id": "c001",
+      "source_text": "Python 3.0 is the newest Python release.",
+      "start": 0,
+      "end": 40,
+      "normalized_proposition": null,
+      "factuality": "FACTUAL",
+      "temporal": "DYNAMIC",
+      "fresh_evidence": "REQUIRED",
+      "uncertainty": [],
+      "temporal_reference": null
+    }
+  ]
+}
