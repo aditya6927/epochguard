@@ -4,7 +4,7 @@ EpochGuard explores evidence-aware verification of time-sensitive AI answers and
 
 The broader goal is to connect answers to evidence, policy, and validity over time, including when an answer is reused from a cache. The current implementation is deliberately narrow: a native Go plugin for Bifrost, a Python/FastAPI verifier, and one explicit claim policy backed by Tavily Extract. An EpochGuard-owned verified cache is proposed, not implemented.
 
-**Status:** experimental development software. Offline tests exercise the real gateway, plugin loader, and verification service with deterministic evidence fixtures. The maintainer reports a passing credentialed FastAPI + Tavily policy test. Complete live gateway qualification is **blocked by deployment retrieval/authentication failure**; supported/older gateway assertions have not passed. See the [live qualification report](docs/task-003b.md) for the partial results. General factual verification and production readiness are not established.
+**Status:** experimental development software. Offline tests exercise the real gateway, plugin loader, and verification service with deterministic evidence fixtures. The maintainer reports a successful **narrow live Bifrost → Go → FastAPI → Tavily qualification** on November 8, 2026, covering supported delivery and older-claim refusal with the local provider fixture. The [qualification report](docs/task-003b.md) preserves both the earlier blocked attempts and the successful rerun. General factual verification, production readiness, and protected caching remain unimplemented or unqualified.
 
 ## Why enforce at the gateway?
 
@@ -30,7 +30,7 @@ flowchart LR
     Gateway -->|Allowed answer or safe refusal| Client
 ```
 
-Offline verification tests substitute a deterministic HTTP fixture for Tavily. The gateway, native plugin loader, FastAPI route, evidence comparison, and refusal path remain real. FastAPI's live policy pass is reported separately from the complete Bifrost → Go → FastAPI → Tavily gateway qualification.
+Offline verification tests substitute a deterministic HTTP fixture for Tavily. The gateway, native plugin loader, FastAPI route, evidence comparison, and refusal path remain real. The maintainer-reported FastAPI policy pass and subsequent complete narrow live gateway pass are recorded separately from those fixture-based results.
 
 | Component | Current state |
 | --- | --- |
@@ -177,7 +177,7 @@ Offline Compose supplies fake fixture credentials. Live retrieval reads `TAVILY_
 
 ## Opt-in live Tavily testing
 
-The maintainer reports a passing credentialed FastAPI policy test: SUPPORTED / MATCHED_PRIMARY_LABEL with live evidence. This qualifies that policy call, not the complete gateway route. The [gateway qualification report](docs/task-003b.md) records the subsequent live attempts and their exact limits. Successful connectivity alone is not a verification verdict.
+The maintainer reports passing credentialed FastAPI policy and full narrow gateway tests. The [gateway qualification report](docs/task-003b.md) records the successful November 8 rerun after supplying a working credential and recreating the stack, while preserving the earlier 401 attempts. The exact original credential mismatch remains unproven. Qualification remains limited to the existing single policy and local provider fixture; successful connectivity alone is not a verification verdict.
 
 Build both images as in the quick start, then set `TAVILY_API_KEY` in your shell environment. For PowerShell, enter it without putting its value in command history:
 
@@ -249,11 +249,10 @@ Remove-Variable tavilyKey
 
 The documented design directions are:
 
-1. Complete and record the full live gateway qualification, retaining the separately reported FastAPI evidence and explicit failure semantics.
-2. Develop additional bounded verification policies and the proposed claim-extraction/time-sensitivity components with their own acceptance criteria.
-3. Implement evidence persistence and an EpochGuard-owned verified cache, including trusted scope, policy/evidence validity, and atomic admission/revocation checks described in ADR 0003.
-4. Add revalidation/invalidation workflows, and qualify concurrency, outages, and stale-writer races before claiming safe reuse.
-5. Add production authentication and a readiness gate; qualify additional providers and request modes before expanding the supported surface.
+1. Develop additional bounded verification policies and the proposed claim-extraction/time-sensitivity components with their own acceptance criteria.
+2. Implement evidence persistence and an EpochGuard-owned verified cache, including trusted scope, policy/evidence validity, and atomic admission/revocation checks described in ADR 0003.
+3. Add revalidation/invalidation workflows, and qualify concurrency, outages, and stale-writer races before claiming safe reuse.
+4. Add production authentication and a readiness gate; qualify additional providers and request modes before expanding the supported surface.
 
 These are plans, not delivered capabilities or a release schedule.
 

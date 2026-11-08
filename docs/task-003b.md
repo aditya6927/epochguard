@@ -2,7 +2,7 @@
 
 Date: 2026-11-08 (Asia/Calcutta). Scope: qualify the existing buffered Bifrost → EpochGuard Go plugin → FastAPI → Tavily route, without changing the claim policy, enforcement architecture, timeouts, or cache ownership.
 
-**Result: blocked live gateway qualification**, recorded at the maintainer's request. Actual live attempts verified active plugin placement/cache absence and passed unsupported-claim, upstream-error and streaming controls. The initial direct bootstrap returned no usable evidence; a separate fixed-URL diagnostic inside the verifier received Tavily HTTP 401. After verifier recreation, the bootstrap still returned INSUFFICIENT / RETRIEVAL_FAILURE. **Supported and older live gateway assertions did not run.** No complete live gateway pass is claimed. Offline regressions passed, and the reproducible opt-in runner is ready for a future credentialed attempt.
+**Result: completed narrow live gateway qualification**, based on the successful rerun supplied by the maintainer on **November 8, 2026**. Full `TestLiveGatewayQualification` passed in **18.16 seconds**, including all five subtests. Supported and older claims traversed the real Bifrost → Go → FastAPI → Tavily route, with the older answer refused without leakage or unintended fallback. The earlier blocked 401 qualification is preserved below. This qualifies the existing single policy with the local provider fixture, not general factual verification, production providers, production readiness, or a protected cache.
 
 ## Evidence supplied before this qualification
 
@@ -47,7 +47,7 @@ Requests forge ALLOW, bypass, verified, excessive timeout, sub-millisecond retri
 
 A successful run makes up to **three extraction requests**: one direct bootstrap and two gateway candidates. These are independent observations, not automatic retries. Runtime diagnostics performed while investigating a failure are separate calls and must be counted separately from a passing run.
 
-## Actual live observations so far
+## Initial blocked qualification (preserved)
 
 | Check | Observed result |
 | --- | --- |
@@ -62,11 +62,34 @@ A successful run makes up to **three extraction requests**: one direct bootstrap
 | Supported exact claim through gateway with live evidence | **Not run / blocked** by failed live discovery |
 | Older exact claim through gateway with live evidence | **Not run / blocked** by failed live discovery |
 
-The 401 was reported to the maintainer. After a verifier recreation was observed, one further qualification attempt still returned RETRIEVAL_FAILURE. The maintainer then selected **“Record blocked qualification”**; no further live calls were made. This was a run after an external state change, not an automatic retrieval retry. A credential failure must not become an ALLOW. A future attempt after correction must retain the failed evidence and report its own results separately.
+The 401 was reported to the maintainer. After a verifier recreation was observed, one further qualification attempt still returned RETRIEVAL_FAILURE. The maintainer then selected **“Record blocked qualification”**; no further live calls were made during that agent-run qualification. This was a run after an external state change, not an automatic retrieval retry. A credential failure must not become an ALLOW. These failed observations remain part of the record; the later successful maintainer rerun is recorded separately below.
+
+## Successful maintainer rerun — November 8, 2026
+
+The following results were **supplied by the maintainer** and are recorded in this documentation-only update. They were not independently rerun by the documentation agent. The maintainer independently validated a working real Tavily credential with **HTTP 200**, then recreated the live Compose stack. The gateway, verifier, provider and evidence fixture all became healthy. Actual test inspection confirmed EpochGuard active at **pre_builtin, order 0**, with the semantic cache absent.
+
+The full `TestLiveGatewayQualification` passed in **18.16 seconds**. All **five subtests passed**, with no observed bypass or fallback regression:
+
+| Stage / subtest | Maintainer-supplied result | Reported latency | Provider delta |
+| --- | --- | --- | --- |
+| Live bootstrap, `3.0.0` probe | Discovered **3.15.2**; CONTRADICTED / OLDER_THAN_PRIMARY_LABEL | **5933 ms** | Direct verifier observation; no gateway provider call |
+| Supported exact `3.15.2` claim | **HTTP 200** | **5964 ms** | **1** |
+| Older exact `3.15.1` claim | **HTTP 403**, terminal refusal with no provider answer leakage | **6136 ms** | **1** |
+| Unsupported answer | **HTTP 503** | **88 ms** | Not supplied in the rerun summary |
+| Genuine provider error | Original **HTTP 400** preserved | **10 ms** | Not supplied in the rerun summary |
+| Streaming request | Refused **HTTP 400** | **1 ms** | Not supplied in the rerun summary |
+
+The plugin/cache checks and bootstrap run in the parent test; the five subtests are unsupported answer, genuine provider error, streaming refusal, supported claim and older claim. The reported passing test retains the existing forged-header, usable-fallback, provider-counter and no-answer assertions. No application code, policy, timeout setting or test assertion was changed for this documentation update.
+
+The successful rerun followed supplying a working credential and recreating the stack. **The exact root cause of the original credential mismatch is not proven.** The earlier 401 and RETRIEVAL_FAILURE observations must not be rewritten as successes or assigned an unconfirmed configuration cause.
+
+Version **3.15.2** is the label observed in this run, not a permanently correct live answer. The runner still discovers its candidate dynamically and derives the older version; no version was hardcoded into test expectations. The supplied summary contains outcomes and timings, not retrieval IDs, content hashes or observation timestamps; those fields are not invented here. These are individual request observations, not performance benchmarks or latency guarantees.
+
+**Live retrieval counts remain unavailable.** Planned test calls, elapsed time and provider counters are not substitutes for independently measured Tavily retrieval counts. After the successful run, the maintainer reported stopping the Compose stack and clearing `TAVILY_API_KEY`. This supersedes the initial session's preserved-stack state; no credential value is recorded in the report.
 
 ## Counts and observability limits
 
-The provider fixture exposes per-candidate counters; tests use before/after deltas and do not reset shared state. Unsupported 503 and genuine 400 controls each used one provider call; streaming used none. Supported/older checks also require delta one, proving that a refusal did not advance to a usable fallback.
+The provider fixture exposes per-candidate counters; tests use before/after deltas and do not reset shared state. In the initial agent-run controls, unsupported 503 and genuine 400 each used one provider call; streaming used none. The successful maintainer rerun reports delta **1** for both supported and older candidates. The older refusal therefore did not advance to either of the two usable fallbacks requested by the test. Provider deltas for the other successful-rerun subtests were not included in the supplied summary; their assertions are covered by the reported full test pass.
 
 The production verifier does **not** expose a live retrieval-attempt counter. A live bootstrap returns a retrieval ID and evidence metadata only on usable evidence; terminal gateway refusals intentionally return no provider/evidence record. A test runner's planned call count and response latency are not an independently measured Tavily account count. No new metrics endpoint, proxy or credentialed account-usage query was added just for this task.
 
@@ -92,7 +115,7 @@ docker run --rm --network epochguard-003a-live_default -e EPOCHGUARD_RUN_LIVE_TA
 
 The setup token above is the repository's explicitly public local-development-only token, not a production secret. The test still uses the real gateway and native loader. Its supported/older assertions must execute and pass; a generic final PASS with a skipped live test is insufficient.
 
-## Offline regressions executed
+## Offline regressions from the original qualification
 
 ```sh
 docker compose build --builder epochguard-002a gateway
@@ -123,12 +146,16 @@ docker run --rm --network none epochguard-dev:002a /app/verification.test '-test
 | New live opt-in guard with network disabled and no flag/key | **1 skipped**, exit 0; no network or live qualification |
 | Offline fixture call controls | Unsupported/additional claims: provider delta 1, retrieval delta 0; genuine errors skip evaluation; supported/older/unavailable controls and usable fallback assertions passed |
 | Final Compose validation, documentation and diff checks | Live/offline/legacy configurations valid; **45 local links** and balanced code fences checked across five documents; `git diff --check` exit 0 |
-| Cleanup | Offline stacks created by this task removed; maintainer-started live stack preserved |
+| Cleanup at the initial review | Offline stacks created by this task removed; maintainer-started live stack preserved then. The maintainer subsequently stopped it after the successful rerun |
 
-Safe ignored evidence is retained under `artifacts/003b/`: native build logs, `go-unit-final.log`, offline suites, live preflight, initial flag-parsing transcript, `live-gateway-initial.log`, `live-gateway.log`, sanitized diagnostic status, and runtime traces. No credential is part of source or logs.
+Safe ignored evidence from the original agent-run qualification is retained under `artifacts/003b/`: native build logs, `go-unit-final.log`, offline suites, live preflight, initial flag-parsing transcript, `live-gateway-initial.log`, `live-gateway.log`, sanitized diagnostic status, and runtime traces. These original blocked-run logs are not replaced or presented as the successful rerun transcript. The successful rerun is recorded from the maintainer-supplied results above. No credential is part of source or logs.
+
+## Documentation-only rerun update checks
+
+For this November 8 documentation update, `git diff --check` exited 0. A local Python documentation check validated **45 relative links/anchors** and balanced code fences across README, AGENTS, architecture and the two verification reports; it also checked the supplied timings and preserved failure/limitation statements. A SHA-256 comparison of repository files before/after editing confirmed changes only to `README.md`, `AGENTS.md`, `docs/architecture.md` and this report. Application code, policy, configuration and test assertions are unchanged. No application tests, live requests or credential operations were executed for this update.
 
 ## Limits and review boundary
 
 This qualification uses the controlled local provider and the existing single exact Python.org Windows release-label policy. It does not qualify production model providers, general factual verification, publication freshness, signed evidence, arbitrary plugins/transports, safe streaming delivery, production authentication, or a protected cache. Client disconnect propagation across every transport remains unqualified; supplied-context cancellation and bounded work are covered by existing unit tests. The built-in cache remains disabled.
 
-No verification architecture or ADR change is needed for this test-only milestone. Recommended commit, not created: `test(verification): add opt-in live gateway qualification`. Stop for maintainer review with the complete live gateway objective explicitly blocked. The maintainer-started live deployment is left running and unchanged; only task-owned offline stacks and disposable runners were removed.
+Narrow live gateway qualification is complete on the maintainer-supplied evidence above; the initial blocked attempts remain visible. No verification architecture or ADR change is needed. This follow-up changes documentation only and does not rerun application/live tests or alter their assertions. Recommended documentation commit, not created: `docs: record successful narrow live gateway qualification`. Stop for maintainer review without committing.
