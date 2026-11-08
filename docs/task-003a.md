@@ -1,5 +1,7 @@
 # Task 003A — first evidence-backed verification slice
 
+Later status: the maintainer reports a passing credentialed FastAPI + Tavily policy test. [Task 003B](task-003b.md) records that evidence and the separate live gateway qualification. Results below retain their original execution scope and dates.
+
 Implemented and exercised on 2026-11-06; timeout follow-up exercised on 2026-11-07. This is a narrow policy implementation with offline end-to-end qualification, **not general factual verification or completed live Tavily qualification**. The maintainer subsequently reported successful live raw extraction and a failed four-second live test; see the follow-up below. No passing live full-policy verdict is claimed here.
 
 ## Supported claim and rules

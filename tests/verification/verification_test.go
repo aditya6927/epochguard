@@ -228,34 +228,39 @@ func assertAnswer(t *testing.T, r result, text string) {
 func TestRealPluginsActiveAndCacheDisabled(t *testing.T) {
 	for _, name := range []string{"supported", "missing", "ambiguous", "timeout", "failure", "malformed"} {
 		t.Run(name, func(t *testing.T) {
-			var loaded struct {
-				Plugins []string `json:"plugins"`
-			}
-			get(t, "http://gateway-"+name+":8080/api/plugins/loaded", &loaded, true)
-			if !slices.Contains(loaded.Plugins, "epochguard") || slices.Contains(loaded.Plugins, "semantic_cache") {
-				t.Fatalf("missing enforcement or cache enabled: %v", loaded.Plugins)
-			}
-			var v struct {
-				Plugins []struct {
-					Name      string `json:"name"`
-					Placement string `json:"placement"`
-					Order     *int   `json:"order"`
-					Status    struct {
-						Status string `json:"status"`
-					} `json:"status"`
-				} `json:"plugins"`
-			}
-			get(t, "http://gateway-"+name+":8080/api/plugins", &v, true)
-			active := false
-			for _, p := range v.Plugins {
-				if p.Name == "epochguard" {
-					active = p.Placement == "pre_builtin" && p.Order != nil && *p.Order == 0 && p.Status.Status == "active"
-				}
-			}
-			if !active {
-				t.Fatal("plugin not active at required placement")
-			}
+			requireActivePlugin(t, name)
 		})
+	}
+}
+
+func requireActivePlugin(t *testing.T, name string) {
+	t.Helper()
+	var loaded struct {
+		Plugins []string `json:"plugins"`
+	}
+	get(t, "http://gateway-"+name+":8080/api/plugins/loaded", &loaded, true)
+	if !slices.Contains(loaded.Plugins, "epochguard") || slices.Contains(loaded.Plugins, "semantic_cache") {
+		t.Fatalf("missing enforcement or cache enabled: %v", loaded.Plugins)
+	}
+	var v struct {
+		Plugins []struct {
+			Name      string `json:"name"`
+			Placement string `json:"placement"`
+			Order     *int   `json:"order"`
+			Status    struct {
+				Status string `json:"status"`
+			} `json:"status"`
+		} `json:"plugins"`
+	}
+	get(t, "http://gateway-"+name+":8080/api/plugins", &v, true)
+	active := false
+	for _, p := range v.Plugins {
+		if p.Name == "epochguard" {
+			active = p.Placement == "pre_builtin" && p.Order != nil && *p.Order == 0 && p.Status.Status == "active"
+		}
+	}
+	if !active {
+		t.Fatal("plugin not active at required placement")
 	}
 }
 

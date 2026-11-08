@@ -4,7 +4,7 @@ This repository is both a hackathon project and a long-term engineering portfoli
 
 ## Current status
 
-- **Current milestone (Task 003A):** a bounded Go HTTP DecisionSource calls a Python/FastAPI verifier implementing one exact Python.org Windows latest-release label comparison through Tavily Extract. Offline real gateway/service tests pass; live Tavily remains opt-in and has not been qualified with credentials. See `docs/task-003a.md`. Task 002B typed enforcement and the separate 002C cache experiments are preserved. Default and 003A deployments keep caching disabled; the default Compose example still uses fixed test decisions.
+- **Current qualification (Task 003B):** the maintainer reports a passing credentialed FastAPI + Tavily policy test. The opt-in real gateway runner is implemented; active plugin placement/cache absence and live unsupported/error/streaming controls passed. Complete live gateway qualification is **blocked**: deployed retrieval received Tavily 401 and a post-recreation attempt still returned RETRIEVAL_FAILURE. Supported/older live gateway assertions did not run; the maintainer requested that blocked result be recorded. See `docs/task-003b.md`. Offline enforcement and separate cache experiments are preserved. Default and verification deployments keep caching disabled; the default Compose example still uses fixed test decisions.
 - **Not yet implemented:** general factual/freshness verification, origin freshness attestation, an EpochGuard-owned protected cache, logically atomic revocation, safe streaming delivery, production authentication, and an external readiness gate.
 - The diagnostic `X-EpochGuard-*` headers are **not** evidence of response freshness or a security authorization mechanism.
 
@@ -63,6 +63,8 @@ docker compose -f compose.verify.yaml down --remove-orphans
 ```
 
 Build the native gateway image first. The Python image runs offline tests during build. Only an explicitly selected live test/deployment may use `TAVILY_API_KEY`; never print resolved live Compose configuration. A fixture evidence record must not be accepted as live evidence or described as a real factual observation.
+
+For the opt-in live gateway suite, start only `gateway-supported` with `compose.verify.yaml` plus `compose.verify.live.yaml`, then run `verification-tests` with `-e EPOCHGUARD_RUN_LIVE_TAVILY=1 --no-deps`. This runner gets no Tavily key and dynamically derives its candidate version from a direct verifier observation. Expect up to three extraction calls on a successful run; do not retry failed live assertions to manufacture a pass. See `docs/task-003b.md` for exact commands and retrieval-observability limits.
 
 ## Source layout and ownership
 

@@ -1,6 +1,6 @@
 # EpochGuard architecture
 
-**Status:** Task 003A implements a narrow Go → FastAPI → Tavily Extract evidence-comparison path, qualified end to end with deterministic HTTP evidence fixtures. A passing full-policy live Tavily test remains unqualified; the maintainer reported successful raw extraction before the timeout follow-up. Task 002B enforcement and Task 002C cache findings are preserved. Default and 003A deployments keep caching disabled; general verification and the protected cache remain proposed. Updated: 2026-11-07.
+**Status:** the maintainer reports a credentialed FastAPI + Tavily policy pass. Task 003B adds explicit live gateway qualification using the existing Bifrost → Go → FastAPI → Tavily path. Actual plugin/order/cache inspection and unsupported/error/streaming controls passed; complete live gateway qualification is **blocked** by deployed retrieval/authentication failure (Tavily 401; RETRIEVAL_FAILURE after recreation). Supported/older live gateway assertions did not run. Offline enforcement and cache findings are preserved. Default and verification deployments keep caching disabled; general verification and the protected cache remain proposed. Updated: 2026-11-08.
 
 ## Problem and system boundary
 
@@ -78,6 +78,8 @@ FastAPI bounds bodies, retrieval and work deadlines; Go independently bounds res
 
 `compose.verify.yaml` runs real gateway/plugin/service instances on an internal network, using only an HTTP Tavily fixture. `compose.verify.live.yaml` explicitly enables egress and loopback gateway access with an environment key for manual live follow-up. Default `compose.yaml` remains the fixed test-only 002B example. [Task 003A](task-003a.md) records the contract, trust assumptions, experiments, actual counters, latencies, and live-test instructions. There is no new cache or persistent evidence database.
 
+The live override now explicitly selects `TestLiveGatewayQualification` and requires a runner opt-in flag. The runner shares the existing HTTP assertions, receives no API credential, obtains a dynamic version from one direct verifier observation, and then exercises supported/older candidates through Bifrost with usable fallbacks and forged controls. No enforcement or verification architecture changes are introduced. [Task 003B](task-003b.md) distinguishes the maintainer-reported FastAPI pass, actual gateway observations, and unavailable retrieval-counter telemetry.
+
 ### Supported and unsupported surface
 
 | Qualified in 002B | Not qualified in 002B |
@@ -120,7 +122,7 @@ Task 002B exercises **ALLOW**, **REJECT**, and **UNAVAILABLE** decisions on *rea
 
 Task 002C extends that gate with isolated direct-cache lifecycle experiments and explicit unsafe controls. Its results qualify the documented experiments, not production cache safety or semantic similarity mode. The final protected cache remains outside this milestone.
 
-Task 003A and its timeout follow-up cover 41 offline service tests, seven real gateway acceptance groups with 31 subtests, and a separate deterministic long-duration gateway test. These cover evidence comparisons, malformed/failed/timed-out verification, no answer leakage, upstream errors, fallback, streaming refusal, and timeout validation/propagation. Full-policy live Tavily qualification remains pending the opt-in credentialed test. This qualifies one policy and a fixture-backed integration, not arbitrary response verification.
+Task 003A and its timeout follow-up cover 41 offline service tests and real gateway acceptance with 31 subtests, plus a separate deterministic long-duration path. Task 003B reruns that gate and adds an offline version-derivation check and opt-in live gateway test. The maintainer-reported FastAPI live pass does not substitute for complete live gateway qualification. This qualifies one policy and the explicitly recorded paths, not arbitrary response verification.
 
 ## Primary references
 
@@ -129,5 +131,6 @@ Task 003A and its timeout follow-up cover 41 offline service tests, seven real g
 - `docs/task-002b.md` — synchronous enforcement design and executed qualification evidence.
 - `docs/task-002c.md` — real direct-cache lifecycle and race evidence.
 - `docs/task-003a.md` — narrow evidence policy, typed service contract, executed offline integration and live-test boundary.
+- `docs/task-003b.md` — live gateway qualification, independent FastAPI evidence, observed failures, and reproducible opt-in runner.
 - `docs/decisions/0003-protected-cache-ownership.md` — proposed verified admission/revocation design.
 - `docs/decisions/0001-native-bifrost-plugin.md` — rationale and alternatives.

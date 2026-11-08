@@ -4,7 +4,7 @@ EpochGuard explores evidence-aware verification of time-sensitive AI answers and
 
 The broader goal is to connect answers to evidence, policy, and validity over time, including when an answer is reused from a cache. The current implementation is deliberately narrow: a native Go plugin for Bifrost, a Python/FastAPI verifier, and one explicit claim policy backed by Tavily Extract. An EpochGuard-owned verified cache is proposed, not implemented.
 
-**Status:** experimental development software. Offline tests exercise the real gateway, plugin loader, and verification service with deterministic evidence fixtures. A passing full-policy live Tavily test has not been recorded. General factual verification and production readiness are not established.
+**Status:** experimental development software. Offline tests exercise the real gateway, plugin loader, and verification service with deterministic evidence fixtures. The maintainer reports a passing credentialed FastAPI + Tavily policy test. Complete live gateway qualification is **blocked by deployment retrieval/authentication failure**; supported/older gateway assertions have not passed. See the [live qualification report](docs/task-003b.md) for the partial results. General factual verification and production readiness are not established.
 
 ## Why enforce at the gateway?
 
@@ -30,7 +30,7 @@ flowchart LR
     Gateway -->|Allowed answer or safe refusal| Client
 ```
 
-Offline verification tests substitute a deterministic HTTP fixture for Tavily. The gateway, native plugin loader, FastAPI route, evidence comparison, and refusal path remain real. The live path is implemented but still needs a passing credentialed full-policy test.
+Offline verification tests substitute a deterministic HTTP fixture for Tavily. The gateway, native plugin loader, FastAPI route, evidence comparison, and refusal path remain real. FastAPI's live policy pass is reported separately from the complete Bifrost → Go → FastAPI → Tavily gateway qualification.
 
 | Component | Current state |
 | --- | --- |
@@ -177,7 +177,7 @@ Offline Compose supplies fake fixture credentials. Live retrieval reads `TAVILY_
 
 ## Opt-in live Tavily testing
 
-A credentialed full-policy live pass remains unrecorded. The maintainer reported successful raw extraction and parsing, but the earlier full test exceeded its short deadline. The longer profile is available for follow-up; successful connectivity alone is not a verification verdict.
+The maintainer reports a passing credentialed FastAPI policy test: SUPPORTED / MATCHED_PRIMARY_LABEL with live evidence. This qualifies that policy call, not the complete gateway route. The [gateway qualification report](docs/task-003b.md) records the subsequent live attempts and their exact limits. Successful connectivity alone is not a verification verdict.
 
 Build both images as in the quick start, then set `TAVILY_API_KEY` in your shell environment. For PowerShell, enter it without putting its value in command history:
 
@@ -200,7 +200,15 @@ To try the live-configured gateway with the local candidate-provider fixture:
 docker compose -f compose.verify.yaml -f compose.verify.live.yaml up -d --wait gateway-supported
 ```
 
-Only start `gateway-supported` in this configuration. Do not run the synthetic offline acceptance suite against live evidence. The inherited evidence fixture starts as a dependency but is unused by live retrieval. The gateway is available only on `127.0.0.1:8081`; there is no production provider or inference authentication.
+Only start `gateway-supported` in this configuration. The inherited evidence fixture starts as a dependency but is unused by live retrieval. The gateway is available only on `127.0.0.1:8081`; there is no production provider or inference authentication.
+
+Explicitly run the live gateway qualification after startup:
+
+```sh
+docker compose -f compose.verify.yaml -f compose.verify.live.yaml run --rm --no-deps -e EPOCHGUARD_RUN_LIVE_TAVILY=1 verification-tests
+```
+
+The live override selects only the live gateway test. It first checks actual plugin placement and cache absence, then makes one direct verifier observation to derive a candidate version and checks supported and older claims through Bifrost. A successful run makes up to three extraction calls. The runner receives no Tavily key. Unsupported claims, upstream errors, streaming refusal, no-answer leakage, provider counts, and forged bypass/deadline headers are checked as described in the report. Live retrieval counts are not exposed; zero-retrieval controls are measured in the offline suite. Do not run synthetic offline expectations against the live verifier. A skipped test without opt-in is not live qualification.
 
 For a PowerShell request, choose a candidate version to check. The provider fixture returns this sentence verbatim so the verifier can evaluate it:
 
@@ -241,7 +249,7 @@ Remove-Variable tavilyKey
 
 The documented design directions are:
 
-1. Complete and record credentialed full-policy live qualification, retaining explicit evidence and failure semantics.
+1. Complete and record the full live gateway qualification, retaining the separately reported FastAPI evidence and explicit failure semantics.
 2. Develop additional bounded verification policies and the proposed claim-extraction/time-sensitivity components with their own acceptance criteria.
 3. Implement evidence persistence and an EpochGuard-owned verified cache, including trusted scope, policy/evidence validity, and atomic admission/revocation checks described in ADR 0003.
 4. Add revalidation/invalidation workflows, and qualify concurrency, outages, and stale-writer races before claiming safe reuse.
@@ -274,5 +282,6 @@ Development history and executed evidence:
 - [Response enforcement, fallback, and no-leak tests](docs/task-002b.md)
 - [Real cache ordering, invalidation, and race experiments](docs/task-002c.md)
 - [Narrow evidence policy, live-test status, and timeout follow-up](docs/task-003a.md)
+- [Live gateway qualification and observed limits](docs/task-003b.md)
 
 The reports retain exact commands, results, limitations, and historical scope. Current implementation status is summarized above; detailed milestone reports remain in `docs/`.
