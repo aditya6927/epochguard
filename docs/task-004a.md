@@ -300,3 +300,34 @@ $env:PYTHONPATH = 'services/claim_analysis'
 This makes at most one model call and writes a fresh `report.json`. Read `failure_details.stage`, then each error's code and sanitized path. The invocation still requires the key, `EPOCHGUARD_ALLOW_MODEL_CALLS=1`, an explicitly selected model and configured rates; existing timeout/output/cost guards apply. It does not retry a failed generation or rerun a dataset. A new generation can differ from the old one, so a new success would not identify the previous failure retrospectively. The live failure's exact category remains unknown until observed safely in a fresh failing run.
 
 Changed in this follow-up: `model.py`, `schema.py`, `gemini.py`, `schema_diagnostic.py`, new `validation_diagnostics.py` and `tests/test_validation_diagnostics.py` under `services/claim_analysis/`, package README and this report. Earlier schema-diagnostic changes and tests remain preserved. Recommended commit, not created: `feat(claims): add sanitized model validation diagnostics`. Stop for maintainer review without committing or pushing.
+
+## Evaluation report diagnostics (2026-11-09)
+
+The maintainer reported seven `INVALID_MODEL_ANALYSIS` records in a ten-case Gemini development evaluation while the baseline completed all ten without analysis failures. Those outcomes alone neither identify the rejected fields nor establish better baseline classification quality. This follow-up exposes the already-available sanitized metadata in evaluation records; no new live call was made.
+
+The implementation change is confined to `claim_analysis/cli.py`: initialize `failure_details` to null for each case, copy `failure.diagnostic.to_dict()` when catching an `AnalysisFailure` with diagnostics, and include that value in the existing record. No exception messages, Pydantic errors, candidate text, model output, credentials or provider bodies are parsed or copied into this field. The same sanitizer already used by the schema diagnostic supplies stages, allowlisted codes/paths, at most four issues, a count capped at 64, and a truncation flag.
+
+`reason`, `status`, `extraction`, usage, metrics, summaries and the `004a.evaluation.v1` report structure remain as before, with this additive per-record key. Failed model records retain `extraction: null`. Successful records and failures without metadata use `failure_details: null`. Existing validated-extraction spans and gold metric examples remain unchanged; no new raw-text logging is added. The field is informational and never changes scoring or authorizes delivery. All validation rules, prompts, schema constraints, Gemini settings, labels, gateway enforcement, `003a.v1` and caching remain unchanged. Historical reports retain their old data and implementation hashes.
+
+For example, a failure can retain `reason: INVALID_MODEL_ANALYSIS` while its details say `MODEL_JSON` / `JSON_INVALID_OR_INCOMPLETE`, `MODEL_SCHEMA` / `SCHEMA_MISSING_FIELD` at `$.claims[0].temporal`, or `SOURCE_BINDING` / `BINDING_RANGE` at `$.claims[0].end`. These examples are offline regression cases, not diagnoses of the earlier live outputs.
+
+Executed from repository root:
+
+```powershell
+$env:PYTHONPATH = 'services/claim_analysis'
+& .venv-003a/Scripts/python.exe -m pytest -c services/claim_analysis/pytest.ini services/claim_analysis/tests -q
+& .venv-003a/Scripts/python.exe -m claim_analysis evaluate --engine baseline --split dev --output artifacts/004a-evaluation-diagnostics/baseline-before.json
+# After the CLI change:
+& .venv-003a/Scripts/python.exe -m claim_analysis evaluate --engine baseline --split dev --output artifacts/004a-evaluation-diagnostics/baseline-after.json
+& .venv-003a/Scripts/python.exe -m claim_analysis evaluate --engine baseline --split dev --dataset artifacts/004a-evaluation-diagnostics/dev-three.jsonl --output artifacts/004a-evaluation-diagnostics/baseline-three.json
+```
+
+- Before changes: **116 tests passed**, 1.28s.
+- After changes: **124 tests passed**, final rerun 2.28s: all existing 116 and eight new regressions for JSON/schema/binding failures, successful analyses, absent metadata, invalid input, redaction and bounded counts. A three-case fake run also verifies that failure details never leak into a later successful record. Failure metrics still count factual omissions; successful extraction and scoring remain unchanged. Tests use fixed fake replies and block external sockets; there are no model calls.
+- The entire development baseline's pre/post non-latency metrics are exactly equal, including all subgroup results. Every existing per-case field is also equal after excluding timing and the new null field. Source-hash checks confirm no other analysis implementation, prompt, schema, setting, dataset, demo, historical report or existing test changed.
+- The documented PowerShell subset selection was executed offline: it selected exactly `eg004a-0001`, `eg004a-0007`, `eg004a-0019`, preserved their original labels/text, and all three baseline analyses completed with null failure details. This is a command/record check, not Gemini performance evidence.
+- Final checks passed: exact four-file scope, unchanged protected implementation/data/report/test hashes, 23 local documentation links/anchors, balanced code fences, changed/new whitespace and `git diff --check` exit 0.
+
+The [package README](../services/claim_analysis/README.md#evaluation-records-with-validation-diagnostics) contains exact PowerShell commands to select those three original JSONL lines, supply credentials securely, and explicitly run Gemini with `--max-requests 3`. Existing timeout/token/cost controls apply. The final command displays only IDs/status/reasons/sanitized details. Use a fresh output directory; a new generation may differ from the previously failed output, and this field cannot reconstruct a discarded old validation exception.
+
+Changed files: `services/claim_analysis/claim_analysis/cli.py`, new `services/claim_analysis/tests/test_evaluation_diagnostics.py`, `services/claim_analysis/README.md`, and this report. Logs/subset artifacts remain ignored under `artifacts/004a-evaluation-diagnostics/`. Recommended commit, not created: `fix(claims): include sanitized validation details in evaluations`. Stop for review without committing or pushing.

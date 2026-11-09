@@ -53,6 +53,7 @@ async def evaluate(args):
     for case in cases:
         start = time.perf_counter()
         result, reply, status, reason = None, None, "ANALYZED", None
+        failure_details = None
         try:
             request = AnalysisInput(text=case.text, reference_date=case.reference_date)
         except ValueError:
@@ -67,9 +68,10 @@ async def evaluate(args):
                     result, reply = await ModelExtractor(source, timeout).analyze(request)
             except AnalysisFailure as failure:
                 status, reason = "ANALYSIS_FAILED", str(failure)
+                failure_details = failure.diagnostic.to_dict() if failure.diagnostic is not None else None
             except ValueError:
                 status, reason = "ANALYSIS_FAILED", "BASELINE_LIMIT_EXCEEDED"
-        records.append(dict(case=case, extraction=result, status=status, reason=reason,
+        records.append(dict(case=case, extraction=result, status=status, reason=reason, failure_details=failure_details,
                             latency_ms=(time.perf_counter()-start)*1000,
                             input_tokens=reply.input_tokens if reply else None,
                             output_tokens=reply.output_tokens if reply else None,

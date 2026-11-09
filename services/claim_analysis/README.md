@@ -120,3 +120,39 @@ $env:PYTHONPATH = 'services/claim_analysis'
 ```
 
 This performs at most one model call and preserves the existing timeout, token and cost guards. Use a new output directory to preserve older evidence. The old generic failure cannot be diagnosed retroactively; a fresh run may generate different output. No live request was made while implementing these diagnostics.
+
+## Evaluation records with validation diagnostics
+
+`claim_analysis evaluate` also adds `failure_details` to each per-case record, using the existing `AnalysisFailure.diagnostic.to_dict()` sanitizer and taxonomy above. Public `reason` codes remain unchanged. Details are null for successful analyses, invalid inputs, baseline failures without metadata, or an `AnalysisFailure` without diagnostics. Failed model records still have `extraction: null`; scoring and existing successful extraction/gold-example fields are unchanged. The new diagnostic field includes no raw candidate/model text, credentials, provider bodies or Pydantic input values.
+
+To rerun exactly development cases `eg004a-0001`, `eg004a-0007`, `eg004a-0019`, first copy their original JSONL lines into a fresh artifact directory. This leaves the repository dataset and labels unchanged:
+
+```powershell
+$env:PYTHONPATH = 'services/claim_analysis'
+$runDirectory = Join-Path 'artifacts/004a-evaluation-diagnostics' ('three-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+New-Item -ItemType Directory -Force $runDirectory | Out-Null
+$requestedIds = @('eg004a-0001', 'eg004a-0007', 'eg004a-0019')
+$selectedRows = @(Get-Content -LiteralPath services/claim_analysis/data/v1/dev.jsonl -Encoding UTF8 | Where-Object { ($_ | ConvertFrom-Json).case_id -in $requestedIds })
+if ($selectedRows.Count -ne 3) { throw 'Expected exactly three development cases.' }
+$subsetPath = Join-Path (Get-Location) (Join-Path $runDirectory 'dev-three.jsonl')
+$reportPath = Join-Path $runDirectory 'gemini-three.json'
+[IO.File]::WriteAllLines($subsetPath, [string[]]$selectedRows, [Text.UTF8Encoding]::new($false))
+```
+
+Then explicitly authorize up to **three** model requests using the same model and current trusted rates; no automatic retries or schema/prompt changes are introduced:
+
+```powershell
+$env:GEMINI_API_KEY = [System.Net.NetworkCredential]::new('', (Read-Host 'Gemini API key' -AsSecureString)).Password
+$env:EPOCHGUARD_CLAIM_MODEL = 'gemini-3.5-flash-lite'
+$env:EPOCHGUARD_CLAIM_INPUT_USD_PER_MILLION = Read-Host 'Current input USD per million tokens for this model/tier'
+$env:EPOCHGUARD_CLAIM_OUTPUT_USD_PER_MILLION = Read-Host 'Current output USD per million tokens for this model/tier'
+$env:EPOCHGUARD_ALLOW_MODEL_CALLS = '1'
+try {
+    & .\.venv-003a\Scripts\python.exe -m claim_analysis evaluate --engine gemini --split dev --dataset "$subsetPath" --max-requests 3 --output "$reportPath"
+} finally {
+    Remove-Item Env:GEMINI_API_KEY, Env:EPOCHGUARD_ALLOW_MODEL_CALLS -ErrorAction SilentlyContinue
+}
+(Get-Content -LiteralPath $reportPath -Raw | ConvertFrom-Json).records | Select-Object case_id, status, reason, failure_details | ConvertTo-Json -Depth 8
+```
+
+Existing process-configured timeout/token/per-request and entire-run cost guards still apply, so fewer than three requests may dispatch if a budget fails. The final view selects only case IDs/status/reasons/sanitized details. A fresh generation can differ from a previous failure; historical reports cannot be backfilled from generic reason codes. No live requests were made while adding this report field.
