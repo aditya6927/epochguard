@@ -13,6 +13,7 @@ class Stage(StrEnum):
     MODEL_JSON = "MODEL_JSON"
     MODEL_SCHEMA = "MODEL_SCHEMA"
     SOURCE_BINDING = "SOURCE_BINDING"
+    ALIGNMENT = "ALIGNMENT"
     EMPTY_ANALYSIS = "EMPTY_ANALYSIS"
     CONTROL = "CONTROL"
 
@@ -51,6 +52,10 @@ class Code(StrEnum):
     BINDING_OVERLAP = "BINDING_OVERLAP"
     BINDING_RANGE = "BINDING_RANGE"
     BINDING_TEXT_MISMATCH = "BINDING_TEXT_MISMATCH"
+    ALIGNMENT_TEXT_NOT_FOUND = "ALIGNMENT_TEXT_NOT_FOUND"
+    ALIGNMENT_AMBIGUOUS = "ALIGNMENT_AMBIGUOUS"
+    ALIGNMENT_OUT_OF_ORDER = "ALIGNMENT_OUT_OF_ORDER"
+    ALIGNMENT_OVERLAP = "ALIGNMENT_OVERLAP"
     EMPTY_MODEL_ANALYSIS = "EMPTY_MODEL_ANALYSIS"
     BUDGET_EXCEEDED = "BUDGET_EXCEEDED"
     NOT_ENABLED = "NOT_ENABLED"
@@ -121,6 +126,12 @@ class BindingFailure(ValueError):
         self.code, self.location = code, tuple(location)
         message = "claims must have sequential IDs and nonoverlapping source order" if code in {Code.BINDING_ID_SEQUENCE, Code.BINDING_OVERLAP} else "claim is not the exact original substring"
         super().__init__(message)
+
+
+class AlignmentFailure(ValueError):
+    def __init__(self, code: Code, location):
+        self.code, self.location = code, tuple(location)
+        super().__init__("exact source alignment failed")
 
 
 # Custom validator types are programmer-owned constants, not exception messages.

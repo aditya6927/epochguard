@@ -1,5 +1,4 @@
 import asyncio
-import copy
 import json
 
 import httpx
@@ -9,9 +8,10 @@ from pydantic_core import PydanticCustomError
 
 from claim_analysis.gemini import GeminiProvider, ModelSettings
 from claim_analysis.model import AnalysisFailure, FakeProvider, ModelExtractor
-from claim_analysis.schema import AnalysisInput
+from claim_analysis.schema import AnalysisInput, parse_extraction
 from claim_analysis.schema_diagnostic import ProbeProvider, generation_schemas, probe
-from claim_analysis.validation_diagnostics import Code, Issue, Stage, safe_path, schema_details
+from claim_analysis.validation_diagnostics import BindingFailure, Code, Issue, Stage, safe_path, schema_details
+from wire_helpers import identification
 
 SECRET = "PRIVATE_CANDIDATE_API_KEY_PROVIDER_MESSAGE"
 
@@ -45,30 +45,34 @@ def failure(raw, source=None):
 def test_source_binding_failure_is_identified_without_source_text(change,code,path):
     value = record()
     value["claims"][0].update(change)
-    error, metadata = failure(json.dumps(value))
-    assert str(error) == "INVALID_MODEL_ANALYSIS" and error.args == ("INVALID_MODEL_ANALYSIS",)
-    assert metadata == {"stage":"SOURCE_BINDING","errors":[{"code":code,"field_path":path}],"error_count":1,"truncated":False}
+    # Canonical binding still rejects bad offsets; the model now never supplies
+    # them. Keep this canonical regression rather than accepting legacy output.
+    with pytest.raises(BindingFailure) as caught:
+        parse_extraction(json.dumps(value),request())
+    assert caught.value.code == code
+    assert safe_path(caught.value.location) == path
 
 
 def test_overlap_is_rejected_not_repaired():
     value = record()
     value["claims"].append({**value["claims"][0],"claim_id":"c002"})
-    _, metadata = failure(json.dumps(value))
-    assert metadata["errors"][0] == {"code":"BINDING_OVERLAP","field_path":"$.claims[1].start"}
+    with pytest.raises(BindingFailure) as caught:
+        parse_extraction(json.dumps(value),request())
+    assert caught.value.code == Code.BINDING_OVERLAP
 
 
 @pytest.mark.parametrize("change,code,path", [
     ({"temporal":SECRET},"SCHEMA_LITERAL_INVALID","$.claims[0].temporal"),
     ({"fresh_evidence":"NOT_REQUIRED"},"CLAIM_DYNAMIC_REQUIRES_FRESH","$.claims[0].fresh_evidence"),
-    ({"end":0},"SCHEMA_CONSTRAINT","$.claims[0].end"),
-    ({"start":True},"SCHEMA_TYPE_INVALID","$.claims[0].start"),
+    ({"source_text":""},"SCHEMA_LIMIT","$.claims[0].source_text"),
+    ({"source_text":True},"SCHEMA_TYPE_INVALID","$.claims[0].source_text"),
     ({"factuality":"UNCERTAIN"},"CLAIM_UNCERTAINTY_MISSING","$.claims[0].uncertainty"),
     ({"temporal_reference":"not a source substring"},"CLAIM_REFERENCE_MISMATCH","$.claims[0].temporal_reference"),
     ({"factuality":"NON_FACTUAL"},"CLAIM_NONFACTUAL_COMBINATION","$.claims[0]"),
     ({"temporal":"STABLE"},"CLAIM_NON_DYNAMIC_EVIDENCE","$.claims[0].fresh_evidence"),
 ])
 def test_pydantic_and_cross_field_rules_remain_strict(change,code,path):
-    value = record()
+    value = identification(record())
     value["claims"][0].update(change)
     error, metadata = failure(json.dumps(value))
     assert str(error) == "INVALID_MODEL_ANALYSIS"
@@ -77,14 +81,14 @@ def test_pydantic_and_cross_field_rules_remain_strict(change,code,path):
 
 
 def test_missing_required_field():
-    value = record()
+    value = identification(record())
     del value["claims"][0]["temporal"]
     _, metadata = failure(json.dumps(value))
     assert metadata["errors"] == [{"code":"SCHEMA_MISSING_FIELD","field_path":"$.claims[0].temporal"}]
 
 
 def test_untrusted_extra_keys_never_appear_in_paths_or_diagnostic_objects():
-    value = record()
+    value = identification(record())
     value["claims"][0][SECRET] = SECRET
     _, metadata = failure(json.dumps(value))
     assert metadata["errors"] == [{"code":"SCHEMA_EXTRA_FIELD","field_path":"$.claims[0].<unknown>"}]
@@ -104,14 +108,14 @@ def test_json_failures_are_separate_from_pydantic(raw,code):
 
 
 def test_empty_model_analysis_preserves_public_failure():
-    error, metadata = failure('{"schema_version":"004a.v1","claims":[]}')
+    error, metadata = failure('{"schema_version":"004a.identification.v1","claims":[]}')
     assert str(error) == "EMPTY_MODEL_ANALYSIS"
     assert metadata["stage"] == "EMPTY_ANALYSIS"
     assert metadata["errors"] == [{"code":"EMPTY_MODEL_ANALYSIS","field_path":"$.claims"}]
 
 
 def test_error_collection_and_numeric_locations_are_bounded():
-    value = {"schema_version":"004a.v1","claims":[{SECRET:SECRET} for _ in range(64)]}
+    value = {"schema_version":"004a.identification.v1","claims":[{SECRET:SECRET} for _ in range(64)]}
     _, metadata = failure(json.dumps(value))
     assert metadata["error_count"] == 64 and metadata["truncated"] is True
     assert len(metadata["errors"]) == 4
@@ -137,7 +141,7 @@ def settings():
 
 
 def envelope(raw=None):
-    return {"candidates":[{"finishReason":"STOP","content":{"parts":[{"text":raw or json.dumps(record())}]}}]}
+    return {"candidates":[{"finishReason":"STOP","content":{"parts":[{"text":raw or json.dumps(identification(record()))}]}}]}
 
 
 @pytest.mark.parametrize("kind,public,stage,code", [
@@ -201,10 +205,10 @@ def test_unexpected_provider_exception_and_builtin_timeout_preserve_public_codes
 @pytest.mark.parametrize("invalid", [False,True])
 def test_probe_report_keeps_http_and_strict_results_and_adds_safe_details(invalid):
     text = "The stock is available."
-    value = record()
-    value["claims"][0].update(source_text=text,end=len(text))
+    value = identification(record())
+    value["claims"][0].update(source_text=text)
     if invalid:
-        value["claims"][0]["end"] = 999
+        value["claims"][0]["source_text"] = "not in the original response"
     class Observed(httpx.AsyncBaseTransport):
         status = None
         async def handle_async_request(self,req):
@@ -217,8 +221,8 @@ def test_probe_report_keeps_http_and_strict_results_and_adds_safe_details(invali
     assert row["strict_analysis_valid"] is (not invalid)
     if invalid:
         assert row["failure_code"] == "INVALID_MODEL_ANALYSIS"
-        assert row["failure_details"]["stage"] == "SOURCE_BINDING"
-        assert row["failure_details"]["errors"][0]["code"] == "BINDING_RANGE"
+        assert row["failure_details"]["stage"] == "ALIGNMENT"
+        assert row["failure_details"]["errors"][0]["code"] == "ALIGNMENT_TEXT_NOT_FOUND"
     else:
         assert row["failure_code"] is None and row["failure_details"] is None
     assert SECRET not in json.dumps(row) and text not in json.dumps(row)
@@ -226,6 +230,6 @@ def test_probe_report_keeps_http_and_strict_results_and_adds_safe_details(invali
 
 def test_valid_analysis_is_unchanged_and_diagnostics_do_not_authorize():
     expected = record()
-    result, _ = asyncio.run(ModelExtractor(FakeProvider(json.dumps(expected))).analyze(request()))
+    result, _ = asyncio.run(ModelExtractor(FakeProvider(json.dumps(identification(expected)))).analyze(request()))
     assert result.model_dump() == expected
     assert "diagnostic" not in result.model_dump() and "authorization" not in result.model_dump()

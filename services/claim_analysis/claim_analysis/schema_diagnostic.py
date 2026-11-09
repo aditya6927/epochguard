@@ -16,12 +16,13 @@ import time
 import httpx
 
 from .gemini import GeminiProvider, provider_schema
+from .alignment import IDENTIFICATION_SCHEMA, Identification
 from .model import AnalysisFailure, ModelExtractor
-from .schema import AnalysisInput, Extraction
+from .schema import AnalysisInput
 
 
 DEFAULT_VARIANTS = ("original", "no_max_items")
-VARIANTS = DEFAULT_VARIANTS + ("no_titles", "no_numeric_bounds", "nullable_type_union", "inline_refs")
+VARIANTS = DEFAULT_VARIANTS + ("no_titles", "nullable_type_union", "inline_refs")
 
 
 def canonical(schema):
@@ -66,7 +67,7 @@ def inline_refs(schema):
 
 
 def generation_schemas():
-    strict = Extraction.model_json_schema()
+    strict = Identification.model_json_schema()
     original = provider_schema(strict, omit_array_bounds=False)
     reduced = provider_schema(strict)
     return {
@@ -74,7 +75,6 @@ def generation_schemas():
         "no_max_items":reduced,
         # Each further probe changes ONE factor relative to no_max_items.
         "no_titles":remove_keywords(reduced, {"title"}),
-        "no_numeric_bounds":remove_keywords(reduced, {"minimum", "maximum"}),
         "nullable_type_union":nullable_types(reduced),
         "inline_refs":inline_refs(reduced)}
 
@@ -143,7 +143,8 @@ async def run(args):
     # Preflight all model opt-in/settings before creating a misleading live report.
     provider = ProbeProvider.from_environment(args.max_requests) if args.live else None
     args.output.mkdir(parents=True, exist_ok=True)
-    manifest = {"diagnostic_schema":"004a.gemini-schema.v1", "mode":"live" if args.live else "offline_export",
+    manifest = {"diagnostic_schema":"004a.gemini-schema.v2", "identification_schema":IDENTIFICATION_SCHEMA,
+                "mode":"live" if args.live else "offline_export",
                 "selected_variants":selected, "live_qualification_pending":True,
                 "model":provider.settings.model if provider else None,
                 "schemas":{}, "results":[]}

@@ -1,5 +1,4 @@
 import asyncio
-import copy
 import json
 from types import SimpleNamespace
 
@@ -8,6 +7,7 @@ import pytest
 from claim_analysis import cli
 from claim_analysis.dataset import DATA, load
 from claim_analysis.model import AnalysisFailure
+from wire_helpers import identification
 
 
 def evaluate_one(tmp_path, reply, *, case=None):
@@ -26,15 +26,15 @@ def evaluate_one(tmp_path, reply, *, case=None):
 @pytest.mark.parametrize("kind,stage,code,path", [
     ("json","MODEL_JSON","JSON_INVALID_OR_INCOMPLETE","$"),
     ("schema","MODEL_SCHEMA","SCHEMA_MISSING_FIELD","$.claims[0].temporal"),
-    ("binding","SOURCE_BINDING","BINDING_RANGE","$.claims[0].end"),
+    ("binding","ALIGNMENT","ALIGNMENT_TEXT_NOT_FOUND","$.claims[0].source_text"),
 ])
 def test_evaluation_serializes_existing_safe_details_and_preserves_scoring(tmp_path,kind,stage,code,path,capsys):
     case = load(DATA/"dev.jsonl")[0]
-    value = copy.deepcopy(case.gold.model_dump())
+    value = identification(case.gold.model_dump())
     if kind == "schema":
         del value["claims"][0]["temporal"]
     elif kind == "binding":
-        value["claims"][0]["end"] = len(case.text)+1
+        value["claims"][0]["source_text"] = "Missing exact quotation."
     raw = '{"claims":' if kind == "json" else json.dumps(value)
     report = evaluate_one(tmp_path,raw)
     record = report["records"][0]
@@ -54,7 +54,7 @@ def test_evaluation_serializes_existing_safe_details_and_preserves_scoring(tmp_p
 
 def test_successful_evaluation_keeps_extraction_and_metrics_with_null_details(tmp_path):
     case = load(DATA/"dev.jsonl")[0]
-    report = evaluate_one(tmp_path,case.gold.model_dump_json())
+    report = evaluate_one(tmp_path,json.dumps(identification(case.gold.model_dump())))
     record = report["records"][0]
     assert record["status"] == "ANALYZED" and record["reason"] is None
     assert record["failure_details"] is None and record["extraction"] == case.gold.model_dump()
@@ -77,14 +77,14 @@ def test_failure_without_diagnostic_metadata_is_null(tmp_path,monkeypatch):
 
 def test_evaluation_unknown_fields_values_and_error_count_are_sanitized(tmp_path,capsys):
     secret = "PRIVATE_CANDIDATE_MODEL_OUTPUT_API_KEY_PROVIDER_BODY"
-    report = evaluate_one(tmp_path,json.dumps({"schema_version":"004a.v1","claims":[{secret:secret} for _ in range(64)]}))
+    report = evaluate_one(tmp_path,json.dumps({"schema_version":"004a.identification.v1","claims":[{secret:secret} for _ in range(64)]}))
     record = report["records"][0]
     details = record["failure_details"]
     assert details["stage"] == "MODEL_SCHEMA"
     assert details["error_count"] == 64 and details["truncated"] is True
     assert len(details["errors"]) == 4
     assert secret not in json.dumps(record) + capsys.readouterr().out
-    report = evaluate_one(tmp_path,json.dumps({"schema_version":"004a.v1","claims":[],secret:secret}))
+    report = evaluate_one(tmp_path,json.dumps({"schema_version":"004a.identification.v1","claims":[],secret:secret}))
     assert report["records"][0]["failure_details"]["errors"] == [{"code":"SCHEMA_EXTRA_FIELD","field_path":"$.<unknown>"}]
     assert secret not in json.dumps(report["records"][0])
 
@@ -105,9 +105,9 @@ def test_details_do_not_leak_between_requested_development_cases(tmp_path):
     dataset.write_text("".join(case.model_dump_json()+"\n" for case in cases),encoding="utf-8")
     replies = []
     for i,case in enumerate(cases):
-        value = copy.deepcopy(case.gold.model_dump())
+        value = identification(case.gold.model_dump())
         if i == 0:
-            value["claims"][0]["end"] = len(case.text)+1
+            value["claims"][0]["source_text"] = "Missing exact quotation."
         elif i == 1:
             del value["claims"][0]["temporal"]
         replies.append(json.dumps({"case_id":case.case_id,"reply":json.dumps(value)})+"\n")
@@ -117,5 +117,23 @@ def test_details_do_not_leak_between_requested_development_cases(tmp_path):
     assert asyncio.run(cli.evaluate(args)) == 0
     records = json.loads(output.read_text(encoding="utf-8"))["records"]
     assert [r["case_id"] for r in records] == [c.case_id for c in cases]
-    assert [r["failure_details"]["stage"] if r["failure_details"] else None for r in records] == ["SOURCE_BINDING","MODEL_SCHEMA",None]
+    assert [r["failure_details"]["stage"] if r["failure_details"] else None for r in records] == ["ALIGNMENT","MODEL_SCHEMA",None]
     assert [r["status"] for r in records] == ["ANALYSIS_FAILED","ANALYSIS_FAILED","ANALYZED"]
+
+
+def test_extraction_failure_is_separate_from_valid_but_wrong_classification(tmp_path):
+    case = load(DATA/"dev.jsonl")[0]
+    reply = identification(case.gold.model_dump())
+    # A semantically wrong but structurally consistent label remains an analysis,
+    # not a verification verdict; evaluation must expose its classification miss.
+    reply["claims"][1].update(temporal="STABLE",fresh_evidence="NOT_REQUIRED")
+    report = evaluate_one(tmp_path,json.dumps(reply))
+    assert report["analysis_outcomes"] == {"analyzed":1,"extraction_failures":0,"invalid_inputs":0}
+    assert report["metrics"]["analyzed_only"]["temporal_matched_accuracy"] == 0.5
+    assert report["metrics"]["all"]["fresh_evidence"]["recall"] == 0
+    assert report["records"][0]["failure_details"] is None
+    reply["claims"][1]["source_text"] = "Not a source quotation."
+    report = evaluate_one(tmp_path,json.dumps(reply))
+    assert report["analysis_outcomes"] == {"analyzed":0,"extraction_failures":1,"invalid_inputs":0}
+    assert report["metrics"]["analyzed_only"]["responses"] == 0
+    assert report["metrics"]["all"]["claim"]["recall"] == 0

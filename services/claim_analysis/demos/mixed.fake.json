@@ -1,11 +1,9 @@
 {
-  "schema_version": "004a.v1",
+  "schema_version": "004a.identification.v1",
   "claims": [
     {
       "claim_id": "c001",
       "source_text": "Hydrogen has atomic number one.",
-      "start": 0,
-      "end": 31,
       "normalized_proposition": null,
       "factuality": "FACTUAL",
       "temporal": "STABLE",
@@ -16,8 +14,6 @@
     {
       "claim_id": "c002",
       "source_text": "The Atlas package is version 4.0 today.",
-      "start": 32,
-      "end": 71,
       "normalized_proposition": null,
       "factuality": "FACTUAL",
       "temporal": "DYNAMIC",

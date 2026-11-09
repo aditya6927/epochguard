@@ -1,0 +1,123 @@
+{
+  "$defs": {
+    "IdentifiedClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "pattern": "^c[0-9]{3}$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "source_text": {
+          "maxLength": 8192,
+          "minLength": 1,
+          "title": "Source Text",
+          "type": "string"
+        },
+        "normalized_proposition": {
+          "anyOf": [
+            {
+              "maxLength": 8192,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Normalized Proposition"
+        },
+        "factuality": {
+          "enum": [
+            "FACTUAL",
+            "NON_FACTUAL",
+            "UNCERTAIN"
+          ],
+          "title": "Factuality",
+          "type": "string"
+        },
+        "temporal": {
+          "enum": [
+            "DYNAMIC",
+            "HISTORICAL",
+            "STABLE",
+            "UNCERTAIN"
+          ],
+          "title": "Temporal",
+          "type": "string"
+        },
+        "fresh_evidence": {
+          "enum": [
+            "REQUIRED",
+            "NOT_REQUIRED",
+            "UNCERTAIN",
+            "NOT_APPLICABLE"
+          ],
+          "title": "Fresh Evidence",
+          "type": "string"
+        },
+        "uncertainty": {
+          "items": {
+            "enum": [
+              "MISSING_CONTEXT",
+              "AMBIGUOUS_REFERENCE",
+              "MIXED_REQUIREMENTS",
+              "MODEL_ABSTENTION",
+              "BASELINE_HEURISTIC",
+              "UNTRUSTED_INSTRUCTION"
+            ],
+            "type": "string"
+          },
+          "maxItems": 6,
+          "title": "Uncertainty",
+          "type": "array"
+        },
+        "temporal_reference": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Temporal Reference"
+        }
+      },
+      "required": [
+        "claim_id",
+        "source_text",
+        "normalized_proposition",
+        "factuality",
+        "temporal",
+        "fresh_evidence",
+        "uncertainty",
+        "temporal_reference"
+      ],
+      "title": "IdentifiedClaim",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "004a.identification.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "claims": {
+      "items": {
+        "$ref": "#/$defs/IdentifiedClaim"
+      },
+      "maxItems": 64,
+      "title": "Claims",
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "claims"
+  ],
+  "title": "Identification",
+  "type": "object"
+}

@@ -102,6 +102,8 @@ The configured development fixture is intentionally unauthenticated on inference
 
 The 112-case/184-factual-annotation dataset is an agent-authored review draft with separate development/held-out files. Human review and real-model performance qualification remain pending; fake-adapter tests qualify plumbing only. Baseline held-out fresh-evidence recall is poor. This package is not wired into FastAPI, Go, Compose verification defaults or the cache. The existing `003a.v1` contract, single Python policy and all route/enforcement boundaries remain unchanged. Any future integration requires coverage and response-level aggregation: one verified claim cannot authorize other unsupported, omitted or uncertain claims, and STABLE/HISTORICAL classification is not proof of truth.
 
+The model-facing `004a.identification.v1` representation now omits offsets. Python accepts only globally unique exact quotes, calculates original Unicode code-point spans, rejects out-of-order/overlapping claims, then validates the unchanged canonical `004a.v1` contract and source binding. There is no normalization, fuzzy repair, quote replacement or partial acceptance; repeated ambiguous text fails closed. This reduces offset-generation responsibility without verifying semantic correctness or coverage. Live performance of this revised pipeline remains pending; [Task 004A](task-004a.md#deterministic-source-span-alignment-2026-11-09) records the fixed development comparison and qualification commands.
+
 ## Proposed product components — not yet delivered
 
 ```text

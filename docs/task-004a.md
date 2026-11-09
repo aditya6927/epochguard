@@ -331,3 +331,87 @@ $env:PYTHONPATH = 'services/claim_analysis'
 The [package README](../services/claim_analysis/README.md#evaluation-records-with-validation-diagnostics) contains exact PowerShell commands to select those three original JSONL lines, supply credentials securely, and explicitly run Gemini with `--max-requests 3`. Existing timeout/token/cost controls apply. The final command displays only IDs/status/reasons/sanitized details. Use a fresh output directory; a new generation may differ from the previously failed output, and this field cannot reconstruct a discarded old validation exception.
 
 Changed files: `services/claim_analysis/claim_analysis/cli.py`, new `services/claim_analysis/tests/test_evaluation_diagnostics.py`, `services/claim_analysis/README.md`, and this report. Logs/subset artifacts remain ignored under `artifacts/004a-evaluation-diagnostics/`. Recommended commit, not created: `fix(claims): include sanitized validation details in evaluations`. Stop for review without committing or pushing.
+
+## Deterministic source-span alignment (2026-11-09)
+
+### Scope and contract separation
+
+The maintainer's three-case diagnostic localized `eg004a-0001` and `eg004a-0007` to `SOURCE_BINDING / BINDING_TEXT_MISMATCH`, and `eg004a-0019` to `SOURCE_BINDING / BINDING_RANGE`. This does not establish that every failed output contained a correct quote with only bad offsets: raw failed outputs were not retained. The change removes offset calculation from the model's responsibilities while retaining all canonical acceptance conditions.
+
+The model now emits a separate strict [identification contract](../services/claim_analysis/schema-004a.identification.v1.json), `004a.identification.v1`, with eight claim fields: ID, exact source text, optional untrusted normalized proposition, factuality, temporal category, fresh-evidence requirement, uncertainty and temporal reference. **Start/end are not allowed in this wire format.** Python computes them, constructs canonical `004a.v1`, then runs its original Pydantic consistency checks and final source binding. The canonical schema and its generated artifact are unchanged; old offset-bearing provider replies are rejected rather than repaired.
+
+`alignment.py` clones the canonical non-offset field definitions and limits into the provider model, avoiding a second independently maintained set of semantic field constraints. Validators that require offsets are not inherited by this intermediate model; the complete canonical validators run when the aligned result is constructed. Required fields, supported categories, six-uncertainty and 64-claim limits, extra-field rejection, body bounds and strict JSON parsing remain active. No claim is discarded or reclassified to force success.
+
+### Exact algorithm and failure behavior
+
+For every supplied quote, in provider order:
+
+1. Find an exact occurrence in the original Python string. If absent, reject the entire extraction with `ALIGNMENT_TEXT_NOT_FOUND`.
+2. Search again from the first match's start plus one code point. Any second occurrence, including an overlapping occurrence, causes `ALIGNMENT_AMBIGUOUS`. There is no first/nth/next-occurrence selection and no contextual assignment of repeated quotes.
+3. Compute `end = start + len(source_text)` in original Unicode code points. Reject reversed source order (`ALIGNMENT_OUT_OF_ORDER`) or overlap (`ALIGNMENT_OVERLAP`). Adjacent spans are allowed. Claims are never sorted.
+4. Preserve every semantic field and quote, add only the calculated offsets, validate the entire canonical extraction, and run `Extraction.bind()` against the original input.
+
+There is no whitespace/case/Unicode normalization, approximate matching, paraphrase substitution, guessed subject, offset correction or partial acceptance. `normalized_proposition` is never an alignment source. If any claim fails, no extraction result is returned. New sanitized failures use stage `ALIGNMENT` and an allowlisted `source_text` field path; existing diagnostics/count/path bounds remain unchanged. Canonical cross-field failures remain `MODEL_SCHEMA`, and the final ID/source guard remains `SOURCE_BINDING`. The public analysis failure string remains `INVALID_MODEL_ANALYSIS`.
+
+Repeated identical text is conservatively refused even if a more complex global/contextual resolver might uniquely assign it. Conversely, a unique substring can still be a misleading fragment of a negated/qualified statement. The aligner preserves the quote exactly and never adds missing context; it cannot establish that the model selected a complete proposition, preserved semantic scope, extracted every assertion, classified correctly or verified truth. Full wording/negation/qualifiers remain requirements on semantic extraction, with exact-preservation and altered-quote rejection covered by tests.
+
+### Provider generation and evaluation changes
+
+Prompt version changes from `004a.prompt.v1` to `004a.prompt.v2`: the offset-generation instructions are replaced with exact-quote/no-offset instructions and the new wire version. The factuality/temporal/evidence classification rules are unchanged. This is not prompt tuning from held-out outcomes.
+
+The generation schema now has `$defs.IdentifiedClaim`, no offset fields or numeric offset constraints, and version literal `004a.identification.v1`. As before, the provider converter omits only array `maxItems` hints while local count limits remain enforced. The schema diagnostic now labels this profile `004a.gemini-schema.v2` and records `identification_schema`; `original` and `no_max_items` refer to this new profile, not the historical offset-bearing schemas. Its obsolete `no_numeric_bounds` option was removed because it would send a duplicate request; titles/nullable representation/reference experiments remain explicit diagnostic-only choices. Historical schema reports/hashes are preserved.
+
+| Artifact | SHA-256 |
+| --- | --- |
+| Unchanged canonical `schema-004a.v1.json` file | `22537498b33b07939feae96b2000ed664ec666f49f9b310d5b091523a31dbd8e` |
+| New `schema-004a.identification.v1.json` file | `1708eba595bb506f94e81101d58458e4a881425a245d16f34a56a6887fe7676d` |
+| Compact/sorted new provider `no_max_items` schema, 1,397 bytes | `d643b5fed04ed6590350556cbb59774bca32e0908ee62a5a45a536d6d712d758` |
+
+No Gemini pricing, credentials, model selection, endpoint, timeout/token bounds, reservation algorithm or retry policy changed. The new schema/prompt still require actual live compatibility and quality qualification. The Go gateway, 003A verifier, `003a.v1`, caches and evaluation labels remain unchanged.
+
+Evaluation retains the original frozen matching/scoring rules and original `all`, `mixed` and `adversarial` metrics. It adds `analysis_outcomes` (analyzed, extraction failures, invalid inputs) and `metrics.analyzed_only`, which applies the same scorer only to structurally valid analyses. This separates mechanical/provider failures from semantic-label comparisons on accepted outputs. The primary all-response metrics still count failures as misses; conditional scores must never conceal those failures. Report provenance includes `alignment.py` and the new prompt hash/version. Historical reports are not rewritten.
+
+Offline fake/demo fixtures were explicitly migrated to the new identification wire format. A test-only fixture helper removes offsets from canonical **test expectations**; it is not imported by production and never converts actual model replies. Canonical-parser regressions for invalid offsets remain intact; model-format tests now assert the new strict contract. No tests were skipped to obtain a passing run.
+
+### Tests and measured development results
+
+Before implementation, **124 offline tests passed**, 1.47s. After fixture migration, the same 124 tests passed, 1.77s. With alignment and evaluation regressions, **151 tests passed**, final rerun 3.45s. Tests cover fixture reproductions of all three reported failures, legacy-format rejection, Unicode/combining/emoji/CRLF offsets, overlapping repeated occurrences, repeated identical assertions, ambiguity despite surrounding context, missing/paraphrased/normalized text, negation/qualifiers, multiple atomic claims and adjacent spans, overlap/order, adversarial instructions, no claim dropping, count limits, canonical semantic constraints and exact final binding. A separate test shows that a structurally valid but semantically wrong label remains an analyzed result scored as wrong, not an extraction failure.
+
+Commands executed, in order (all tests before development comparison):
+
+```powershell
+$env:PYTHONPATH = 'services/claim_analysis'
+& .venv-003a/Scripts/python.exe -m pytest -c services/claim_analysis/pytest.ini services/claim_analysis/tests -q
+& .venv-003a/Scripts/python.exe -m claim_analysis evaluate --engine baseline --split dev --dataset artifacts/004a-alignment/dev-ten.jsonl --output artifacts/004a-alignment/baseline-ten.json
+& .venv-003a/Scripts/python.exe -m claim_analysis evaluate --engine fake --split dev --dataset artifacts/004a-alignment/dev-ten.jsonl --fake-replies artifacts/004a-alignment/scripted-ten.jsonl --output artifacts/004a-alignment/scripted-roundtrip.json
+& .venv-003a/Scripts/python.exe -m claim_analysis.schema_diagnostic --variants no_max_items --max-requests 1 --output artifacts/004a-alignment/provider-schema
+```
+
+The exact historical ten examples were located in `artifacts/004a/dev-smoke.jsonl` and verified against the current frozen annotations: `0001`, `0007`, `0013`, `0019`, `0021`, `0025`, `0031`, `0033`, `0037`, `0043` (each prefixed `eg004a-`). They are not the first ten rows. No held-out evaluation or tuning was performed. Existing held-out schema/review integrity tests remain unchanged.
+
+| Same ten-case development set | Current baseline rerun | Historical Gemini, before alignment | Revised Gemini |
+| --- | --- | --- | --- |
+| Valid analyses / extraction failures | 10 / 0 | 3 / 7 | **Pending live opt-in** |
+| Overall factual matches / gold | 21 / 21 | 6 / 21 | Pending |
+| Overall claim F1 | 1.000 | 0.444 | Pending |
+| Overall temporal macro-F1 | 0.650 | 0.361 | Pending |
+| Overall fresh-evidence recall | 0.889 | 0.222 | Pending |
+| Temporal matched accuracy among valid analyses | 0.810 (21 matched claims) | 1.000 (only six matched claims in three responses) | Pending |
+
+Baseline non-latency metrics are exactly equal to the saved historical baseline report. Historical Gemini numbers come from the existing `gemini-dev-smoke.json`, not a new model run. The conditional historical accuracy was recomputed from its three saved accepted extractions using the same frozen scorer. Its small successful subset does not offset seven failures or qualify model quality.
+
+Ten **scripted** identification replies constructed from development annotation expectations round-trip through the revised pipeline to exact canonical expectations. That exercises alignment/evaluation plumbing and is labeled `fake-adapter plumbing only`, not a model prediction or model-versus-baseline quality result. It does not prove that the real model will emit the same quotes or labels.
+
+The session has no live model-call opt-in/key available. **No live Gemini or Tavily request was made. The revised baseline-versus-Gemini performance comparison remains pending.** Do not infer that seven failures will disappear: verbatim quote selection, ambiguity, schema compliance, truncation and semantic errors can still fail. The schema diagnostic export reports live qualification pending. Logs, fixed-subset copies and fixture-only outputs remain ignored under `artifacts/004a-alignment/`.
+
+The exact PowerShell subset-construction commands were also executed offline and produced the verified same ten case IDs/labels. All five migrated fake demo commands passed. Final checks passed: 12 protected implementation/data/report/schema hashes, unchanged canonical schema, fake-fixture changes restricted to wire version/removing offsets, unchanged baseline non-latency metrics, 36 relative documentation links/anchors, code fences, changed/new whitespace and JSON syntax, 20-file scope, and `git diff --check` exit 0.
+
+The [package README](../services/claim_analysis/README.md#qualify-alignment-on-the-original-ten-development-examples) provides complete PowerShell commands to reconstruct exactly these ten examples from unchanged repository JSONL, run the baseline, configure trusted Gemini credentials/rates, explicitly enable model calls and run with `--max-requests 10`. Existing per-request/whole-run cost and timeout/token guards apply; there are no automatic retries. Use a fresh output directory and record failures alongside conditional classification scores.
+
+### Review boundary and files
+
+Remaining limitations include globally repeated quotes, unique but incomplete/semantically misleading fragments, omitted assertions, incorrect classifications, hallucinated/paraphrased quotes, context-dependent pronouns, discontinuous claims and provider/schema/output failures. Exact alignment is source integrity, not semantic verification or coverage proof. The dataset remains an agent-authored human-review draft. No unrestricted verification, response aggregation, protected cache or Task 004B work was added.
+
+Changed files: new `claim_analysis/alignment.py`, `schema-004a.identification.v1.json`, `tests/test_alignment.py`, `tests/wire_helpers.py`; existing `claim_analysis/model.py`, `validation_diagnostics.py`, `schema_diagnostic.py`, `cli.py`; four existing test modules (`test_analysis.py`, `test_schema_diagnostic.py`, `test_validation_diagnostics.py`, `test_evaluation_diagnostics.py`); five `demos/*.fake.json` fixtures; package README; `docs/architecture.md`; and this report. All package paths are under `services/claim_analysis/`. Canonical `schema.py`, `schema-004a.v1.json`, pricing/configuration code, datasets, original scoring implementation and historical reports are unchanged.
+
+Recommended commit, not created: `feat(claims): align exact source quotes before canonical validation`. Stop for review with revised live-model qualification explicitly pending; no commit or push.

@@ -15,6 +15,7 @@ from claim_analysis.evaluation import match_spans, score
 from claim_analysis.gemini import GeminiProvider, ModelSettings, provider_schema
 from claim_analysis.model import AnalysisFailure, FakeProvider, ModelExtractor, SYSTEM
 from claim_analysis.schema import AnalysisInput, Claim, Extraction, parse_extraction, strict_json
+from wire_helpers import identification
 
 
 def request(text="The stock is available."):
@@ -112,11 +113,11 @@ def test_model_works_from_original_and_can_split_baseline_unit():
     first, second = "Hydrogen has one proton", "the stock is available."
     result = Extraction(schema_version="004a.v1", claims=[
         unit(first,temporal="STABLE",fresh="NOT_REQUIRED"),unit(second,text.index(second),"c002")])
-    extracted, _ = run(FakeProvider(result.model_dump_json()), text)
+    extracted, _ = run(FakeProvider(json.dumps(identification(result.model_dump()))), text)
     assert len(extracted.claims) == 2 and len(baseline.analyze(request(text)).claims) == 1
 
 
-@pytest.mark.parametrize("raw", ["{}", json.dumps(payload("Hallucinated claim.")), '{"schema_version":"004a.v1","claims":[]}'])
+@pytest.mark.parametrize("raw", ["{}", json.dumps(identification(payload("Hallucinated claim."))), '{"schema_version":"004a.identification.v1","claims":[]}'])
 def test_model_invalid_is_analysis_failure(raw):
     with pytest.raises(AnalysisFailure):
         run(FakeProvider(raw))
@@ -148,7 +149,7 @@ def settings(**changes):
 
 
 def gemini_response(text=None, **changes):
-    result = {"candidates":[{"finishReason":"STOP","content":{"parts":[{"text":text or json.dumps(payload())}]}}],
+    result = {"candidates":[{"finishReason":"STOP","content":{"parts":[{"text":text or json.dumps(identification(payload()))}]}}],
               "usageMetadata":{"promptTokenCount":100,"totalTokenCount":130}}
     result.update(changes)
     return result
@@ -169,7 +170,7 @@ def test_real_adapter_request_is_structured_and_injection_cannot_configure():
         assert body["generationConfig"]["responseMimeType"] == "application/json"
         assert "tools" not in body and "evil.invalid" not in str(req.url)
         assert set(req.extensions["timeout"].values()) == {30.0}
-        return httpx.Response(200,json=gemini_response(expected.model_dump_json()))
+        return httpx.Response(200,json=gemini_response(json.dumps(identification(expected.model_dump()))))
     provider = GeminiProvider(settings(),"offline-fixture-key",transport=httpx.MockTransport(handler))
     result, usage = run(provider,text)
     assert len(seen) == 1 and result == expected
@@ -285,7 +286,7 @@ def test_evaluation_cli_metadata_and_fake_not_quality(tmp_path):
     dataset = tmp_path/"one.jsonl"
     dataset.write_text(case.model_dump_json()+"\n",encoding="utf-8")
     fixture = tmp_path/"fake.jsonl"
-    fixture.write_text(json.dumps({"case_id":case.case_id,"reply":case.gold.model_dump_json()})+"\n")
+    fixture.write_text(json.dumps({"case_id":case.case_id,"reply":json.dumps(identification(case.gold.model_dump()))})+"\n")
     output = tmp_path/"result.json"
     args = SimpleNamespace(dataset=dataset,split="dev",require_human_reviewed=False,engine="fake",
                            fake_replies=fixture,max_requests=1,output=output)
@@ -320,7 +321,8 @@ def test_reproducible_demo_fixtures_have_valid_source_spans():
     assert {p.stem for p in root.glob("*.txt")} == names
     for name in names:
         source = (root/f"{name}.txt").read_text(encoding="utf-8")
-        result = parse_extraction((root/f"{name}.fake.json").read_bytes(),request(source))
+        from claim_analysis.alignment import parse_identification
+        result = parse_identification((root/f"{name}.fake.json").read_bytes(),request(source))
         assert result.claims
 
 

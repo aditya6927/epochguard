@@ -25,7 +25,9 @@ def summary(report):
         return "n/a" if value is None else f"{value:.3f}"
     lines = [f"Engine: {report['engine']}; split: {report['split']}; independent human review pending: {report['review_pending']}",
              f"Quality qualification: {report['qualification']}"]
-    for group in ("all", "mixed", "adversarial"):
+    outcomes = report["analysis_outcomes"]
+    lines.append(f"Outcomes: analyzed={outcomes['analyzed']}; extraction_failures={outcomes['extraction_failures']}; invalid_inputs={outcomes['invalid_inputs']}")
+    for group in ("all", "mixed", "adversarial", "analyzed_only"):
         s = report["metrics"][group]
         lines.append(f"{group}: responses={s['responses']}; claim P/R/F1={fmt(s['claim']['precision'])}/{fmt(s['claim']['recall'])}/{fmt(s['claim']['f1'])}; temporal macro-F1={fmt(s['temporal_macro_f1'])}; fresh P/R={fmt(s['fresh_evidence']['precision'])}/{fmt(s['fresh_evidence']['recall'])}; dynamic omissions={s['critical_misses']['omitted']}; dynamic nonfresh={s['critical_misses']['labeled_nonfresh']}; failures={s['analysis_failures_or_invalid_outcomes']}")
     return "\n".join(lines) + "\n"
@@ -78,6 +80,7 @@ async def evaluate(args):
                             estimated_cost_usd=reply.estimated_cost_usd if reply else None))
     source_root = Path(__file__).parent
     pending = sum(c.review_status != "human_reviewed" for c in cases)
+    analyzed = [r for r in records if r["status"] == "ANALYZED"]
     report = {
         "report_schema":"004a.evaluation.v1", "engine":args.engine, "split":args.split,
         "qualification":"fake-adapter plumbing only" if args.engine == "fake" else "draft-label measurement; not human-reviewed quality" if pending else "measured against human-reviewed annotations",
@@ -85,15 +88,19 @@ async def evaluate(args):
         "model_performance_pending":args.engine != "gemini" or not any(r["status"] == "ANALYZED" and r["extraction"] and r["case"].text.strip() for r in records),
         "dataset_sha256":digest(path.read_bytes()), "reference_dates":sorted({c.reference_date for c in cases}),
         "prompt_version":PROMPT_VERSION, "prompt_sha256":digest(SYSTEM.encode()),
-        "implementation_sha256":{n:digest((source_root/n).read_bytes()) for n in ("baseline.py","schema.py","evaluation.py","model.py","gemini.py","dataset.py","cli.py")},
+        "implementation_sha256":{n:digest((source_root/n).read_bytes()) for n in ("baseline.py","schema.py","alignment.py","evaluation.py","model.py","gemini.py","dataset.py","cli.py")},
         "matching":"greedy greatest character IoU >= 0.5, ties gold/pred index, one-to-one, no fractional credit; exact metrics >= 1.0",
         "model_configuration":provider.settings.model_dump() if provider else None,
         "model_attempts":provider.calls if provider else 0,
         "reserved_planning_cost_usd":provider.reserved_usd if provider else None,
+        "analysis_outcomes":{"analyzed":len(analyzed),
+                             "extraction_failures":sum(r["status"] == "ANALYSIS_FAILED" for r in records),
+                             "invalid_inputs":sum(r["status"] == "INVALID_INPUT" for r in records)},
         "metrics":{
             "all":score(records),
             "mixed":score([r for r in records if any(t in r["case"].tags for t in ("mixed","multi_claim","mixed_scope"))]),
-            "adversarial":score([r for r in records if "adversarial" in r["case"].tags])},
+            "adversarial":score([r for r in records if "adversarial" in r["case"].tags]),
+            "analyzed_only":score(analyzed)},
         "records":[{**{k:v for k,v in r.items() if k not in {"case","extraction"}},
                     "case_id":r["case"].case_id,"extraction":r["extraction"].model_dump() if r["extraction"] else None} for r in records]}
     args.output.parent.mkdir(parents=True, exist_ok=True)

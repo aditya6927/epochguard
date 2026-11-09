@@ -1,6 +1,5 @@
 import asyncio
 import copy
-import hashlib
 import json
 from pathlib import Path
 from types import SimpleNamespace
@@ -13,6 +12,8 @@ from claim_analysis.gemini import GeminiProvider, ModelSettings, provider_schema
 from claim_analysis.model import AnalysisFailure, FakeProvider, ModelExtractor
 from claim_analysis.schema import AnalysisInput, Claim, Extraction, parse_extraction
 from claim_analysis.schema_diagnostic import canonical, generation_schemas, probe, ProbeProvider, run
+from claim_analysis.alignment import Identification
+from wire_helpers import identification
 
 
 def request(text="The stock is available."):
@@ -33,37 +34,35 @@ def settings(**changes):
 
 
 def test_original_reproduction_and_minimal_provider_diff():
-    strict = Extraction.model_json_schema()
+    strict = Identification.model_json_schema()
     before = copy.deepcopy(strict)
     schemas = generation_schemas()
     original = schemas["original"]
-    assert hashlib.sha256(canonical(original)).hexdigest() == "60c4fc533d2ed73aa922a140282f91fd0e854e34ebb2e230a688a825f17e8130"
+    assert original["properties"]["schema_version"]["enum"] == ["004a.identification.v1"]
+    assert "start" not in original["$defs"]["IdentifiedClaim"]["properties"]
     assert original["properties"]["claims"].pop("maxItems") == 64
-    assert original["$defs"]["Claim"]["properties"]["uncertainty"].pop("maxItems") == 6
+    assert original["$defs"]["IdentifiedClaim"]["properties"]["uncertainty"].pop("maxItems") == 6
     assert original == schemas["no_max_items"] == provider_schema(strict)
     assert strict == before
     snapshot = Path(__file__).parents[1]/"schema-004a.v1.json"
-    assert json.loads(snapshot.read_text()) == strict
+    assert json.loads(snapshot.read_text()) == Extraction.model_json_schema()
 
 
 def test_incremental_variants_are_independent_diagnostic_only_changes():
     schemas = generation_schemas()
     reduced = schemas["no_max_items"]
-    no_numeric = copy.deepcopy(reduced)
-    assert no_numeric["$defs"]["Claim"]["properties"]["start"].pop("minimum") == 0
-    assert schemas["no_numeric_bounds"] == no_numeric
     nullable = copy.deepcopy(reduced)
     for name in ("normalized_proposition","temporal_reference"):
-        prop = nullable["$defs"]["Claim"]["properties"][name]
+        prop = nullable["$defs"]["IdentifiedClaim"]["properties"][name]
         assert prop.pop("anyOf") == [{"type":"string"},{"type":"null"}]
         prop["type"] = ["string","null"]
     assert schemas["nullable_type_union"] == nullable
     inlined = copy.deepcopy(reduced)
-    claim = inlined.pop("$defs")["Claim"]
+    claim = inlined.pop("$defs")["IdentifiedClaim"]
     inlined["properties"]["claims"]["items"] = claim
     assert schemas["inline_refs"] == inlined
     assert "title" not in canonical(schemas["no_titles"]).decode()
-    assert schemas["no_max_items"] == provider_schema(Extraction.model_json_schema())
+    assert schemas["no_max_items"] == provider_schema(Identification.model_json_schema())
 
 
 def test_local_claim_count_limit_survives_provider_relaxation():
@@ -79,7 +78,7 @@ def test_local_claim_count_limit_survives_provider_relaxation():
         parse_extraction(data,request(text))
     assert any(e["type"] == "too_long" and e["loc"] == ("claims",) for e in invalid.value.errors())
     with pytest.raises(AnalysisFailure, match="INVALID_MODEL_ANALYSIS"):
-        asyncio.run(ModelExtractor(FakeProvider(data)).analyze(request(text)))
+        asyncio.run(ModelExtractor(FakeProvider(json.dumps(identification(json.loads(data))))).analyze(request(text)))
 
 
 def test_local_uncertainty_limit_survives_provider_relaxation():
@@ -103,7 +102,7 @@ class RecordingMock(httpx.AsyncBaseTransport):
         assert req.url.host == "generativelanguage.googleapis.com"
         assert set(req.extensions["timeout"].values()) == {30.0}
         self.status = self.desired_status
-        text = '{"claims":[]}' if self.invalid_output else json.dumps(record())
+        text = '{"claims":[]}' if self.invalid_output else json.dumps(identification(record()))
         body = {"candidates":[{"finishReason":"STOP","content":{"parts":[{"text":text}]}}]}
         if self.status != 200:
             body = {"error":{"message":"SECRET_KEY_AND_PROVIDER_BODY","status":"INVALID_ARGUMENT"}}

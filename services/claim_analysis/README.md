@@ -2,7 +2,7 @@
 
 Identify assertions and their temporal requirements without verifying them or authorizing response release. This package is independent of FastAPI `/v1/verify`, Bifrost and Tavily. It reuses Pydantic/httpx from the existing lockfile. See [annotation rules](ANNOTATION.md), [JSON schema](schema-004a.v1.json) and [the qualification report](../../docs/task-004a.md).
 
-The dataset has 112 synthetic draft examples and 184 factual assertions. **Independent human review is pending.** The real Gemini REST adapter exists, but its model quality has not been measured. Fake outputs exercise plumbing only. Baseline measurements and error records are in [reports](reports/).
+The dataset has 112 synthetic draft examples and 184 factual assertions. **Independent human review is pending.** A narrow historical ten-case Gemini development run had seven extraction failures. The revised exact-alignment pipeline has not yet been live-qualified. Fake outputs exercise plumbing only. Baseline measurements and error records are in [reports](reports/).
 
 Use Python 3.12 and the existing lockfile. From the repository root in PowerShell (reuse `.venv-003a` if it already exists):
 
@@ -11,10 +11,20 @@ python -m venv .venv-003a
 & .\.venv-003a\Scripts\python.exe -m pip install -r services/claim_analysis/requirements.txt
 $env:PYTHONPATH = 'services/claim_analysis'
 & .\.venv-003a\Scripts\python.exe -m pytest -c services/claim_analysis/pytest.ini services/claim_analysis/tests -q
-& .\.venv-003a\Scripts\python.exe -m claim_analysis evaluate --engine baseline --split heldout --output artifacts/004a/baseline-heldout.json
+& .\.venv-003a\Scripts\python.exe -m claim_analysis evaluate --engine baseline --split dev --output artifacts/004a/baseline-dev.json
 ```
 
 Linux/macOS use `.venv-003a/bin/python` and prefix commands with `PYTHONPATH=services/claim_analysis`. Evaluation writes JSON and a text summary with per-group metrics, per-response analyses/failures, critical misses, input and implementation hashes, usage and latency. `--require-human-reviewed` refuses the current drafts. To expand annotations, append new stable IDs; do not blindly regenerate over human-reviewed edits using `data/build_v1.py`.
+
+## Exact source alignment
+
+The model-facing contract is now [004a.identification.v1](schema-004a.identification.v1.json): the existing semantic fields and exact `source_text`, with **no start/end offsets**. Python calculates offsets only for quotes with exactly one occurrence in the original response. It rejects missing/ambiguous quotes, reversed source order and overlapping spans. Matching is case/Unicode/whitespace exact, with no normalization, fuzzy search, inferred subject, nth-occurrence selection, sorting or claim dropping. Repeated identical text is rejected even when context might disambiguate it.
+
+The result then passes the unchanged strict [canonical 004a.v1 schema](schema-004a.v1.json) and final source binding, including count, ID, classification and consistency constraints. The aligner never substitutes `normalized_proposition` for source text. Old offset-bearing provider replies are rejected, not repaired. Fake/demo replies were migrated explicitly to the new provider format; annotations and canonical results are unchanged. Exact substring binding is not semantic verification: a model can still omit claims, misclassify them or select too little context.
+
+New sanitized `ALIGNMENT` codes are `ALIGNMENT_TEXT_NOT_FOUND`, `ALIGNMENT_AMBIGUOUS`, `ALIGNMENT_OUT_OF_ORDER`, and `ALIGNMENT_OVERLAP`. Each points to the affected `source_text` field without exposing its value. Existing `MODEL_SCHEMA` and final canonical `SOURCE_BINDING` diagnostics remain active.
+
+Evaluation adds `analysis_outcomes` counts and an `analyzed_only` metric group. Read extraction failures separately from semantic-label scores on valid analyses; the original `all` metrics still include failed responses as misses. Conditional success-only scores must never hide failures. Frozen span matching and labels are unchanged. See [the alignment report](../../docs/task-004a.md#deterministic-source-span-alignment-2026-11-09).
 
 ## Reproducible demonstrations
 
@@ -58,7 +68,7 @@ Review the entire-run planning budget first. Insufficient budgets produce explic
 
 ## Gemini schema compatibility diagnostic
 
-The maintainer observed HTTP 400 for the original generation schema and HTTP 200 after removing generation-side `maxItems` (64 claims, six uncertainty entries). That reduced-schema diagnostic failed local validation, while a separate standalone generation passed. This supports request acceptance for the reduced schema, not reliable extraction or model quality. The strict Pydantic schema, counts, span checks and output/token/deadline limits remain enforced locally. The [follow-up report](../../docs/task-004a.md#safe-model-validation-diagnostics-2026-11-09) separates the supplied live evidence from the offline diagnostic tests.
+The maintainer observed HTTP 400 for the previous offset-bearing generation schema and HTTP 200 after removing generation-side `maxItems` (64 claims, six uncertainty entries). That diagnostic failed local validation, while a separate standalone generation passed. These observations do not qualify the new offset-free identification schema or model quality. The diagnostic now exports/probes `004a.identification.v1`; report version `004a.gemini-schema.v2` identifies this new profile. Historical v1 reports/hashes remain preserved. Strict canonical limits and the [sanitized failure taxonomy](../../docs/task-004a.md#safe-model-validation-diagnostics-2026-11-09) remain active.
 
 Export the exact original and changed provider schemas with no key, opt-in or network calls:
 
@@ -88,10 +98,10 @@ The tool uses fixed synthetic text and records schema hashes, HTTP statuses, str
 If the changed schema still returns 400, keep the same key/model/rate setup and explicitly probe **one factor at a time**:
 
 ```powershell
-& .\.venv-003a\Scripts\python.exe -m claim_analysis.schema_diagnostic --live --variants no_max_items no_numeric_bounds --max-requests 2 --output artifacts/004a-gemini-schema/numeric
+& .\.venv-003a\Scripts\python.exe -m claim_analysis.schema_diagnostic --live --variants no_max_items no_titles --max-requests 2 --output artifacts/004a-gemini-schema/titles
 ```
 
-Replace `no_numeric_bounds` with `no_titles`, `nullable_type_union`, or `inline_refs` for separate comparisons. Each variant starts from `no_max_items`, not the preceding experiment. These alternatives are diagnostic-only; a passing alternative never changes normal adapter behavior or relaxes local validation. The default remains unqualified and the live command exits 1 if only an alternative succeeds. No automatic schema fallback or full-dataset/model evaluation is performed.
+Replace `no_titles` with `nullable_type_union` or `inline_refs` for separate comparisons. Each variant starts from `no_max_items`, not the preceding experiment. `no_numeric_bounds` was removed because identification has no numeric offset fields and that probe would be a duplicate. These alternatives are diagnostic-only; a passing alternative never changes normal adapter behavior or relaxes local validation. The default remains unqualified and the live command exits 1 if only an alternative succeeds. No automatic schema fallback or full-dataset/model evaluation is performed.
 
 ## Safe validation failure details
 
@@ -105,6 +115,7 @@ Diagnostic rows retain `failure_code`, `http_status`, `http_accepted`, and `stri
 | `MODEL_JSON` | Invalid/incomplete model JSON, duplicate keys, nonfinite numbers or invalid encoding |
 | `MODEL_SCHEMA` | Missing/extra fields, wrong type/category, length/count constraint or cross-field inconsistency |
 | `SOURCE_BINDING` | ID sequence, overlapping spans, out-of-range end, or source substring mismatch |
+| `ALIGNMENT` | Exact source text missing/ambiguous, reversed source order, or overlapping resolved spans |
 | `EMPTY_ANALYSIS` | No claims on a nonempty input |
 | `CONTROL` | Opt-in, configuration or request/cost budget guard |
 
@@ -120,6 +131,49 @@ $env:PYTHONPATH = 'services/claim_analysis'
 ```
 
 This performs at most one model call and preserves the existing timeout, token and cost guards. Use a new output directory to preserve older evidence. The old generic failure cannot be diagnosed retroactively; a fresh run may generate different output. No live request was made while implementing these diagnostics.
+
+## Qualify alignment on the original ten development examples
+
+First run the offline tests above. Then create exactly the historical ten-case subset, preserving original JSONL lines and labels. This is **not** the first ten rows. No held-out examples are used:
+
+```powershell
+$env:PYTHONPATH = 'services/claim_analysis'
+$runDirectory = Join-Path 'artifacts/004a-alignment' ('ten-' + (Get-Date -Format 'yyyyMMdd-HHmmss'))
+New-Item -ItemType Directory -Force $runDirectory | Out-Null
+$requestedIds = @('eg004a-0001','eg004a-0007','eg004a-0013','eg004a-0019','eg004a-0021','eg004a-0025','eg004a-0031','eg004a-0033','eg004a-0037','eg004a-0043')
+$selectedRows = @(Get-Content -LiteralPath services/claim_analysis/data/v1/dev.jsonl -Encoding UTF8 | Where-Object { ($_ | ConvertFrom-Json).case_id -in $requestedIds })
+if ($selectedRows.Count -ne 10) { throw 'Expected exactly ten development cases.' }
+$subsetPath = Join-Path (Get-Location) (Join-Path $runDirectory 'dev-ten.jsonl')
+$baselinePath = Join-Path $runDirectory 'baseline-ten.json'
+$geminiPath = Join-Path $runDirectory 'gemini-ten.json'
+[IO.File]::WriteAllLines($subsetPath, [string[]]$selectedRows, [Text.UTF8Encoding]::new($false))
+& .\.venv-003a\Scripts\python.exe -m claim_analysis evaluate --engine baseline --split dev --dataset "$subsetPath" --output "$baselinePath"
+```
+
+For an explicitly authorized run of **at most ten model requests**, configure the same model/key/current rates with the secure setup above. Existing token/deadline and per-request/whole-run cost limits remain in force; a denied budget can yield fewer than ten requests. Do not retry failures to manufacture a passing comparison:
+
+```powershell
+$env:EPOCHGUARD_ALLOW_MODEL_CALLS = '1'
+try {
+    & .\.venv-003a\Scripts\python.exe -m claim_analysis evaluate --engine gemini --split dev --dataset "$subsetPath" --max-requests 10 --output "$geminiPath"
+} finally {
+    Remove-Item Env:GEMINI_API_KEY, Env:EPOCHGUARD_ALLOW_MODEL_CALLS -ErrorAction SilentlyContinue
+}
+foreach ($comparisonPath in @($baselinePath, $geminiPath)) {
+    $comparison = Get-Content -LiteralPath $comparisonPath -Raw | ConvertFrom-Json
+    [pscustomobject]@{
+        engine = $comparison.engine
+        analyzed = $comparison.analysis_outcomes.analyzed
+        extraction_failures = $comparison.analysis_outcomes.extraction_failures
+        overall_claim_f1 = $comparison.metrics.all.claim.f1
+        overall_fresh_recall = $comparison.metrics.all.fresh_evidence.recall
+        temporal_accuracy_among_valid = $comparison.metrics.analyzed_only.temporal_matched_accuracy
+    }
+}
+(Get-Content -LiteralPath $geminiPath -Raw | ConvertFrom-Json).records | Select-Object case_id, status, reason, failure_details | ConvertTo-Json -Depth 8
+```
+
+This comparison is pending until a new live run actually executes. Scripted alignment round trips are not model-quality results. The annotated facts are still human-review drafts, and alignment does not establish their truth or complete claim coverage. Do not tune against the held-out set.
 
 ## Evaluation records with validation diagnostics
 
