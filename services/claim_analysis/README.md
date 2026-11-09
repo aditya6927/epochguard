@@ -55,3 +55,68 @@ The held-out file currently has 47 nonempty valid responses eligible for model c
 ```
 
 Review the entire-run planning budget first. Insufficient budgets produce explicit failures, not baseline substitutions or invented successful results. Compare the real report with the frozen baseline report only after human annotation review and actual execution. Do not tune against this held-out file and call it held-out again.
+
+## Gemini schema compatibility diagnostic
+
+The maintainer observed HTTP 400 for the original generation schema and HTTP 200 after removing generation-side `maxItems` (64 claims, six uncertainty entries). That reduced-schema diagnostic failed local validation, while a separate standalone generation passed. This supports request acceptance for the reduced schema, not reliable extraction or model quality. The strict Pydantic schema, counts, span checks and output/token/deadline limits remain enforced locally. The [follow-up report](../../docs/task-004a.md#safe-model-validation-diagnostics-2026-11-09) separates the supplied live evidence from the offline diagnostic tests.
+
+Export the exact original and changed provider schemas with no key, opt-in or network calls:
+
+```powershell
+$env:PYTHONPATH = 'services/claim_analysis'
+& .\.venv-003a\Scripts\python.exe -m claim_analysis.schema_diagnostic --output artifacts/004a-gemini-schema/offline
+```
+
+For an explicitly authorized **two-request** live comparison, from repository root:
+
+```powershell
+$env:PYTHONPATH = 'services/claim_analysis'
+$env:GEMINI_API_KEY = [System.Net.NetworkCredential]::new('', (Read-Host 'Gemini API key' -AsSecureString)).Password
+$env:EPOCHGUARD_CLAIM_MODEL = 'gemini-3.5-flash-lite'
+$env:EPOCHGUARD_CLAIM_INPUT_USD_PER_MILLION = Read-Host 'Current input USD per million tokens for this model/tier'
+$env:EPOCHGUARD_CLAIM_OUTPUT_USD_PER_MILLION = Read-Host 'Current output USD per million tokens for this model/tier'
+$env:EPOCHGUARD_ALLOW_MODEL_CALLS = '1'
+try {
+    & .\.venv-003a\Scripts\python.exe -m claim_analysis.schema_diagnostic --live --max-requests 2 --output artifacts/004a-gemini-schema/live
+} finally {
+    Remove-Item Env:GEMINI_API_KEY, Env:EPOCHGUARD_ALLOW_MODEL_CALLS -ErrorAction SilentlyContinue
+}
+```
+
+The tool uses fixed synthetic text and records schema hashes, HTTP statuses, strict local validation outcome, safe failure codes, latency and available usage. It does not print keys, headers, raw provider output or error messages. Existing request/cost reservations and validated timeout/output settings apply to the whole comparison. Auth/rate/server errors or a timeout stop subsequent probes; there are no retries. HTTP 200 alone establishes request acceptance, not a valid extraction or factual verification. Exit 0 on a live run requires the default `no_max_items` variant to pass strict local analysis. Original HTTP 400 is a comparison result. Dry exports always retain `live_qualification_pending: true`.
+
+If the changed schema still returns 400, keep the same key/model/rate setup and explicitly probe **one factor at a time**:
+
+```powershell
+& .\.venv-003a\Scripts\python.exe -m claim_analysis.schema_diagnostic --live --variants no_max_items no_numeric_bounds --max-requests 2 --output artifacts/004a-gemini-schema/numeric
+```
+
+Replace `no_numeric_bounds` with `no_titles`, `nullable_type_union`, or `inline_refs` for separate comparisons. Each variant starts from `no_max_items`, not the preceding experiment. These alternatives are diagnostic-only; a passing alternative never changes normal adapter behavior or relaxes local validation. The default remains unqualified and the live command exits 1 if only an alternative succeeds. No automatic schema fallback or full-dataset/model evaluation is performed.
+
+## Safe validation failure details
+
+Diagnostic rows retain `failure_code`, `http_status`, `http_accepted`, and `strict_analysis_valid`, and add `failure_details` (null on success). Normal analysis/evaluation failure codes remain unchanged. Details never authorize an answer and do not repair output.
+
+| Stage | Meaning / representative code |
+| --- | --- |
+| `PROVIDER_TRANSPORT` | Connection/transport failure, timeout, or unexpected provider exception |
+| `PROVIDER_HTTP` | Non-200 response; `HTTP_FAILURE`; inspect the existing HTTP status field |
+| `PROVIDER_ENVELOPE` | Invalid outer API JSON/content/usage, size bound, or incomplete generation |
+| `MODEL_JSON` | Invalid/incomplete model JSON, duplicate keys, nonfinite numbers or invalid encoding |
+| `MODEL_SCHEMA` | Missing/extra fields, wrong type/category, length/count constraint or cross-field inconsistency |
+| `SOURCE_BINDING` | ID sequence, overlapping spans, out-of-range end, or source substring mismatch |
+| `EMPTY_ANALYSIS` | No claims on a nonempty input |
+| `CONTROL` | Opt-in, configuration or request/cost budget guard |
+
+For example, `CLAIM_DYNAMIC_REQUIRES_FRESH` at `$.claims[0].fresh_evidence` identifies an invalid dynamic/evidence combination. `BINDING_RANGE` at `$.claims[0].end` means the end offset exceeds the original response length; `BINDING_TEXT_MISMATCH` means the supplied offsets/source text do not match. Neither diagnostic proposes a repaired value. A cross-field rule may point to the whole claim when several fields are involved.
+
+Reports contain at most four issues. `error_count` is capped at 64, and `truncated` marks omitted issues. Field names are allowlisted; unknown keys become `<unknown>`, indices outside 0–63 become `[*]`, and path depth/length are capped. Pydantic messages, `input`, context and URLs are not serialized. No candidate/model text, credentials, request headers, provider error bodies or arbitrary exception messages are retained in failure metadata.
+
+To repeat **only the reduced-schema diagnostic** after setting the same trusted model/key/rates and `EPOCHGUARD_ALLOW_MODEL_CALLS=1` as above:
+
+```powershell
+$env:PYTHONPATH = 'services/claim_analysis'
+& .\.venv-003a\Scripts\python.exe -m claim_analysis.schema_diagnostic --live --variants no_max_items --max-requests 1 --output artifacts/004a-validation-diagnostics/live-reduced
+```
+
+This performs at most one model call and preserves the existing timeout, token and cost guards. Use a new output directory to preserve older evidence. The old generic failure cannot be diagnosed retroactively; a fresh run may generate different output. No live request was made while implementing these diagnostics.

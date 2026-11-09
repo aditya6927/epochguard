@@ -5,6 +5,9 @@ import json
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic_core import PydanticCustomError
+
+from .validation_diagnostics import BindingFailure, Code, JSONFailure
 
 MAX_CHARS, MAX_BYTES, MAX_JSON, MAX_CLAIMS = 8192, 32768, 65536, 64
 SCHEMA = "004a.v1"
@@ -55,24 +58,26 @@ class Claim(Strict):
 
     @model_validator(mode="after")
     def consistent(self):
-        if self.end <= self.start or len(set(self.uncertainty)) != len(self.uncertainty):
-            raise ValueError("invalid span/repeated uncertainty")
+        if self.end <= self.start:
+            raise PydanticCustomError("claim_span_order", "invalid span order")
+        if len(set(self.uncertainty)) != len(self.uncertainty):
+            raise PydanticCustomError("claim_duplicate_uncertainty", "repeated uncertainty")
         if self.temporal_reference is not None and (not self.temporal_reference or self.temporal_reference not in self.source_text):
-            raise ValueError("temporal reference must be verbatim")
+            raise PydanticCustomError("claim_reference_mismatch", "temporal reference must be verbatim")
         if self.factuality == "NON_FACTUAL":
             if self.temporal != "UNCERTAIN" or self.fresh_evidence != "NOT_APPLICABLE":
-                raise ValueError("non-factual unit cannot imply factual evidence policy")
+                raise PydanticCustomError("claim_nonfactual_combination", "non-factual unit cannot imply factual evidence policy")
         else:
             if self.fresh_evidence == "NOT_APPLICABLE":
-                raise ValueError("checkable/uncertain statement needs evidence classification")
+                raise PydanticCustomError("claim_evidence_not_applicable", "checkable/uncertain statement needs evidence classification")
             if self.factuality == "UNCERTAIN" and not self.uncertainty:
-                raise ValueError("uncertain factuality needs a reason")
+                raise PydanticCustomError("claim_uncertainty_missing", "uncertain factuality needs a reason")
             if self.temporal == "UNCERTAIN" and (not self.uncertainty or self.fresh_evidence == "NOT_REQUIRED"):
-                raise ValueError("uncertain temporal scope cannot waive fresh evidence")
+                raise PydanticCustomError("claim_uncertain_temporal_combination", "uncertain temporal scope cannot waive fresh evidence")
             if self.temporal == "DYNAMIC" and self.fresh_evidence != "REQUIRED":
-                raise ValueError("dynamic facts need fresh evidence")
+                raise PydanticCustomError("claim_dynamic_requires_fresh", "dynamic facts need fresh evidence")
             if self.temporal in {"STABLE", "HISTORICAL"} and self.fresh_evidence != "NOT_REQUIRED":
-                raise ValueError("inconsistent temporal requirement")
+                raise PydanticCustomError("claim_non_dynamic_evidence", "inconsistent temporal requirement")
         return self
 
 
@@ -83,28 +88,32 @@ class Extraction(Strict):
     def bind(self, request: AnalysisInput):
         previous = 0
         for i, claim in enumerate(self.claims, 1):
-            if claim.claim_id != f"c{i:03d}" or claim.start < previous:
-                raise ValueError("claims must have sequential IDs and nonoverlapping source order")
-            if claim.end > len(request.text) or request.text[claim.start:claim.end] != claim.source_text:
-                raise ValueError("claim is not the exact original substring")
+            if claim.claim_id != f"c{i:03d}":
+                raise BindingFailure(Code.BINDING_ID_SEQUENCE, ("claims", i-1, "claim_id"))
+            if claim.start < previous:
+                raise BindingFailure(Code.BINDING_OVERLAP, ("claims", i-1, "start"))
+            if claim.end > len(request.text):
+                raise BindingFailure(Code.BINDING_RANGE, ("claims", i-1, "end"))
+            if request.text[claim.start:claim.end] != claim.source_text:
+                raise BindingFailure(Code.BINDING_TEXT_MISMATCH, ("claims", i-1, "source_text"))
             previous = claim.end
         return self
 
 
 def strict_json(data: str | bytes):
     if len(data.encode("utf-8") if isinstance(data, str) else data) > MAX_JSON:
-        raise ValueError("JSON output bound exceeded")
+        raise JSONFailure(Code.OUTPUT_TOO_LARGE)
 
     def pairs(items):
         result = {}
         for key, value in items:
             if key in result:
-                raise ValueError("duplicate JSON key")
+                raise JSONFailure(Code.JSON_DUPLICATE_KEY)
             result[key] = value
         return result
 
     def invalid_constant(_):
-        raise ValueError("non-finite JSON number")
+        raise JSONFailure(Code.JSON_NONFINITE_NUMBER)
 
     return json.loads(data, object_pairs_hook=pairs, parse_constant=invalid_constant)
 

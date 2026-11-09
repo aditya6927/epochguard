@@ -10,6 +10,7 @@ from pydantic import Field
 
 from .model import AnalysisFailure, ModelReply, SYSTEM
 from .schema import MAX_JSON, Strict, strict_json
+from .validation_diagnostics import Code, JSONFailure, Stage, details
 
 
 class ModelSettings(Strict):
@@ -24,23 +25,30 @@ class ModelSettings(Strict):
     max_run_usd: float = Field(default=1.0, gt=0, le=25, allow_inf_nan=False)
 
 
-def provider_schema(value):
-    """Gemini supports a JSON Schema subset; full rules remain local checks."""
+def provider_schema(value, *, omit_array_bounds=True):
+    """Generation hints only; full bounds remain mandatory local checks.
+
+    Nested maxItems bounds can increase Gemini's constrained-decoding state
+    space. Omit them from generation; retain the original form for the explicit
+    schema diagnostic only. No model output selects this trusted conversion.
+    """
     allowed = {"$defs", "$ref", "type", "title", "description", "enum", "items",
                "minItems", "maxItems", "minimum", "maximum", "anyOf", "properties",
                "additionalProperties", "required"}
     if isinstance(value, list):
-        return [provider_schema(v) for v in value]
+        return [provider_schema(v, omit_array_bounds=omit_array_bounds) for v in value]
     if not isinstance(value, dict):
         return value
     result = {}
     for key, item in value.items():
+        if key == "maxItems" and omit_array_bounds:
+            continue
         if key == "const":
             result["enum"] = [item]
         elif key in {"properties", "$defs"}:
-            result[key] = {name:provider_schema(child) for name,child in item.items()}
+            result[key] = {name:provider_schema(child, omit_array_bounds=omit_array_bounds) for name,child in item.items()}
         elif key in allowed:
-            result[key] = provider_schema(item)
+            result[key] = provider_schema(item, omit_array_bounds=omit_array_bounds)
     return result
 
 
@@ -57,7 +65,7 @@ class GeminiProvider:
     @classmethod
     def from_environment(cls, max_requests=1):
         if os.environ.get("EPOCHGUARD_ALLOW_MODEL_CALLS") != "1":
-            raise AnalysisFailure("MODEL_NOT_ENABLED")
+            raise AnalysisFailure("MODEL_NOT_ENABLED", diagnostic=details(Stage.CONTROL, Code.NOT_ENABLED))
         try:
             settings = ModelSettings(
                 model=os.environ["EPOCHGUARD_CLAIM_MODEL"], max_requests=max_requests,
@@ -69,7 +77,7 @@ class GeminiProvider:
                 max_run_usd=float(os.environ.get("EPOCHGUARD_CLAIM_MAX_RUN_USD", "1")))
             return cls(settings, os.environ["GEMINI_API_KEY"])
         except (ValueError, KeyError):
-            raise AnalysisFailure("INVALID_MODEL_CONFIGURATION") from None
+            raise AnalysisFailure("INVALID_MODEL_CONFIGURATION", diagnostic=details(Stage.CONTROL, Code.INVALID_CONFIGURATION)) from None
 
     async def generate(self, request, schema):
         settings = self.settings
@@ -79,7 +87,7 @@ class GeminiProvider:
         reservation = (input_bound * settings.input_usd_per_million + settings.max_output_tokens * settings.output_usd_per_million) / 1_000_000
         async with self._budget_lock:
             if self.calls >= settings.max_requests or reservation > settings.max_request_usd or self.reserved_usd + reservation > settings.max_run_usd:
-                raise AnalysisFailure("MODEL_BUDGET_EXCEEDED")
+                raise AnalysisFailure("MODEL_BUDGET_EXCEEDED", diagnostic=details(Stage.CONTROL, Code.BUDGET_EXCEEDED))
             # Failed/cancelled calls consume their reservation; no retry loophole.
             self.calls += 1
             self.reserved_usd += reservation
@@ -88,34 +96,36 @@ class GeminiProvider:
             "contents": [{"role": "user", "parts": [{"text": candidate}]}],
             "generationConfig": {"candidateCount": 1, "temperature": 0,
                                  "maxOutputTokens": settings.max_output_tokens,
-                                 "responseMimeType": "application/json", "responseJsonSchema": provider_schema(schema)}}
+                                 "responseMimeType": "application/json", "responseJsonSchema": self._generation_schema(schema)}}
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.model}:generateContent"
+        phase = Stage.PROVIDER_TRANSPORT
         try:
             async with asyncio.timeout(settings.timeout_seconds):
                 async with httpx.AsyncClient(timeout=settings.timeout_seconds, follow_redirects=False,
                                              trust_env=False, transport=self._transport) as client:
                     async with client.stream("POST", url, json=payload, headers={"x-goog-api-key": self._key}) as response:
                         if response.status_code != 200:
-                            raise AnalysisFailure("MODEL_PROVIDER_FAILURE")
+                            raise AnalysisFailure("MODEL_PROVIDER_FAILURE", diagnostic=details(Stage.PROVIDER_HTTP, Code.HTTP_FAILURE))
                         data = bytearray()
                         async for chunk in response.aiter_bytes():
                             data.extend(chunk)
                             if len(data) > MAX_JSON:
-                                raise AnalysisFailure("MODEL_OUTPUT_TOO_LARGE")
+                                raise AnalysisFailure("MODEL_OUTPUT_TOO_LARGE", diagnostic=details(Stage.PROVIDER_ENVELOPE, Code.OUTPUT_TOO_LARGE))
+            phase = Stage.PROVIDER_ENVELOPE
             record = strict_json(bytes(data))
             candidates = record["candidates"]
             if len(candidates) != 1 or candidates[0]["finishReason"] != "STOP":
-                raise AnalysisFailure("MODEL_INCOMPLETE")
+                raise AnalysisFailure("MODEL_INCOMPLETE", diagnostic=details(phase, Code.ENVELOPE_INCOMPLETE))
             parts = candidates[0]["content"]["parts"]
             text_parts = [p["text"] for p in parts if "text" in p and not p.get("thought", False)]
             if not text_parts or any("functionCall" in p for p in parts):
-                raise AnalysisFailure("MODEL_INVALID_RESPONSE")
+                raise AnalysisFailure("MODEL_INVALID_RESPONSE", diagnostic=details(phase, Code.ENVELOPE_CONTENT_INVALID))
             usage = record.get("usageMetadata", {})
             incoming = usage.get("promptTokenCount")
             total = usage.get("totalTokenCount")
             if incoming is not None or total is not None:
                 if type(incoming) is not int or type(total) is not int or not 0 <= incoming <= total:
-                    raise AnalysisFailure("MODEL_INVALID_USAGE")
+                    raise AnalysisFailure("MODEL_INVALID_USAGE", diagnostic=details(phase, Code.ENVELOPE_USAGE_INVALID))
                 outgoing = total - incoming  # Includes reported thought tokens.
                 cost = (incoming * settings.input_usd_per_million + outgoing * settings.output_usd_per_million) / 1_000_000
             else:
@@ -124,8 +134,22 @@ class GeminiProvider:
         except asyncio.CancelledError:
             raise
         except (TimeoutError, httpx.TimeoutException):
-            raise AnalysisFailure("MODEL_TIMEOUT") from None
+            raise AnalysisFailure("MODEL_TIMEOUT", diagnostic=details(Stage.PROVIDER_TRANSPORT, Code.TIMEOUT)) from None
         except AnalysisFailure:
             raise
+        except JSONFailure as error:
+            raise AnalysisFailure("MODEL_PROVIDER_FAILURE", diagnostic=details(phase, error.code)) from None
+        except (json.JSONDecodeError, RecursionError):
+            raise AnalysisFailure("MODEL_PROVIDER_FAILURE", diagnostic=details(phase, Code.JSON_INVALID_OR_INCOMPLETE)) from None
+        except UnicodeError:
+            raise AnalysisFailure("MODEL_PROVIDER_FAILURE", diagnostic=details(phase, Code.JSON_INVALID_ENCODING)) from None
+        except httpx.TransportError:
+            raise AnalysisFailure("MODEL_PROVIDER_FAILURE", diagnostic=details(Stage.PROVIDER_TRANSPORT, Code.TRANSPORT_FAILURE)) from None
         except Exception:
-            raise AnalysisFailure("MODEL_PROVIDER_FAILURE") from None
+            code = Code.ENVELOPE_INVALID if phase == Stage.PROVIDER_ENVELOPE else Code.TRANSPORT_FAILURE
+            raise AnalysisFailure("MODEL_PROVIDER_FAILURE", diagnostic=details(phase, code)) from None
+
+    def _generation_schema(self, schema):
+        # A diagnostic subclass supplies controlled alternate generation hints.
+        # The request, budgets, transport and strict ModelExtractor stay shared.
+        return provider_schema(schema)
