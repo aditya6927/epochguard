@@ -5,6 +5,7 @@ import hashlib
 import re
 
 from .contract import Claim, Evidence, VerificationRequest, VerificationResponse, VERSION_PATTERN, SOURCE_URL
+from .diagnostics import failure
 from .retrieval import RetrievalFailure, RetrievalTimeout
 
 CLAIM_RE = re.compile(
@@ -46,7 +47,20 @@ async def verify(request: VerificationRequest, retriever, clock=lambda: datetime
     claim = None
     evidence = []
 
-    def response(verdict, reason):
+    def response(verdict, reason, retrieval_failure=None):
+        if verdict == "INSUFFICIENT":
+            if retrieval_failure is not None:
+                failure("retrieval_failure", retrieval_failure.category, retrieval_failure.status)
+            else:
+                category = {
+                    "VERIFIER_ERROR": "verification_unavailable",
+                    "UNSUPPORTED_CLAIM": "unsupported_claim",
+                    "INSUFFICIENT_EVIDENCE": "invalid_evidence",
+                    "AMBIGUOUS_EVIDENCE": "ambiguous_evidence",
+                    "STALE_OBSERVATION": "stale_observation",
+                    "CLAIM_AHEAD_OF_SOURCE": "claim_ahead_of_source",
+                }.get(reason, "verification_unavailable")
+                failure("verification_failure", category)
         return VerificationResponse(request_id=request.request_id,
                                     candidate_sha256=request.candidate_sha256, claim=claim,
                                     verdict=verdict, reason_code=reason,
@@ -87,10 +101,10 @@ async def verify(request: VerificationRequest, retriever, clock=lambda: datetime
         # A source extraction may lag an announcement. Never call a newer claim
         # false merely because this observation lists an older version.
         return response("INSUFFICIENT", "CLAIM_AHEAD_OF_SOURCE")
-    except RetrievalTimeout:
-        return response("INSUFFICIENT", "RETRIEVAL_TIMEOUT")
-    except RetrievalFailure:
-        return response("INSUFFICIENT", "RETRIEVAL_FAILURE")
+    except RetrievalTimeout as error:
+        return response("INSUFFICIENT", "RETRIEVAL_TIMEOUT", error)
+    except RetrievalFailure as error:
+        return response("INSUFFICIENT", "RETRIEVAL_FAILURE", error)
     except Exception:
         # Never echo provider/page/credential/exception text across the boundary.
         return response("INSUFFICIENT", "VERIFIER_ERROR")

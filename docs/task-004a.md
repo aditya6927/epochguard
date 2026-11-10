@@ -1,5 +1,7 @@
 # Task 004A — Time-sensitive claim identification and evaluation
 
+Follow-up: [Task 004A-H](task-004a-hardening.md) records contract-parser, sanitized-diagnostic, baseline lexical and schema-byte hardening. Schema file hashes below now refer to normalized LF bytes stored in Git; earlier CRLF hashes are preserved in that report. Historical evaluation results remain unchanged.
+
 Implemented November 8–9, 2026 as a **stand-alone experiment**, outside the qualified gateway. The offline implementation and regressions are complete for review. **Full acceptance is pending independent human annotation review and real-model performance qualification.** No paid model or Tavily call was made, and no model-quality improvement is claimed. The evaluation reference date remains fixed to November 8 across the local date rollover.
 
 ## Scope and contract
@@ -194,7 +196,7 @@ Canonical JSON here means sorted keys with compact separators, UTF-8:
 | --- | --- |
 | Original provider schema | 1,483 bytes; `60c4fc533d2ed73aa922a140282f91fd0e854e34ebb2e230a688a825f17e8130` |
 | Provider schema without maxItems | 1,456 bytes; `d556b807cadc5587af599f6b4afbcaee436874ecf5f85a0b58e3bece3343c5a7` |
-| Unchanged strict JSON Schema file, original file bytes | `22537498b33b07939feae96b2000ed664ec666f49f9b310d5b091523a31dbd8e` |
+| Unchanged strict JSON Schema, normalized LF file bytes | `4844a67557f27a96feca2a439d68cefd1a70724010f923bf3f135a45158d4986` |
 
 The new `claim_analysis.schema_diagnostic` command exports both variants entirely offline and optionally compares them using the **same** `GeminiProvider` request, cost-reservation, timeout and output-parsing path. A small private generation-schema hook permits the diagnostic subclass to select a fixed local schema. A transport wrapper observes status only. The probe runs the unchanged `ModelExtractor`, so HTTP acceptance and valid strict extraction are separate report fields. It uses one fixed synthetic response, no evaluation labels, no model-listing requests and no candidate-supplied configuration.
 
@@ -363,8 +365,8 @@ The generation schema now has `$defs.IdentifiedClaim`, no offset fields or numer
 
 | Artifact | SHA-256 |
 | --- | --- |
-| Unchanged canonical `schema-004a.v1.json` file | `22537498b33b07939feae96b2000ed664ec666f49f9b310d5b091523a31dbd8e` |
-| New `schema-004a.identification.v1.json` file | `1708eba595bb506f94e81101d58458e4a881425a245d16f34a56a6887fe7676d` |
+| Unchanged canonical `schema-004a.v1.json` file | `4844a67557f27a96feca2a439d68cefd1a70724010f923bf3f135a45158d4986` |
+| New `schema-004a.identification.v1.json` file | `4514b8bc30d2acf9e7ac1f928cb28180db499e52297e26b4cc11d85b454e526a` |
 | Compact/sorted new provider `no_max_items` schema, 1,397 bytes | `d643b5fed04ed6590350556cbb59774bca32e0908ee62a5a45a536d6d712d758` |
 
 No Gemini pricing, credentials, model selection, endpoint, timeout/token bounds, reservation algorithm or retry policy changed. The new schema/prompt still require actual live compatibility and quality qualification. The Go gateway, 003A verifier, `003a.v1`, caches and evaluation labels remain unchanged.

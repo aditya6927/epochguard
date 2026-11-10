@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"log"
 	"mime"
 	"net/http"
 	"net/url"
@@ -143,47 +142,57 @@ func (s *httpDecisionSource) Decide(ctx context.Context, resp *schemas.BifrostRe
 	started := time.Now()
 	text, version, err := plainCandidate(resp)
 	if err != nil {
-		return Unavailable, err
+		return Unavailable, verificationFailure{category: "unsupported_candidate"}
 	}
 	sum := sha256.Sum256([]byte(text))
 	nonce := make([]byte, 16)
 	if _, err := rand.Read(nonce); err != nil {
-		return Unavailable, errors.New("epochguard: verification identity unavailable")
+		return Unavailable, verificationFailure{category: "verification_unavailable"}
 	}
 	payload := verificationRequest{verificationSchema, verificationPolicy, hex.EncodeToString(nonce), text, hex.EncodeToString(sum[:])}
 	body, err := json.Marshal(payload)
 	if err != nil {
-		return Unavailable, errors.New("epochguard: verification encoding failed")
+		return Unavailable, verificationFailure{category: "request_failure"}
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, s.endpoint, bytes.NewReader(body))
 	if err != nil {
-		return Unavailable, errors.New("epochguard: verification request failed")
+		return Unavailable, verificationFailure{category: "request_failure"}
 	}
 	req.Header.Set("Content-Type", "application/json")
 	response, err := s.client.Do(req)
 	if err != nil {
-		return Unavailable, errors.New("epochguard: verification transport unavailable")
+		return Unavailable, transportFailure(err)
 	}
 	defer response.Body.Close()
 	media, _, _ := mime.ParseMediaType(response.Header.Get("Content-Type"))
-	if response.StatusCode != http.StatusOK || media != "application/json" {
-		return Unavailable, errors.New("epochguard: verification status unavailable")
+	if response.StatusCode != http.StatusOK {
+		return Unavailable, verificationFailure{category: "verifier_http_failure", status: response.StatusCode}
+	}
+	if media != "application/json" {
+		return Unavailable, verificationFailure{category: "invalid_contract", status: response.StatusCode}
 	}
 	data, err := io.ReadAll(io.LimitReader(response.Body, 32769))
-	if err != nil || len(data) > 32768 {
-		return Unavailable, errors.New("epochguard: invalid verification body")
+	if err != nil {
+		failure := transportFailure(err)
+		failure.status = response.StatusCode
+		return Unavailable, failure
+	}
+	if len(data) > 32768 {
+		return Unavailable, verificationFailure{category: "invalid_contract", status: response.StatusCode}
 	}
 	var verdict verificationResponse
 	if err := strictJSON(data, &verdict); err != nil {
-		return Unavailable, errors.New("epochguard: malformed verification contract")
+		return Unavailable, verificationFailure{category: "invalid_contract", status: response.StatusCode}
 	}
 	decision, err := validateVerification(payload, version, verdict, started, time.Now())
 	if decision != Unavailable && (len(verdict.Evidence) != 1 || verdict.Evidence[0].RetrievalMode != s.evidenceMode) {
-		return Unavailable, errors.New("epochguard: evidence mode mismatch")
+		return Unavailable, verificationFailure{category: "invalid_contract", status: response.StatusCode}
 	}
-	if err == nil {
-		log.Printf("epochguard verification_verdict=%s reason=%s latency_ms=%d", verdict.Verdict, verdict.ReasonCode, time.Since(started).Milliseconds())
+	if err != nil {
+		return Unavailable, verificationFailure{category: "invalid_contract", status: response.StatusCode}
 	}
+	// Validation above restricts verdict/reason to fixed contract literals.
+	safeLogf("epochguard verification_verdict=%s reason=%s latency_ms=%d", verdict.Verdict, verdict.ReasonCode, time.Since(started).Milliseconds())
 	return decision, err
 }
 
@@ -234,12 +243,16 @@ func compareVersion(a, b string) int {
 	return 0
 }
 
-// Reject duplicate keys before decoding the typed contract; encoding/json's
-// ordinary last-value-wins behavior is inappropriate for verdict records.
-func strictJSON(data []byte, target any) error {
+// This fixed contract accepts only exact canonical names, at their own object
+// level. Reject aliases (including Unicode folds), unknown and duplicate names
+// before typed decoding can apply encoding/json's case-insensitive matching.
+func strictJSON(data []byte, target *verificationResponse) error {
 	tokens := json.NewDecoder(bytes.NewReader(data))
-	var walk func() error
-	walk = func() error {
+	var walk func(string, int) error
+	walk = func(object string, depth int) error {
+		if depth > 4 {
+			return errors.New("invalid contract nesting")
+		}
 		t, err := tokens.Token()
 		if err != nil {
 			return err
@@ -257,14 +270,18 @@ func strictJSON(data []byte, target any) error {
 					if !ok || keys[name] {
 						return errors.New("duplicate key")
 					}
+					child, allowed := contractField(object, name)
+					if !allowed {
+						return errors.New("noncanonical contract field")
+					}
 					keys[name] = true
-					if err := walk(); err != nil {
+					if err := walk(child, depth+1); err != nil {
 						return err
 					}
 				}
 			case '[':
 				for tokens.More() {
-					if err := walk(); err != nil {
+					if err := walk(object, depth+1); err != nil {
 						return err
 					}
 				}
@@ -276,7 +293,7 @@ func strictJSON(data []byte, target any) error {
 		}
 		return nil
 	}
-	if err := walk(); err != nil {
+	if err := walk("response", 0); err != nil {
 		return err
 	}
 	if _, err := tokens.Token(); err != io.EOF {
@@ -285,4 +302,29 @@ func strictJSON(data []byte, target any) error {
 	decoder := json.NewDecoder(bytes.NewReader(data))
 	decoder.DisallowUnknownFields()
 	return decoder.Decode(target)
+}
+
+func contractField(object, name string) (string, bool) {
+	switch object {
+	case "response":
+		switch name {
+		case "schema_version", "policy_id", "request_id", "candidate_sha256", "verdict", "reason_code", "checked_at":
+			return "scalar", true
+		case "claim":
+			return "claim", true
+		case "evidence":
+			return "evidence", true
+		}
+	case "claim":
+		switch name {
+		case "kind", "version":
+			return "scalar", true
+		}
+	case "evidence":
+		switch name {
+		case "url", "retrieval_mode", "content_sha256", "retrieved_at", "observed_at", "retrieval_id", "observed_version", "excerpt":
+			return "scalar", true
+		}
+	}
+	return "", false
 }

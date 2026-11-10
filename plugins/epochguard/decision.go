@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"log"
 	"sync/atomic"
 	"time"
 
@@ -95,7 +94,7 @@ func configure(config any) error {
 		// Cache is disabled in the 003A deployment. Suppress writes as defense
 		// in depth if a trusted deployment accidentally enables the built-in.
 		activePolicy.Store(&policy{source: source, cacheNoStore: true})
-		log.Print("epochguard event=init task=003a source=http policy=python-windows-latest-v1")
+		safeLogf("epochguard event=init task=003a source=http policy=python-windows-latest-v1")
 		return nil
 	}
 	if cfg.Decision == "" {
@@ -118,7 +117,7 @@ func configure(config any) error {
 		source = delayedDecision{decision: fixedDecision(cfg.Decision), delay: time.Duration(cfg.TestDecisionDelayMS) * time.Millisecond}
 	}
 	activePolicy.Store(&policy{source: source, cacheNoStore: cfg.CacheNoStore})
-	log.Printf("epochguard event=init task=002b test_only=%t decision=%s", cfg.TestOnly, cfg.Decision)
+	safeLogf("epochguard event=init task=002b test_only=%t decision=%s", cfg.TestOnly, cfg.Decision)
 	return nil
 }
 
@@ -140,10 +139,16 @@ func enforce(ctx context.Context, resp *schemas.BifrostResponse, upstreamErr *sc
 		return nil, upstreamErr, nil
 	}
 	decision := Unavailable
+	var decisionErr error
 	if resp != nil && resp.ChatResponse != nil && source != nil && ctx.Err() == nil {
-		if result, err := source.Decide(ctx, resp); err == nil && ctx.Err() == nil {
+		result, err := source.Decide(ctx, resp)
+		decisionErr = err
+		if err == nil && ctx.Err() == nil {
 			decision = result
 		}
+	}
+	if ctx.Err() != nil {
+		decisionErr = ctx.Err()
 	}
 	switch decision {
 	case Allow:
@@ -151,6 +156,7 @@ func enforce(ctx context.Context, resp *schemas.BifrostResponse, upstreamErr *sc
 	case Reject:
 		return nil, refusal(403, "epochguard_rejected", "EpochGuard refused the provider response."), nil
 	default:
+		logVerificationFailure(decisionErr)
 		return nil, refusal(503, "epochguard_verification_unavailable", "EpochGuard verification is unavailable."), nil
 	}
 }

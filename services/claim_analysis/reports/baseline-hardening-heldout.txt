@@ -1,0 +1,7 @@
+Engine: baseline; split: heldout; independent human review pending: 52
+Quality qualification: draft-label measurement; not human-reviewed quality
+Outcomes: analyzed=49; extraction_failures=0; invalid_inputs=3
+all: responses=52; claim P/R/F1=0.911/0.911/0.911; temporal macro-F1=0.522; fresh P/R=0.812/0.232; dynamic omissions=6; dynamic nonfresh=0; failures=0
+mixed: responses=11; claim P/R/F1=0.889/0.727/0.800; temporal macro-F1=0.490; fresh P/R=0.667/0.143; dynamic omissions=5; dynamic nonfresh=0; failures=0
+adversarial: responses=8; claim P/R/F1=0.667/0.667/0.667; temporal macro-F1=0.167; fresh P/R=0.667/0.667; dynamic omissions=1; dynamic nonfresh=0; failures=0
+analyzed_only: responses=49; claim P/R/F1=0.911/0.911/0.911; temporal macro-F1=0.522; fresh P/R=0.812/0.232; dynamic omissions=6; dynamic nonfresh=0; failures=0

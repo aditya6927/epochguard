@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 from .contract import VerificationRequest, VerificationResponse
+from .diagnostics import failure
 from .policy import verify
 from .retrieval import TavilyRetriever
 from .settings import TimeoutSettings
@@ -32,6 +33,7 @@ class RequestBound:
                     if not message.get("more_body", False):
                         break
         except TimeoutError:
+            failure("verification_failure", "request_failure")
             return await JSONResponse({"detail": "request deadline"}, status_code=408)(scope, receive, send)
         sent = False
 
@@ -61,7 +63,8 @@ def create_app(retriever=None, *, timeouts: TimeoutSettings | None = None) -> Fa
             async with asyncio.timeout(budgets.verification_seconds):
                 source = retriever if retriever is not None else TavilyRetriever.from_environment(timeouts=budgets)
                 return await verify(request, source)
-        except Exception:
+        except Exception as error:
+            failure("verification_failure", "verification_timeout" if isinstance(error, TimeoutError) else "verification_unavailable")
             return VerificationResponse(request_id=request.request_id,
                                         candidate_sha256=request.candidate_sha256,
                                         claim=None, verdict="INSUFFICIENT",

@@ -4,7 +4,6 @@ package main
 
 import (
 	"errors"
-	"log"
 	"strings"
 	"sync"
 
@@ -28,14 +27,14 @@ func Init(config any) error {
 	if err := configure(config); err != nil {
 		// Returning an Init error would make the loader omit this plugin.
 		// Keep hooks installed with no source: successful candidates fail closed.
-		log.Printf("epochguard event=config_invalid decision=UNAVAILABLE error=%v", err)
+		safeLogf("epochguard event=config_invalid decision=UNAVAILABLE error=%v", err)
 	}
 	return nil
 }
 
 func Cleanup() error {
 	activePolicy.Store(nil)
-	log.Print("epochguard event=cleanup task=002b")
+	safeLogf("epochguard event=cleanup task=002b")
 	return nil
 }
 
@@ -50,7 +49,7 @@ func record(ctx *schemas.BifrostContext, phase string) {
 	trace.mu.Lock()
 	trace.phases = append(trace.phases, phase)
 	trace.mu.Unlock()
-	log.Printf("epochguard hook=%s request_id=%v", phase, ctx.Value(schemas.BifrostContextKeyRequestID))
+	safeLogf("epochguard hook=%s request_id=%v", phase, ctx.Value(schemas.BifrostContextKeyRequestID))
 }
 
 func HTTPTransportPreHook(ctx *schemas.BifrostContext, req *schemas.HTTPRequest) (*schemas.HTTPResponse, error) {
@@ -91,7 +90,7 @@ func PostLLMHook(ctx *schemas.BifrostContext, resp *schemas.BifrostResponse, bif
 		trace.cacheAtPost = cacheState
 		trace.mu.Unlock()
 	}
-	log.Printf("epochguard cache_at_post=%s request_id=%v", cacheState, ctx.Value(schemas.BifrostContextKeyRequestID))
+	safeLogf("epochguard cache_at_post=%s request_id=%v", cacheState, ctx.Value(schemas.BifrostContextKeyRequestID))
 	var source DecisionSource
 	if policy := activePolicy.Load(); policy != nil {
 		source = policy.source

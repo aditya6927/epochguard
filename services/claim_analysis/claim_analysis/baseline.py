@@ -9,8 +9,11 @@ HISTORY = re.compile(r"\b(?:in|during|as of|on) ((?:18|19|20)\d{2}(?:-\d{2}-\d{2
 RELATIVE = re.compile(r"\b(today|currently|now|yesterday|last year|this week|tomorrow)\b", re.I)
 DYNAMIC = re.compile(r"\b(latest|current|today|now|price|costs?|trades?|ceo|president|minister|captain|ranked|ranking|forecast|weather|available|stock|sold out|delayed|cancelled|open|closed|requires?|regulations?|visa|release|version|supports?|shipping|leads?|score|wins?|tickets?|interest rate|yield|exchange rate)\b", re.I)
 STABLE = re.compile(r"\b(triangle|prime|integer|hydrogen|oxygen|atom|molecule|photosynthesis|gravity|orbits|continent|capital|wrote|invented|founded|became|sum|equals|square|mammal|freezes|boils|algorithm|binary|kilometre|kilometer|unicode|utf-8|http|json)\b", re.I)
-OPINION = re.compile(r"\b(I (?:think|prefer|love|expect)|best|beautiful|wonderful|should|will|predict|probably|might|may win)\b", re.I)
-INSTRUCTION = re.compile(r"^(?:please|ignore|return|print|forget|use|do not|system:|assistant:)", re.I)
+OPINION = re.compile(r"\b(I (?:think|prefer|love|expect)|beautiful|wonderful|should|will|predict|probably|might|may win)\b|\b(?:is|are|was|were) (?:the )?best\b", re.I)
+INSTRUCTION = re.compile(r"^(?:(?:please|ignore|return|print|forget|use|do not)\b|system:|assistant:)", re.I)
+# A known subjectivity/instruction signal must not erase a recognized assertion
+# in the same sentence. Keep its span uncertain; changing signals need evidence.
+ASSERTION = re.compile(r"\b(?:is|are|was|were|has|have|costs?|requires?)\b", re.I)
 
 
 def analyze(request: AnalysisInput) -> Extraction:
@@ -29,6 +32,10 @@ def analyze(request: AnalysisInput) -> Extraction:
             factuality, fresh = "NON_FACTUAL", "NOT_APPLICABLE"
             if INSTRUCTION.search(segment):
                 reasons.append("UNTRUSTED_INSTRUCTION")
+            if not segment.endswith("?") and ASSERTION.search(segment) and (DYNAMIC.search(segment) or STABLE.search(segment) or historical):
+                factuality = "UNCERTAIN"
+                fresh = "REQUIRED" if DYNAMIC.search(segment) else "UNCERTAIN"
+                reasons.append("MIXED_REQUIREMENTS")
         elif re.match(r"^(it|they|this|that|he|she)\b", segment, re.I):
             factuality = "UNCERTAIN"
             reasons.append("AMBIGUOUS_REFERENCE")

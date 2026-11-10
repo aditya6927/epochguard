@@ -5,3 +5,5 @@
 *.sh text eol=lf
 Dockerfile text eol=lf
 *.yaml text eol=lf
+/services/claim_analysis/schema-004a.v1.json text eol=lf
+/services/claim_analysis/schema-004a.identification.v1.json text eol=lf
