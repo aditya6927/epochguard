@@ -1,6 +1,6 @@
 # EpochGuard architecture
 
-**Status:** narrow live Bifrost → Go → FastAPI → Tavily qualification is complete on the maintainer-supplied November 8 rerun: `TestLiveGatewayQualification` and all five subtests passed in 18.16s, including supported delivery and older terminal refusal without answer leakage. Initial blocked 401 attempts remain documented; their exact credential-mismatch cause is not proven. This covers the existing single policy with the local provider fixture. Default and verification deployments keep caching disabled; general verification, production readiness, and the protected cache remain unimplemented or unqualified. Updated: 2026-11-08.
+**Status:** narrow live Bifrost → Go → FastAPI → Tavily qualification is complete on the maintainer-supplied November 8 rerun: `TestLiveGatewayQualification` and all five subtests passed in 18.16s, including supported delivery and older terminal refusal without answer leakage. Initial blocked 401 attempts remain documented; their exact credential-mismatch cause is not proven. This covers the existing single policy with the local provider fixture. Default and verification deployments keep caching disabled; general verification, production readiness, and the protected cache remain unimplemented or unqualified. Updated: 2026-11-13.
 
 ## Problem and system boundary
 
@@ -104,6 +104,37 @@ The 112-case/184-factual-annotation dataset is an agent-authored review draft wi
 
 The model-facing `004a.identification.v1` representation now omits offsets. Python accepts only globally unique exact quotes, calculates original Unicode code-point spans, rejects out-of-order/overlapping claims, then validates the unchanged canonical `004a.v1` contract and source binding. There is no normalization, fuzzy repair, quote replacement or partial acceptance; repeated ambiguous text fails closed. This reduces offset-generation responsibility without verifying semantic correctness or coverage. Live performance of this revised pipeline remains pending; [Task 004A](task-004a.md#deterministic-source-span-alignment-2026-11-09) records the fixed development comparison and qualification commands.
 
+## Experimental multi-claim verification boundary
+
+[Task 004B](task-004b.md) adds `verifier.multiclaim` inside the existing Python
+service source tree, exposed through a programmatic API and offline CLI. It does
+not add a FastAPI route, change Compose profiles, or connect to Go authorization.
+The existing `003a.v1` and `004a.v1` contracts remain unchanged.
+
+```text
+Exact original response + trusted request ID + UTF-8 SHA-256
+  -> trusted complete-response template grammar (maximum eight claims)
+  -> canonical 004A spans / optional 004A extraction schema + binding + agreement
+  -> fixed registry: existing Python Windows policy / requests PyPI JSON policy
+  -> bounded independent evidence observations and deterministic comparisons
+  -> typed per-claim results + coverage + pure aggregation -> 004b.v1 record
+```
+
+SUPPORTED requires complete grammar coverage and every required claim supported.
+A validated contradiction takes precedence over insufficient neighboring claims;
+missing results never count as successful checks. Invalid result bindings,
+extraction failures, omitted claims, unsupported prose and uncertain coverage
+cannot produce SUPPORTED. This solves coverage only for the exact template
+language, not arbitrary semantics. Model classifications do not choose policy or
+waive evidence requirements. Fixture evidence remains explicitly separate from
+live observations, and neither timestamps nor hashes prove source authenticity.
+
+One Pipeline instance per event loop bounds admitted requests; each admitted
+request checks claims sequentially under a shared deadline. No evidence/cache
+persistence, new gateway contract consumer, streaming support or release action
+is implemented. The [component README](../services/verifier/README.md) specifies
+the grammar, evidence sources, lifetimes, resource limits and offline demo.
+
 ## Proposed product components — not yet delivered
 
 ```text
@@ -124,7 +155,7 @@ Client -> Bifrost + EpochGuard enforcement -> verified response / safe refusal
                   Periodic revalidation / invalidation
 ```
 
-Task 002B establishes waiting, typed refusals, and no-leak behavior using deterministic fixtures. Task 003A implements the first narrow service policy above. Task 004A prototypes identification/classification independently; their integration, broader evidence policies, durable evidence, and revalidation remain proposed. The trusted gateway policy chooses and enforces actions. Verification may be unavailable; that is an explicit policy outcome, **not** a successful verdict.
+Task 002B establishes waiting, typed refusals, and no-leak behavior using deterministic fixtures. Task 003A implements the first narrow service policy above. Task 004A prototypes identification/classification independently; 004B adds experimental template-bounded multi-claim verification. Gateway integration of 004B, general evidence policies, durable evidence, and revalidation remain proposed. The trusted gateway policy chooses and enforces actions. Verification may be unavailable; that is an explicit policy outcome, **not** a successful verdict.
 
 Future caching must bind a response to trusted request scope, policy version, evidence IDs/versions, and expiry. A stale physical cache entry must not become returnable after a concurrent write or invalidation race. Task 002C reproduced both the built-in cache's enforcement-order hazards and late-write repopulation; unrestricted built-in writes remain unsuitable for the protected deployment. A future EpochGuard-owned cache needs explicit admission and read/release validity checks plus atomic generation/version comparison, not deletion alone.
 

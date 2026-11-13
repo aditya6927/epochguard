@@ -49,7 +49,7 @@ EpochGuard waits for the verification decision inside Bifrost's `PostLLMHook`. R
 
 ## What can it verify today?
 
-The only supported evidence policy accepts the entire assistant answer in this exact form:
+The qualified gateway evidence policy accepts the entire assistant answer in this exact form:
 
 ```text
 The latest stable Python 3 release for Windows listed on Python.org is X.Y.Z.
@@ -72,6 +72,12 @@ This policy compares an extracted source label. It does not prove general truth 
 A separate [Python analyzer and evaluation CLI](services/claim_analysis/README.md) identifies verbatim claim spans and temporal evidence requirements in ordinary responses. It includes a deterministic baseline, a bounded opt-in Gemini adapter, and 112 synthetic draft examples with 184 factual annotations. Independent human review and real-model performance qualification remain pending. The baseline's low held-out fresh-evidence recall is recorded in [the evaluation report](docs/task-004a.md). Identification is not verification and cannot authorize delivery; the gateway still accepts only the narrow policy above.
 
 ## Quick start: offline verification
+
+An independent [experimental multi-claim API and offline demo](services/verifier/README.md)
+checks exact Python Windows and fixed-package PyPI claims under a whole-response
+grammar. Every required claim needs evidence; unaccounted content prevents
+SUPPORTED. This experiment has no gateway authorization path and does not expand
+the qualified surface above.
 
 You need Git, Docker Desktop running **Linux containers** or Docker Engine on Linux, and Docker Compose with `--wait` support. Builds target Linux/amd64 and use Buildx; other host architectures require emulation. No host Go/Python installation, paid model-provider key, or Tavily key is needed for offline tests. Initial builds require internet access to fetch source, images, and dependencies.
 
