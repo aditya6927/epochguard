@@ -22,6 +22,7 @@ RUN tail -n +2 go.mod > /tmp/host.mod \
 COPY dev/bifrost/ui-placeholder.txt /src/bifrost/transports/bifrost-http/ui/task-002a.txt
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
     go build -p=2 -mod=readonly -trimpath -ldflags='-w -s -X main.Version=v2.4.0' -o /out/bifrost-http ./bifrost-http
+COPY tests/conformance/ /src/epochguard/tests/conformance/
 COPY plugins/epochguard/ /src/epochguard/plugins/epochguard/
 WORKDIR /src/epochguard/plugins/epochguard
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
@@ -40,7 +41,8 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     && go build -mod=readonly -trimpath -o /out/cache-store-proxy ./cmd/cache-store-proxy \
     && go test -mod=readonly -trimpath -c -o /out/smoke.test ./tests/smoke \
     && go test -mod=readonly -trimpath -c -o /out/cache.test ./tests/cachelifecycle \
-    && go test -mod=readonly -trimpath -c -o /out/verification.test ./tests/verification
+    && go test -mod=readonly -trimpath -c -o /out/verification.test ./tests/verification \
+    && go test -mod=readonly -trimpath -c -o /out/multiclaim.test ./tests/multiclaim
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
     go -C /src/epochguard/plugins/epochguard build -mod=readonly -trimpath -tags routeaudit -buildmode=plugin -o /out/routeobserver.so /src/epochguard/tests/routeobserver/main.go \
     && go build -mod=readonly -trimpath -o /out/route-provider-fixture ./cmd/route-provider-fixture \
@@ -65,6 +67,7 @@ COPY --from=build /out/provider-fixture /app/provider-fixture
 COPY --from=build /out/cache-store-proxy /app/cache-store-proxy
 COPY --from=build /out/cache.test /app/cache.test
 COPY --from=build /out/verification.test /app/verification.test
+COPY --from=build /out/multiclaim.test /app/multiclaim.test
 COPY --from=build /out/routeobserver.so /app/plugins/routeobserver.so
 COPY --from=build /out/route-provider-fixture /app/route-provider-fixture
 COPY --from=build /out/routes.test /app/routes.test

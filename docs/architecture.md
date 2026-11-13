@@ -1,6 +1,6 @@
 # EpochGuard architecture
 
-**Status:** narrow live Bifrost → Go → FastAPI → Tavily qualification is complete on the maintainer-supplied November 8 rerun: `TestLiveGatewayQualification` and all five subtests passed in 18.16s, including supported delivery and older terminal refusal without answer leakage. Initial blocked 401 attempts remain documented; their exact credential-mismatch cause is not proven. This covers the existing single policy with the local provider fixture. Default and verification deployments keep caching disabled; general verification, production readiness, and the protected cache remain unimplemented or unqualified. Updated: 2026-11-13.
+**Status:** narrow live Bifrost → Go → FastAPI → Tavily qualification is complete on the maintainer-supplied November 8 rerun: `TestLiveGatewayQualification` and all five subtests passed in 18.16s, including supported delivery and older terminal refusal without answer leakage. Initial blocked 401 attempts remain documented; their exact credential-mismatch cause is not proven. This covers the existing single policy with the local provider fixture. Default and verification deployments keep caching disabled; general verification, production readiness, and the protected cache remain unimplemented or unqualified. Updated: 2026-11-14.
 
 ## Problem and system boundary
 
@@ -107,9 +107,10 @@ The model-facing `004a.identification.v1` representation now omits offsets. Pyth
 ## Experimental multi-claim verification boundary
 
 [Task 004B](task-004b.md) adds `verifier.multiclaim` inside the existing Python
-service source tree, exposed through a programmatic API and offline CLI. It does
-not add a FastAPI route, change Compose profiles, or connect to Go authorization.
-The existing `003a.v1` and `004a.v1` contracts remain unchanged.
+service source tree, initially exposed through a programmatic API and offline
+CLI. [Task 004C](task-004c.md) separately integrates that engine into an explicitly
+configured native gateway mode. The existing `003a.v1` and `004a.v1` contracts
+and default deployments remain unchanged.
 
 ```text
 Exact original response + trusted request ID + UTF-8 SHA-256
@@ -130,10 +131,49 @@ waive evidence requirements. Fixture evidence remains explicitly separate from
 live observations, and neither timestamps nor hashes prove source authenticity.
 
 One Pipeline instance per event loop bounds admitted requests; each admitted
-request checks claims sequentially under a shared deadline. No evidence/cache
-persistence, new gateway contract consumer, streaming support or release action
-is implemented. The [component README](../services/verifier/README.md) specifies
-the grammar, evidence sources, lifetimes, resource limits and offline demo.
+request checks claims sequentially under a shared deadline. There is no
+evidence/cache persistence or streaming delivery. The
+[component README](../services/verifier/README.md) specifies the grammar, evidence
+sources, lifetimes, resource limits and offline demos.
+
+### Controlled experimental gateway integration
+
+```text
+Client -> real buffered Bifrost -> fixture provider -> EpochGuard PostLLMHook
+  -> explicit verifier.mode=004b.v1 / nonce + candidate + UTF-8 hash
+  -> dedicated FastAPI /v1/verify/multiclaim -> unchanged 004B pipeline
+  -> strict bounded result -> independent Go grammar/binding/evidence/aggregation
+  -> original response OR terminal typed 403/503 without fallback
+```
+
+The new mode is selected only by trusted plugin configuration; omitted mode
+still selects `003a.v1`. Go shares the pinned plain-message eligibility guard
+but uses the 004B 8,192-code-point/32,768-byte candidate limits, a 64 KiB request
+and a 256 KiB response bound. The original 003A parser, 512-byte candidate rule,
+wire validator and endpoint remain unchanged. Go rederives all full-response
+spans/IDs/policies/versions instead of trusting COMPLETE or SUPPORTED. Its new
+JSON parser requires exact nested names, types and required fields, rejects
+duplicates/unknowns/null scalar substitutions and bounds arrays/depth. It checks
+configured evidence modes, source URLs, observation times and numeric verdict
+consistency, then recomputes whole-response aggregation. A missing result cannot
+authorize release; a validated independent contradiction can still refuse.
+
+The experimental root-context Python image includes both required packages and
+composes the endpoint with the old app, without changing the original image's
+build context. Endpoint input/output are bounded before release, disconnect
+cancels work, and fixed diagnostics exclude raw candidate/evidence/exception
+text. The packaged factory is fixture-only with explicit test configuration.
+The isolated `compose.verify.004c.yaml` uses internal networking, no published
+ports/real credentials, disabled caching and tmpfs configuration databases.
+Its test relay corrupts real results; a separate no-plugin gateway is an
+intentional unsafe control. These components are not public deployment examples.
+
+Go establishes consistency within a trusted verifier boundary. It cannot prove
+retrieval occurred or authenticate a forged evidence record. Verifier-hop
+authentication, an external readiness gate and origin freshness remain absent.
+The missing-plugin control demonstrates unchecked delivery despite gateway
+health. Qualification covers the exact grammar with fixtures, not live evidence,
+general prose, background work, arbitrary routes, streaming or protected caching.
 
 ## Proposed product components — not yet delivered
 

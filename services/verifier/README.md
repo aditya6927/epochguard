@@ -5,11 +5,12 @@ Python Windows release-label policy. Its Go client validates that contract befor
 gateway delivery. See [the policy specification](../../docs/task-003a.md) and
 [live qualification limits](../../docs/task-003b.md).
 
-`verifier.multiclaim` is a separate experimental `004b.v1` programmatic API and
-offline CLI. It is **not imported by `/v1/verify`**, installed in the gateway, or
-mapped to ALLOW. It shares this service's dependencies, the existing Python
-policy and retrieval implementation, and the unchanged 004A schemas/alignment.
-No additional deployable service is introduced.
+`verifier.multiclaim` provides the experimental `004b.v1` API and offline CLI.
+It is **not imported by `/v1/verify`**. A separately configured experimental
+gateway mode validates its records through the isolated 004C profile below;
+the default and existing 003A deployments remain unchanged. It shares this
+service's dependencies, existing Python policy/retrieval and unchanged 004A
+schemas/alignment. No additional production microservice is introduced.
 
 ## Supported response format
 
@@ -112,7 +113,7 @@ from verifier.multiclaim.demo import scenario
 
 pipeline, request = scenario("A")  # explicit fixture sources
 result = await pipeline.verify(request)
-assert result.verdict == "SUPPORTED"  # experimental result, no gateway action
+assert result.verdict == "SUPPORTED"  # this direct API call takes no gateway action
 ```
 
 Construct `Pipeline(python_source, pypi_source, fixture=False)` with trusted
@@ -185,4 +186,63 @@ Remove-Item Env:EPOCHGUARD_RUN_LIVE_004B
 PyPI is bounded to a four-second retrieval/five-second probe; Python to
 19-second Tavily/20-second retrieval/22-second probe. Individual source
 observations do not qualify whole-response live verification. See
-[Task 004B](../../docs/task-004b.md) for executed checks and deferred integration.
+[Task 004B](../../docs/task-004b.md) for the original independent API qualification.
+
+## Experimental gateway qualification
+
+The separate root-context `Dockerfile.004c` includes the verifier and sibling
+`claim_analysis` package with the same pinned dependencies. Its factory composes
+`POST /v1/verify/multiclaim` alongside the unchanged `/v1/verify` route. The
+original verifier Dockerfile/context/image remain available without 004A imports.
+Both modes use the existing native Go enforcement; the configuration
+`verifier.mode: "004b.v1"` explicitly selects the experimental contract and exact
+endpoint. Omitted mode and explicit `003a.v1` select the legacy path. Mode is not
+read from inference headers, prompt or candidate content.
+
+The experimental endpoint accepts strict 004B JSON within 64 KiB and a two-second
+body deadline, reuses `Pipeline.verify()`, revalidates the result and caps it at
+256 KiB before sending. Disconnects cancel work and release admission. Runtime
+errors have fixed safe diagnostics; malformed input errors never echo candidate
+or Pydantic input details. The packaged server limits concurrency to 32, while
+Pipeline admits at most four active evidence checks with no waiter queue. The
+factory requires explicit test mode plus a fixed fixture case and does not read
+live credentials. Future live deployment must explicitly inject trusted fixed
+retrievers; it is not enabled by this image or an inference request.
+
+Go preserves the existing plain buffered response eligibility checks and applies
+the 004B text limits instead of 003A's 512-byte limit. Its independent validator
+checks canonical complete JSON shape, nonce/hash/candidate binding, exact
+template coverage, Python code-point spans, IDs/policies/versions, extraction
+agreement, evidence modes/URLs/times/reasons/comparisons and evidence identity
+consistency. It recomputes aggregation and rejects disagreement. SUPPORTED maps
+to original-response ALLOW, CONTRADICTED to terminal 403, and INSUFFICIENT or
+contract/transport failure to terminal 503. An independently validated
+contradiction can retain 403 with an absent neighboring result; missing results
+can never yield ALLOW. Go validates consistency within a trusted verifier hop;
+metadata and hashes cannot prove a remote source was consulted.
+
+From the repository root, with Docker Desktop running:
+
+```powershell
+docker buildx build --builder epochguard-002a --load -t epochguard-dev:002a -f dev/Dockerfile .
+docker buildx build --builder epochguard-002a --load -t epochguard-verifier:004c -f services/verifier/Dockerfile.004c .
+docker compose -f compose.verify.004c.yaml up -d --force-recreate --wait --no-build gateway gateway-faults gateway-control
+docker compose -f compose.verify.004c.yaml run --rm --no-deps qualification
+docker compose -f compose.verify.004c.yaml down --volumes --remove-orphans
+```
+
+The internal-only stack publishes no ports, contains no live API keys and keeps
+semantic caching disabled. Gateway configuration databases live in per-container
+tmpfs and cannot survive a restart. The real fixture provider uses its existing
+verbatim-answer mode plus explicit test-only shape controls. A test-only fault
+relay starts with real endpoint results, then corrupts records for rejection
+tests. Only the runner's separate control endpoint selects faults; inference
+text/headers cannot select them. Neither the relay nor the no-plugin gateway is
+a protected production component. The no-plugin control deliberately releases
+unchecked content to demonstrate the missing-plugin startup limitation.
+
+This qualifies exact templates with synthetic evidence and a controlled provider.
+It does not qualify live multi-claim verification, verifier-hop authentication,
+external startup readiness, streaming, arbitrary routes, general prose or caching.
+See [Task 004C](../../docs/task-004c.md) for the exact guarantees, executed results,
+regression commands and remaining boundaries.

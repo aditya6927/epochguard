@@ -87,14 +87,24 @@ func configure(config any) error {
 		if cfg.TestOnly != (cfg.Verifier.EvidenceMode == "fixture") {
 			return errors.New("epochguard: fixture evidence requires explicit test_only configuration")
 		}
-		source, err := newHTTPDecisionSource(*cfg.Verifier)
+		var source DecisionSource
+		var err error
+		if cfg.Verifier.Mode == multiSchema {
+			source, err = newMultiDecisionSource(*cfg.Verifier)
+		} else {
+			source, err = newHTTPDecisionSource(*cfg.Verifier)
+		}
 		if err != nil {
 			return err
 		}
 		// Cache is disabled in the 003A deployment. Suppress writes as defense
 		// in depth if a trusted deployment accidentally enables the built-in.
 		activePolicy.Store(&policy{source: source, cacheNoStore: true})
-		safeLogf("epochguard event=init task=003a source=http policy=python-windows-latest-v1")
+		if cfg.Verifier.Mode == multiSchema {
+			safeLogf("epochguard event=init task=004c source=http policy=multi-claim-templates-v1")
+		} else {
+			safeLogf("epochguard event=init task=003a source=http policy=python-windows-latest-v1")
+		}
 		return nil
 	}
 	if cfg.Decision == "" {

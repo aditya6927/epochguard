@@ -13,6 +13,7 @@ import (
 
 func main() {
 	answerMode := flag.String("answer-mode", "echo", "local fixture output: echo or claim")
+	qualification := flag.Bool("qualification-004c", false, "enable isolated 004C provider-shape controls")
 	flag.Parse()
 	if *answerMode != "echo" && *answerMode != "claim" {
 		log.Fatal("unsupported fixture answer mode")
@@ -72,14 +73,33 @@ func main() {
 			// candidate verbatim. The real verifier, not this fixture, decides.
 			answer = prompt
 		}
-		writeJSON(w, http.StatusOK, map[string]any{
+		result := map[string]any{
 			"id": "chatcmpl-epochguard-fixture", "object": "chat.completion", "created": 1,
 			"model": req.Model,
 			"choices": []any{map[string]any{
 				"index": 0, "message": map[string]string{"role": "assistant", "content": answer}, "finish_reason": "stop",
 			}},
 			"usage": map[string]int{"prompt_tokens": 1, "completion_tokens": 1, "total_tokens": 2},
-		})
+		}
+		if *qualification {
+			choices := result["choices"].([]any)
+			choice := choices[0].(map[string]any)
+			switch prompt {
+			case "004c:missing":
+				result["choices"] = []any{}
+			case "004c:multiple":
+				result["choices"] = append(choices, choices[0])
+			case "004c:partial":
+				choice["finish_reason"] = "length"
+			case "004c:tools":
+				choice["message"] = map[string]any{"role": "assistant", "content": answer, "tool_calls": []any{map[string]any{"id": "fixture-tool", "type": "function", "function": map[string]string{"name": "untrusted", "arguments": "{}"}}}}
+			case "004c:blocks":
+				choice["message"] = map[string]any{"role": "assistant", "content": []any{map[string]string{"type": "text", "text": answer}}}
+			case "004c:metadata":
+				choice["content_filter_results"] = map[string]any{"untrusted": true}
+			}
+		}
+		writeJSON(w, http.StatusOK, result)
 	})
 	server := &http.Server{Addr: ":9000", Handler: mux, ReadHeaderTimeout: 5 * time.Second}
 	log.Print("provider fixture listening on :9000")

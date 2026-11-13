@@ -73,11 +73,12 @@ A separate [Python analyzer and evaluation CLI](services/claim_analysis/README.m
 
 ## Quick start: offline verification
 
-An independent [experimental multi-claim API and offline demo](services/verifier/README.md)
+An [experimental multi-claim API and isolated gateway demo](services/verifier/README.md)
 checks exact Python Windows and fixed-package PyPI claims under a whole-response
 grammar. Every required claim needs evidence; unaccounted content prevents
-SUPPORTED. This experiment has no gateway authorization path and does not expand
-the qualified surface above.
+SUPPORTED. Its explicitly configured `004b.v1` mode adds independent Go coverage
+and contract checks. Existing `003a.v1` deployments keep their current behavior;
+the separate demo qualifies synthetic fixtures, not broader live verification.
 
 You need Git, Docker Desktop running **Linux containers** or Docker Engine on Linux, and Docker Compose with `--wait` support. Builds target Linux/amd64 and use Buildx; other host architectures require emulation. No host Go/Python installation, paid model-provider key, or Tavily key is needed for offline tests. Initial builds require internet access to fetch source, images, and dependencies.
 

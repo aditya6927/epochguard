@@ -1,0 +1,83 @@
+# Experimental offline native-gateway qualification. No ports or live keys.
+name: epochguard-004c
+x-native: &native
+  image: epochguard-dev:002a
+  platform: linux/amd64
+x-python: &python
+  image: epochguard-verifier:004c
+  platform: linux/amd64
+  build:
+    context: .
+    dockerfile: services/verifier/Dockerfile.004c
+x-verifier: &verifier
+  <<: *python
+  healthcheck:
+    test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=2)"]
+    interval: 2s
+    timeout: 3s
+    retries: 30
+x-gateway: &gateway
+  <<: *native
+  command: ["/app/bifrost-http", "-app-dir", "/app/verify", "-host", "0.0.0.0", "-port", "8080"]
+  environment:
+    BIFROST_SETUP_TOKEN: epochguard-local-dev-only
+  tmpfs: ["/tmp:uid=10001,gid=10001,mode=1777"]
+  depends_on:
+    provider: {condition: service_healthy}
+    verifier-supported: {condition: service_healthy}
+    faults: {condition: service_healthy}
+  healthcheck:
+    test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+    interval: 2s
+    timeout: 2s
+    retries: 60
+    start_period: 10s
+services:
+  provider:
+    <<: *native
+    command: ["/app/provider-fixture", "-answer-mode", "claim", "-qualification-004c"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9000/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  verifier-supported:
+    <<: *verifier
+    environment: {EPOCHGUARD_TEST_MODE: "1", EPOCHGUARD_004C_FIXTURE_CASE: "A"}
+  verifier-missing:
+    <<: *verifier
+    environment: {EPOCHGUARD_TEST_MODE: "1", EPOCHGUARD_004C_FIXTURE_CASE: "C"}
+  verifier-injected:
+    <<: *verifier
+    environment: {EPOCHGUARD_TEST_MODE: "1", EPOCHGUARD_004C_FIXTURE_CASE: "E"}
+  verifier-wrong:
+    <<: *verifier
+    environment: {EPOCHGUARD_TEST_MODE: "1", EPOCHGUARD_004C_FIXTURE_CASE: "F"}
+  faults:
+    <<: *verifier
+    command: ["python", "-m", "uvicorn", "tests_gateway.fault_relay:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    environment: {EPOCHGUARD_TEST_MODE: "1"}
+    depends_on:
+      verifier-supported: {condition: service_healthy}
+      verifier-missing: {condition: service_healthy}
+      verifier-injected: {condition: service_healthy}
+      verifier-wrong: {condition: service_healthy}
+  gateway:
+    <<: *gateway
+    volumes: ["./dev/bifrost/multiclaim/gateway.json:/app/verify/config.json:ro"]
+  gateway-faults:
+    <<: *gateway
+    volumes: ["./dev/bifrost/multiclaim/gateway-faults.json:/app/verify/config.json:ro"]
+  gateway-control:
+    <<: *gateway
+    volumes: ["./dev/bifrost/multiclaim/gateway-control.json:/app/verify/config.json:ro"]
+  qualification:
+    <<: *native
+    command: ["/app/multiclaim.test", "-test.v", "-test.timeout=120s"]
+    depends_on:
+      gateway: {condition: service_healthy}
+      gateway-faults: {condition: service_healthy}
+      gateway-control: {condition: service_healthy}
+networks:
+  default:
+    internal: true

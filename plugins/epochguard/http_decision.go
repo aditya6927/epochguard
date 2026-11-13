@@ -31,6 +31,7 @@ var digestRE = regexp.MustCompile(`^[0-9a-f]{64}$`)
 var retrievalIDRE = regexp.MustCompile(`^[A-Za-z0-9_-]{1,128}$`)
 
 type HTTPVerificationConfig struct {
+	Mode         string `json:"mode,omitempty"`
 	URL          string `json:"url"`
 	TimeoutMS    int    `json:"timeout_ms"`
 	EvidenceMode string `json:"evidence_mode"`
@@ -79,6 +80,9 @@ type httpDecisionSource struct {
 }
 
 func newHTTPDecisionSource(config HTTPVerificationConfig) (*httpDecisionSource, error) {
+	if config.Mode != "" && config.Mode != verificationSchema {
+		return nil, errors.New("epochguard: unknown verifier mode")
+	}
 	if config.EvidenceMode == "" {
 		config.EvidenceMode = "tavily_live"
 	}
@@ -111,23 +115,11 @@ func newHTTPDecisionSource(config HTTPVerificationConfig) (*httpDecisionSource, 
 // tools, reasoning, multimodal content, extra choices and partial completions.
 // All fields below were inspected in the exact core v1.14.1 response schema.
 func plainCandidate(resp *schemas.BifrostResponse) (string, string, error) {
+	text, err := bufferedCandidate(resp)
+	if err != nil {
+		return "", "", err
+	}
 	bad := errors.New("epochguard: unsupported provider candidate")
-	if resp == nil || resp.ChatResponse == nil {
-		return "", "", bad
-	}
-	chat := resp.ChatResponse
-	if chat.Object != "chat.completion" || len(chat.Choices) != 1 || len(chat.SearchResults) > 0 || len(chat.Videos) > 0 || len(chat.Citations) > 0 {
-		return "", "", bad
-	}
-	choice := chat.Choices[0]
-	if choice.ChatNonStreamResponseChoice == nil || choice.TextCompletionResponseChoice != nil || choice.ChatStreamResponseChoice != nil || choice.FinishReason == nil || *choice.FinishReason != "stop" || choice.LogProbs != nil {
-		return "", "", bad
-	}
-	msg := choice.Message
-	if msg == nil || msg.Role != schemas.ChatMessageRoleAssistant || msg.ChatAssistantMessage != nil || msg.ChatToolMessage != nil || msg.Name != nil || msg.Content == nil || msg.Content.ContentStr == nil || msg.Content.ContentBlocks != nil {
-		return "", "", bad
-	}
-	text := *msg.Content.ContentStr
 	if len(text) > 512 {
 		return "", "", bad
 	}
@@ -136,6 +128,28 @@ func plainCandidate(resp *schemas.BifrostResponse) (string, string, error) {
 		return "", "", bad
 	}
 	return text, match[1], nil
+}
+
+// Shared eligibility checks against the pinned core v1.14.1 schema. Each mode
+// applies its own text policy afterward; 003A retains its exact old parser.
+func bufferedCandidate(resp *schemas.BifrostResponse) (string, error) {
+	bad := errors.New("epochguard: unsupported provider candidate")
+	if resp == nil || resp.ChatResponse == nil {
+		return "", bad
+	}
+	chat := resp.ChatResponse
+	if chat.Object != "chat.completion" || len(chat.Choices) != 1 || len(chat.SearchResults) > 0 || len(chat.Videos) > 0 || len(chat.Citations) > 0 {
+		return "", bad
+	}
+	choice := chat.Choices[0]
+	if choice.ChatNonStreamResponseChoice == nil || choice.TextCompletionResponseChoice != nil || choice.ChatStreamResponseChoice != nil || choice.FinishReason == nil || *choice.FinishReason != "stop" || choice.LogProbs != nil {
+		return "", bad
+	}
+	msg := choice.Message
+	if msg == nil || msg.Role != schemas.ChatMessageRoleAssistant || msg.ChatAssistantMessage != nil || msg.ChatToolMessage != nil || msg.Name != nil || msg.Content == nil || msg.Content.ContentStr == nil || msg.Content.ContentBlocks != nil {
+		return "", bad
+	}
+	return *msg.Content.ContentStr, nil
 }
 
 func (s *httpDecisionSource) Decide(ctx context.Context, resp *schemas.BifrostResponse) (Decision, error) {
