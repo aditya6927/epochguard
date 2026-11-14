@@ -1,9 +1,90 @@
 # Task 004E: live multi-claim evidence qualification
 
-Implemented starting from clean `main` at `749b5ac`, November 14, 2026
-(Asia/Calcutta). **LIVE QUALIFICATION PENDING.** No paid Tavily, live PyPI or
-Gemini request was executed. Offline simulations establish implementation and
-enforcement behavior, not genuine current source observations. No commit/push.
+The original implementation phase started from clean `main` at `749b5ac` on
+November 14, 2026 (Asia/Calcutta) and completed without live Tavily, PyPI or Gemini
+calls. A subsequent maintainer-authorized live run on **November 14, 2026** met
+the defined narrow acceptance checks, based on the report assessment below.
+This qualifies the protected exact-template two-policy path with a controlled
+provider, not a production service, commercial LLM or general factual verifier.
+
+## Maintainer live qualification — November 14, 2026
+
+The maintainer first executed the offline build/qualification:
+
+```powershell
+& .venv-003a/Scripts/python.exe tests/livequalification/qualify.py --build
+```
+
+Its result was `004E offline qualification passed; LIVE QUALIFICATION PENDING`.
+That message describes the offline phase; it is not the current project status.
+The maintainer then supplied explicit live opt-in and a temporary runtime Tavily
+credential file and executed:
+
+```powershell
+& .venv-003a/Scripts/python.exe tests/livequalification/qualify.py --live
+```
+
+The runner printed `LIVE RUN COLLECTED: independent result review required`.
+It did **not** print a final live PASS assertion. The maintainer reported that
+all five client cases had `expectation_met=true`. This documentation-only review
+independently inspected the existing local `artifacts/004e/live/preflight.json`,
+`measurements.json` and `report.json` and confirmed they match the supplied
+observations below. No qualification or source request was rerun, and no runtime
+artifact or credential is added to the repository by this update.
+
+| Preflight source | Retrieval mode | Observed version |
+| --- | --- | --- |
+| Python.org Windows through Tavily Extract | `tavily_live` | `3.15.2` |
+| Fixed requests project, PyPI JSON API | `pypi_live` | `2.34.2` |
+
+The reports record `fixture=false`. Case A used both observed versions; case B
+claimed Python `3.15.1` against a fresh `3.15.2` observation, alongside the
+supported requests `2.34.2` claim. These are observations from that run, not
+permanent current-version assertions or future hardcoded test expectations.
+
+| Protected ingress case | HTTP | Outcome / delivery | Elapsed ms |
+| --- | --- | --- | --- |
+| A-support | 200 | ALLOW; original candidate bytes match | 3963.358 |
+| B-contradiction | 403 | REJECT; answer not released | 6542.582 |
+| C-unsupported | 503 | UNAVAILABLE; answer not released | 25.517 |
+| E-no-plugin | 503 | INGRESS_REFUSED; answer not released | 112.425 |
+| F-provider-error | 400 | PROVIDER_ERROR; provider error preserved | 31.473 |
+
+| Matching verifier record | Verdict and claim checks | Elapsed ms |
+| --- | --- | --- |
+| A | SUPPORTED; two individually SUPPORTED claims | 3900.605 |
+| B | CONTRADICTED; one CONTRADICTED and one SUPPORTED claim | 6516.847 |
+| C | INSUFFICIENT; no claims admitted | 0.154 |
+
+| Source | Attempted | Completed | Recorded retrieval durations ms, in order |
+| --- | --- | --- | --- |
+| Tavily | 3 | 3 | 5792.614, 3589.463, 6114.624 |
+| PyPI | 3 | 3 | 222.576, 305.546, 395.233 |
+
+These counters are application-level retrieval invocations shared by preflight
+and the two factual requests, not independent billing or origin-fetch evidence.
+The values fit the fixed three-call budget per source. Pipeline and client
+durations have different measurement boundaries; they are individual observations,
+not performance guarantees. No unavailable provider/Go/ingress component timing
+is inferred by subtracting them. Observation timestamps record local receipt of
+evidence, not source publication time or an attested origin-fetch time.
+
+**Report assessment:** the collected live data and five successful client
+expectations satisfy the defined narrow acceptance checks. The requests exercised
+real-source verification through the real gateway, independent Go validation and
+the 004D receipt-gated protected ingress: supported two-claim delivery, terminal
+contradiction refusal, unsupported-content refusal, missing-plugin refusal and
+genuine provider-error handling. The receipt check occurs inside ingress; this
+review does not claim separate cryptographic re-verification of raw receipts from
+the JSON reports. F is a preserved failed provider operation, not a verification
+success. E is a deployment-integrity control, not evidence-source qualification.
+
+The original offline simulated source-failure, tampering and restart results
+below retain their own scope. This live run does not qualify arbitrary prose,
+additional policies, a real commercial LLM, production readiness/authentication,
+the unauthenticated private verifier hop, generalized source freshness, streaming
+or caching. This assessment is based on inspected reports and maintainer-supplied
+execution evidence, not an independently repeated live execution.
 
 ## Requirement, design and trust
 
@@ -49,7 +130,7 @@ numeric version, exact URL, duplicate-key and size checks are preserved. Neither
 document guarantees that a future observation will satisfy these narrow parsers.
 Current versions were not assumed or looked up for a candidate.
 
-## File inventory and ownership
+## Original implementation file inventory and ownership
 
 New files:
 
@@ -73,7 +154,7 @@ Modified files:
 | `plugins/epochguard/main.go` | Monotonic request start on request-owned trace |
 | `internal/ingress/ingress.go`, `cmd/protected-ingress/main.go` | Fixed opt-in live request/write deadlines and authenticated negative readiness |
 | `services/verifier/verifier/multiclaim/app.py` | Parameterize the existing body/disconnect middleware path; its existing default behavior is unchanged; preflight reuses it |
-| README, architecture and verifier README | Implemented boundary and pending live status |
+| README, architecture and verifier README | Implemented boundary and live status pending at the end of the original implementation phase |
 
 The qualified `/v1/verify` implementation, Python/PyPI policies, grammar,
 contracts, aggregation, validators, dependencies, annotation data, old tests,
@@ -275,12 +356,13 @@ Separate provider latency, Go contract timing and ingress MAC/buffering timing
 are unavailable. No unrelated timings are subtracted to invent them. Source
 receipt times are not origin publication times.
 
-No actual live versions, evidence identifiers, live latency or live call results
-exist for this task. Live attempts/completions by this agent: **zero**. An
-operator run must be independently inspected before changing the pending status;
-successful direct probes alone are insufficient.
+At the end of the original implementation phase there were no live versions or
+live results from that phase; the implementation agent made **zero** live calls.
+The subsequent maintainer run and report assessment above supply the narrow live
+qualification evidence. This documentation-only update also makes no live calls;
+successful direct probes alone would not establish the protected end-to-end path.
 
-## Offline qualification evidence
+## Original implementation: offline qualification evidence
 
 Executed commands/results follow; all are offline.
 Safe ignored logs are under `artifacts/004e/`; the existing 004D driver keeps its
@@ -358,9 +440,9 @@ docker compose -f compose.verify.yaml -f compose.verify.timeouts.yaml run --rm v
 | Opt-in/missing credential guards | Host rejects paid run without explicit flag/file before Docker/source calls; actual live-factory container rejects missing credentials with network none |
 | Final scope/configuration audit | Nine existing files modified, 15 added; syntax/JSON/whitespace/fences, 61 local documentation links, `git diff --check`, both `config --quiet` profiles passed |
 
-Race detection covers units, not live gateway processes. No live test or isolated
-cache-lifecycle rerun is claimed. The fixture restart counts are observations,
-not throughput benchmarks. Direct gateway/plugin/provider and all five legacy
+Race detection covers units, not live gateway processes. The original implementation
+phase included no live test or isolated cache-lifecycle rerun. The fixture restart
+counts are observations, not throughput benchmarks. Direct gateway/plugin/provider and all five legacy
 test binaries were byte-identical before/after the final ingress-only deadline
 adjustment; those suites' passing results apply to the unchanged binaries.
 
@@ -413,14 +495,17 @@ and file paths are not echoed. Later review tightened the ingress/client total
 deadline hierarchy and added stalled-body cancellation/failure-record tests;
 all affected checks and the complete 004D/004E ingress qualifications were rerun.
 
-All task-owned stacks/networks and generated signing-key volumes were removed.
-Only the pre-existing BuildKit builder remained running. No real credential file
-was created by this agent and no paid execution was authorized or performed.
+At the end of the original implementation phase, all task-owned stacks/networks
+and generated signing-key volumes were removed; only the pre-existing BuildKit
+builder remained running. That implementation agent created no real credential
+file and performed no paid execution. The later maintainer-authorized live run
+used its separately supplied temporary runtime credential file.
 
 ## Remaining limitations and review
 
 This is a controlled, exact-template, two-source qualification with a synthetic
-provider. The real-source run remains pending. The existing numeric/label rules
+provider. The November 14 maintainer run met the narrow live acceptance checks;
+broader verification remains unqualified. The existing numeric/label rules
 may deliberately reject current/future source formatting; no policy was relaxed
 to obtain support. Observation age is not origin freshness. General prose,
 additional policies/providers, live model quality, production authentication,
@@ -429,8 +514,42 @@ routes/background work remain outside scope. A compromised trusted process,
 host, key or verifier can defeat this trust boundary. External source changes
 and transient failures can make a correctly failing live run inconclusive.
 
-Recommended conventional commit, not created:
+## Documentation-only consistency update
+
+This follow-up started from clean `main` at
+`662bc38639178ea4f39866740626b872d0820efb`. It changes only this report,
+`README.md`, `AGENTS.md`, `docs/architecture.md` and
+`services/verifier/README.md`. It records the supplied live results, scopes the
+original no-live-call statements to their execution phase, distinguishes the
+two-policy protected profile from legacy 003A, and corrects the obsolete claim
+that isolated protected readiness is absent. Production readiness remains
+unqualified.
+
+The 002A/B/C, 003A/B/C, 004A/004A-H/004B/C/D reports and ADRs 0001–0003 were
+reviewed without changing their execution-time results. Local validation passed
+across all 24 tracked Markdown files: balanced fences, link/reference syntax,
+152 local links including 10 anchor links, and the 17 tables in the five changed
+documents. Inline repository/source references resolved; generated
+runtime references were distinguished from tracked source paths. The sole
+remaining pending-status phrase in these five documents is the
+historical offline runner output above, explicitly labeled as such.
+
+SHA-256 comparison with the starting tree confirms all other 210 tracked files
+are unchanged, including implementation, tests, policies, contracts, Compose
+profiles, older reports and ADRs. No new tracked files, credentials or private
+runtime artifacts were added. The three existing live JSON reports matched the
+documented versions, outcomes, timings, claim verdicts and application-level
+counts. `git diff --check` passed; the final diff was reviewed for unrelated
+formatting changes. Only offline documentation/report checks ran during this
+update; no application tests, Tavily/PyPI/Gemini requests or paid qualifications
+were executed.
+
+Original implementation's recommended conventional commit:
 `feat(verifier): add opt-in protected live multi-claim qualification`.
 
-Stop at implementation review with **LIVE QUALIFICATION PENDING**. Do not commit
-or push.
+Recommended documentation commit, not created:
+`docs: record 004E live qualification and align project status`.
+
+Stop for maintainer review. This update changes documentation only; no
+implementation, tests, policies, contracts, deployment configuration or runtime
+behavior is changed, and no live requests, commits or pushes are performed.

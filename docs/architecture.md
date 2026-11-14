@@ -1,10 +1,19 @@
 # EpochGuard architecture
 
-**Status:** narrow live Bifrost → Go → FastAPI → Tavily qualification is complete on the maintainer-supplied November 8 rerun: `TestLiveGatewayQualification` and all five subtests passed in 18.16s, including supported delivery and older terminal refusal without answer leakage. Initial blocked 401 attempts remain documented; their exact credential-mismatch cause is not proven. This covers the existing single policy with the local provider fixture. Default and verification deployments keep caching disabled; general verification, production readiness, and the protected cache remain unimplemented or unqualified. Updated: 2026-11-14.
+**Status:** the maintainer-authorized November 14, 2026 protected live multi-claim run met its narrow acceptance checks, based on subsequent report inspection: unchanged supported two-claim delivery, contradiction/unsupported/missing-plugin refusals and genuine provider-error preservation. The [004E assessment](task-004e.md) qualifies the 004D ingress boundary and real Tavily/PyPI path together with a controlled provider and exact templates. The runner collected results rather than printing a final live PASS. The legacy single-policy path remains unchanged; its [003B report](task-003b.md) retains the November 8 result and initial blocked attempts. Caching remains disabled; general factual verification, production readiness/authentication and protected caching remain unqualified. Updated: 2026-11-14.
 
 ## Problem and system boundary
 
-EpochGuard is intended to verify time-sensitive claims in AI-generated responses, track supporting evidence, and prevent known-stale responses from being returned or reused. The qualified engineering boundary is more limited: a native Go plugin enforces decisions on one buffered inference route. Its HTTP source checks one exact Python Windows release-label claim through a narrow evidence policy. Offline fixtures and the maintainer-reported narrow live gateway rerun qualify that path, with the limits recorded in Task 003B.
+EpochGuard is intended to verify time-sensitive claims in AI-generated responses, track supporting evidence, and prevent known-stale responses from being returned or reused. Its qualified engineering boundary is limited to buffered `POST /openai/v1/chat/completions` and fixed evidence policies with a controlled provider.
+
+The legacy `003a.v1` path uses `/v1/verify` for one exact Python Windows
+release-label sentence. The experimental path uses 004B's deterministic
+whole-response grammar and two-policy comparisons through
+`/v1/verify/multiclaim`; 004C adds independent Go validation/enforcement, 004D
+adds authenticated protected ingress and isolated readiness, and 004E qualifies
+that composition using real Tavily/Python.org and requests PyPI observations.
+The two-policy implementation is not a general factual verifier. Production-wide
+readiness and authentication remain outside qualification.
 
 ### As implemented in Task 002B
 
@@ -100,7 +109,7 @@ The configured development fixture is intentionally unauthenticated on inference
 
 [Task 004A](task-004a.md) adds a stand-alone Python package/CLI under `services/claim_analysis/`, with schema `004a.v1`. Claims bind exact Unicode code-point spans to the original response and separate factuality, temporal scope, fresh-evidence requirement and uncertainty. A sentence/lexicon baseline and an actual opt-in Gemini HTTP adapter share strict output validation. The model receives original text, not baseline-selected claims. Neither engine produces a truth verdict or authorizes release.
 
-The 112-case/184-factual-annotation dataset is an agent-authored review draft with separate development/held-out files. Human review and real-model performance qualification remain pending; fake-adapter tests qualify plumbing only. Baseline held-out fresh-evidence recall is poor. This package is not wired into FastAPI, Go, Compose verification defaults or the cache. The existing `003a.v1` contract, single Python policy and all route/enforcement boundaries remain unchanged. Any future integration requires coverage and response-level aggregation: one verified claim cannot authorize other unsupported, omitted or uncertain claims, and STABLE/HISTORICAL classification is not proof of truth.
+The 112-case/184-factual-annotation dataset is an agent-authored review draft with separate development/held-out files. Human review and real-model performance qualification remain pending; fake-adapter tests qualify plumbing only. Baseline held-out fresh-evidence recall is poor. Its identification engines do not authorize the default gateway path; the multi-claim implementation below reuses canonical schemas with trusted grammar coverage. The existing `003a.v1` contract, single Python policy and route/enforcement boundaries remain unchanged. Future use of model extraction still requires complete response coverage: one verified claim cannot authorize unsupported, omitted or uncertain neighbors, and STABLE/HISTORICAL classification is not proof of truth.
 
 The model-facing `004a.identification.v1` representation now omits offsets. Python accepts only globally unique exact quotes, calculates original Unicode code-point spans, rejects out-of-order/overlapping claims, then validates the unchanged canonical `004a.v1` contract and source binding. There is no normalization, fuzzy repair, quote replacement or partial acceptance; repeated ambiguous text fails closed. This reduces offset-generation responsibility without verifying semantic correctness or coverage. Live performance of this revised pipeline remains pending; [Task 004A](task-004a.md#deterministic-source-span-alignment-2026-11-09) records the fixed development comparison and qualification commands.
 
@@ -162,7 +171,8 @@ The experimental root-context Python image includes both required packages and
 composes the endpoint with the old app, without changing the original image's
 build context. Endpoint input/output are bounded before release, disconnect
 cancels work, and fixed diagnostics exclude raw candidate/evidence/exception
-text. The packaged factory is fixture-only with explicit test configuration.
+text. The packaged `Dockerfile.004c` factory is fixture-only with explicit test
+configuration; the separate live factory/profile is described below.
 The isolated `compose.verify.004c.yaml` uses internal networking, no published
 ports/real credentials, disabled caching and tmpfs configuration databases.
 Its test relay corrupts real results; a separate no-plugin gateway is an
@@ -174,8 +184,9 @@ authentication, an external readiness gate and origin freshness remain absent
 from those direct-gateway profiles. The separate protected boundary below adds
 per-response enforcement integrity without changing them.
 The missing-plugin control demonstrates unchecked delivery despite gateway
-health. Qualification covers the exact grammar with fixtures, not live evidence,
-general prose, background work, arbitrary routes, streaming or protected caching.
+health. The original 004C qualification covers the exact grammar with fixtures,
+not live evidence, general prose, background work, arbitrary routes, streaming
+or protected caching.
 
 ## Experimental protected ingress boundary
 
@@ -240,7 +251,12 @@ authentication, broader routes and protected caching remain outside qualificatio
 fixed Tavily Extract/Python.org and PyPI requests retrievers, with `fixture=False`.
 The Go policy requires live evidence modes; fixture records cannot authorize
 live-mode delivery. No grammar, comparison, evidence contract, receipt format or
-legacy `/v1/verify` behavior changes. Real-source qualification remains pending.
+legacy `/v1/verify` behavior changes. The November 14 maintainer run and subsequent
+report assessment met the narrow live checks: Python `3.15.2` and requests
+`2.34.2` were supported together; Python `3.15.1` was contradicted against a
+`3.15.2` observation. Unsupported content, missing plugin and genuine provider
+error also met their expected outcomes. These are run-specific observations,
+not fixed current-version assertions or qualification of a commercial LLM.
 
 Only the verifier joins an egress network; Bifrost/provider/management stay
 private and the client can reach only ingress. A runtime file secret is mounted
@@ -297,6 +313,16 @@ Task 002C extends that gate with isolated direct-cache lifecycle experiments and
 
 Task 003A and its timeout follow-up cover 41 offline service tests and real gateway acceptance with 31 subtests, plus a separate deterministic long-duration path. Task 003B reran that gate and added an offline version-derivation check and opt-in live gateway test. The maintainer subsequently reported a full live gateway pass with five passing subtests, distinct from the earlier FastAPI-only pass. Supported and older requests each used one provider call; live retrieval counts remain unavailable. This qualifies one policy with the controlled provider and explicitly recorded paths, not arbitrary response verification or production provider support.
 
+The current protected boundary has separate evidence: 004B/004C establish bounded
+two-policy coverage and independent Go enforcement, 004D establishes per-response
+receipt gating and missing-plugin/restart safety offline, and the November 14
+004E live report assessment establishes the narrow real-source composition.
+All five live client expectations were met; each source recorded three attempted
+and three completed application-level retrieval invocations. This does not
+independently measure billing or origin fetches, authenticate the private
+gateway-to-verifier HTTP hop, establish origin freshness or qualify a global
+Bifrost execution deadline.
+
 ## Primary references
 
 - `docs/bifrost-integration-spike.md` — source investigation and hook/cache contracts.
@@ -305,5 +331,9 @@ Task 003A and its timeout follow-up cover 41 offline service tests and real gate
 - `docs/task-002c.md` — real direct-cache lifecycle and race evidence.
 - `docs/task-003a.md` — narrow evidence policy, typed service contract, executed offline integration and live-test boundary.
 - `docs/task-003b.md` — successful maintainer-run live gateway qualification, separately reported FastAPI evidence, preserved blocked attempts, and reproducible opt-in runner.
+- [004A claim-analysis experiment](task-004a.md) and [004A-H hardening](task-004a-hardening.md) — identification only; human review and model quality remain pending.
+- [004B whole-response verification](task-004b.md) and [004C gateway integration](task-004c.md) — two fixed policies, independent Go validation and original offline qualification.
+- [004D protected ingress](task-004d.md) — authenticated release and isolated lifecycle/readiness qualification.
+- [004E live composition and assessment](task-004e.md) — bounded real-source protected-gateway run and remaining trust limits.
 - `docs/decisions/0003-protected-cache-ownership.md` — proposed verified admission/revocation design.
 - `docs/decisions/0001-native-bifrost-plugin.md` — rationale and alternatives.

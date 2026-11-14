@@ -17,8 +17,16 @@ The [004E live composition](../../docs/task-004e.md) uses a separate
 opt-in, the fixed live deadline profile and a bounded Tavily secret file. It
 rejects fixture/endpoint/package/policy/timeout overrides and constructs the
 real fixed-source retrievers with `fixture=False`. Existing entry points retain
-their behavior. **LIVE QUALIFICATION PENDING**; offline transport faults are
-simulations and cannot establish current source versions or live success.
+their behavior. The maintainer-authorized **November 14, 2026** run met the narrow
+protected live acceptance checks, based on subsequent inspection of preflight,
+measurements and verifier reports: two supported claims delivered unchanged,
+contradiction/unsupported/missing-plugin refusals and preserved provider error.
+All five client expectations were met; the runner printed collected results,
+not a final live PASS. See the [dated report assessment](../../docs/task-004e.md).
+This covers the receipt-gated ingress and real sources with a controlled provider
+under exact templates. Offline transport faults remain simulations; general
+prose, commercial LLMs, origin freshness and production authentication/readiness
+are not qualified.
 
 From the repository root, the credential-free real-gateway demonstration is:
 
@@ -171,6 +179,10 @@ background tasks, retained candidates, evidence cache or asynchronous writes are
 introduced. Caller cancellation propagates and releases admission. Excess work
 returns insufficient per-claim results immediately. Creating a new Pipeline per
 request would defeat the shared admission bound and is not the intended lifecycle.
+The separate 004E factory uses one shared admission slot, a 26-second work
+deadline, fixed per-source budgets and bounded qualification telemetry; the
+[004E report](../../docs/task-004e.md) specifies that live profile. These do not
+change the defaults described here.
 
 The caller owns retrievers. Each built-in HTTP retriever closes its per-call
 client/response, refuses redirects and proxy discovery, and bounds evidence to
@@ -227,9 +239,10 @@ body deadline, reuses `Pipeline.verify()`, revalidates the result and caps it at
 errors have fixed safe diagnostics; malformed input errors never echo candidate
 or Pydantic input details. The packaged server limits concurrency to 32, while
 Pipeline admits at most four active evidence checks with no waiter queue. The
-factory requires explicit test mode plus a fixed fixture case and does not read
-live credentials. Future live deployment must explicitly inject trusted fixed
-retrievers; it is not enabled by this image or an inference request.
+004C factory requires explicit test mode plus a fixed fixture case and does not
+read live credentials. The separately selected 004E live factory constructs its
+trusted fixed retrievers; live evidence is not enabled by the 004C image's default
+factory or an inference request.
 
 Go preserves the existing plain buffered response eligibility checks and applies
 the 004B text limits instead of 003A's 512-byte limit. Its independent validator
@@ -263,8 +276,12 @@ text/headers cannot select them. Neither the relay nor the no-plugin gateway is
 a protected production component. The no-plugin control deliberately releases
 unchecked content to demonstrate the missing-plugin startup limitation.
 
-This qualifies exact templates with synthetic evidence and a controlled provider.
-It does not qualify live multi-claim verification, verifier-hop authentication,
-external startup readiness, streaming, arbitrary routes, general prose or caching.
+The original 004C qualification covers exact templates with synthetic evidence
+and a controlled provider. It does not itself qualify live multi-claim
+verification, verifier-hop authentication, external startup readiness, streaming,
+arbitrary routes, general prose or caching.
 See [Task 004C](../../docs/task-004c.md) for the exact guarantees, executed results,
-regression commands and remaining boundaries.
+regression commands and remaining boundaries. The separate
+[004D ingress qualification](../../docs/task-004d.md) and
+[004E live assessment](../../docs/task-004e.md) establish their later narrow
+boundaries; verifier-hop authentication and production readiness remain unqualified.
