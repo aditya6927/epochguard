@@ -214,7 +214,8 @@ round trip, timestamp windows are bounded, and internal/debug headers are not
 forwarded to clients. The ingress never retries an unchecked inference response.
 
 `GET /ready` freshly checks gateway reachability, active plugin/order/placement,
-mode and cache absence, then obtains an authenticated ALLOW probe. Readiness
+mode and cache absence, then obtains an authenticated ALLOW probe in the offline
+004D profile. Readiness
 does not replace the mandatory per-response receipt check. Runtime removal can
 leave Bifrost serving, but the ingress refuses those unsigned responses. The
 offline lifecycle qualification exercises actual disable and concurrent gateway
@@ -232,6 +233,37 @@ HMAC authenticates the configured enforcement process, not the truth or origin
 freshness of evidence. Hosts, native plugins, keys, clock, deployment configuration
 and the verifier remain trusted; verifier-hop authentication, production client
 authentication, broader routes and protected caching remain outside qualification.
+
+### Opt-in live multi-claim composition
+
+[Task 004E](task-004e.md) adds a separate trusted factory using the same pipeline,
+fixed Tavily Extract/Python.org and PyPI requests retrievers, with `fixture=False`.
+The Go policy requires live evidence modes; fixture records cannot authorize
+live-mode delivery. No grammar, comparison, evidence contract, receipt format or
+legacy `/v1/verify` behavior changes. Real-source qualification remains pending.
+
+Only the verifier joins an egress network; Bifrost/provider/management stay
+private and the client can reach only ingress. A runtime file secret is mounted
+only into the verifier. Fixed HTTPS retrievers disable environment proxies and
+redirect following; this is application restriction, not a packet-level egress
+firewall. The receipt key is separate and remains limited to ingress/signers.
+
+The fixed live hierarchy is Tavily API 19s < retrieval 20s, PyPI 4s, shared work 26s,
+Go verifier 30s, remaining decision budget 40s from HTTP pre-hook, ingress 44s,
+server write 48s and runner 52s. Provider network work remains bounded at 10s.
+Pinned Bifrost has no global HTTP execution deadline; the 40s decision cap uses
+the recorded monotonic start without retaining/cancelling pooled contexts.
+Offline defaults remain unchanged. Receipt age stays 20s from issuance at
+completion; longer work does not expand replay or clock tolerances.
+
+Live `/ready` uses a fixed unsupported-grammar canary and requires an
+authenticated UNAVAILABLE response. It proves enforcement participation rather
+than evidence-source health or factual support. Canaries consume neither source
+budget nor telemetry slots. Private one-shot preflight obtains genuine parsed
+versions; two sequential protected factual requests can then use at most three
+retrieval invocations per source including preflight. Report counters/timings
+describe this process, not Tavily billing, origin fetches or publication times.
+There is no retry, source polling, live fallback to fixtures or Gemini call.
 
 ## Proposed product components — not yet delivered
 
@@ -253,7 +285,7 @@ Client -> Bifrost + EpochGuard enforcement -> verified response / safe refusal
                   Periodic revalidation / invalidation
 ```
 
-Task 002B establishes waiting, typed refusals, and no-leak behavior using deterministic fixtures. Task 003A implements the first narrow service policy above. Task 004A prototypes identification/classification independently; 004B adds experimental template-bounded multi-claim verification. Gateway integration of 004B, general evidence policies, durable evidence, and revalidation remain proposed. The trusted gateway policy chooses and enforces actions. Verification may be unavailable; that is an explicit policy outcome, **not** a successful verdict.
+Task 002B establishes waiting, typed refusals, and no-leak behavior using deterministic fixtures. Task 003A implements the first narrow service policy above. Task 004A prototypes identification/classification independently; 004B adds experimental template-bounded multi-claim verification. General evidence policies, durable evidence and revalidation remain proposed. The isolated 004C/004D integrations and opt-in 004E composition have the boundaries described above. The trusted gateway policy chooses and enforces actions. Verification may be unavailable; that is an explicit policy outcome, **not** a successful verdict.
 
 Future caching must bind a response to trusted request scope, policy version, evidence IDs/versions, and expiry. A stale physical cache entry must not become returnable after a concurrent write or invalidation race. Task 002C reproduced both the built-in cache's enforcement-order hazards and late-write repopulation; unrestricted built-in writes remain unsuitable for the protected deployment. A future EpochGuard-owned cache needs explicit admission and read/release validity checks plus atomic generation/version comparison, not deletion alone.
 

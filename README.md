@@ -89,6 +89,12 @@ qualification includes runtime disable, restart and forged/replayed receipts;
 existing deployments are unchanged, and production authentication remains work
 to do. The report includes a reproducible host-Python lifecycle driver.
 
+An [opt-in live multi-claim profile](docs/task-004e.md) connects this protected
+path to the fixed Tavily/Python.org and PyPI sources, with bounded call budgets,
+longer trusted deadlines and readiness that consumes no source credits. Its
+implementation and offline controls are separate from real-source qualification:
+**LIVE QUALIFICATION PENDING**.
+
 You need Git, Docker Desktop running **Linux containers** or Docker Engine on Linux, and Docker Compose with `--wait` support. Builds target Linux/amd64 and use Buildx; other host architectures require emulation. The development commands below need no host Go/Python installation, paid model-provider key, or Tavily key. Initial builds require internet access to fetch source, images, and dependencies.
 
 Clone the repository, then run the development commands from its root. These commands work in PowerShell and a Linux shell:

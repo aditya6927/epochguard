@@ -17,11 +17,12 @@ PATH = "/v1/verify/multiclaim"
 
 class MultiBound:
     """Bound body receipt before decoding, and cancel work on disconnect."""
-    def __init__(self, app):
+    def __init__(self, app, path=PATH):
         self.app = app
+        self.path = path
 
     async def __call__(self, scope, receive, send):
-        if scope["type"] != "http" or scope["path"] != PATH:
+        if scope["type"] != "http" or scope["path"] != self.path:
             return await self.app(scope, receive, send)
         data = bytearray()
         try:

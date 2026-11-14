@@ -34,16 +34,26 @@ func main() {
 	if err != nil || len(key) != 32 {
 		log.Fatal("ingress credentials unavailable")
 	}
-	probe, err := os.ReadFile(os.Getenv("EPOCHGUARD_PROBE_FILE"))
-	if err != nil || len(probe) > 8192 {
-		log.Fatal("ingress probe unavailable")
+	profile := os.Getenv("EPOCHGUARD_INGRESS_PROFILE")
+	probe := []byte(ingress.LiveCanary)
+	writeTimeout := 15 * time.Second
+	if profile == "004e-live" {
+		if os.Getenv("EPOCHGUARD_PROBE_FILE") != "" {
+			log.Fatal("ingress configuration unavailable")
+		}
+		writeTimeout = 48 * time.Second
+	} else {
+		probe, err = os.ReadFile(os.Getenv("EPOCHGUARD_PROBE_FILE"))
+		if err != nil || len(probe) > 8192 {
+			log.Fatal("ingress probe unavailable")
+		}
 	}
-	h, err := ingress.New(ingress.Config{Gateway: os.Getenv("EPOCHGUARD_GATEWAY_URL"), Secret: key, ManagementToken: os.Getenv("EPOCHGUARD_SETUP_TOKEN"), ProbeCandidate: strings.TrimSuffix(string(probe), "\n")})
+	h, err := ingress.New(ingress.Config{Gateway: os.Getenv("EPOCHGUARD_GATEWAY_URL"), Secret: key, ManagementToken: os.Getenv("EPOCHGUARD_SETUP_TOKEN"), ProbeCandidate: strings.TrimSuffix(string(probe), "\n"), Profile: profile})
 	if err != nil {
 		log.Fatal("ingress configuration unavailable")
 	}
 	defer h.Close()
-	server := &http.Server{Addr: ":8082", Handler: h, ReadHeaderTimeout: 2 * time.Second, ReadTimeout: 3 * time.Second, WriteTimeout: 15 * time.Second, IdleTimeout: 30 * time.Second, MaxHeaderBytes: 16 * 1024, ErrorLog: log.New(io.Discard, "", 0)}
+	server := &http.Server{Addr: ":8082", Handler: h, ReadHeaderTimeout: 2 * time.Second, ReadTimeout: 3 * time.Second, WriteTimeout: writeTimeout, IdleTimeout: 30 * time.Second, MaxHeaderBytes: 16 * 1024, ErrorLog: log.New(io.Discard, "", 0)}
 	log.Print("protected ingress listening")
 	if server.ListenAndServe() != nil {
 		log.Fatal("ingress stopped")

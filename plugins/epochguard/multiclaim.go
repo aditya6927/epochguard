@@ -350,9 +350,15 @@ func validateMulti(req verificationRequest, v multiResult, mode string, started,
 	return decision, nil
 }
 
-type multiDecisionSource struct{ *httpDecisionSource }
+type multiDecisionSource struct {
+	*httpDecisionSource
+	liveBudget bool
+}
 
 func newMultiDecisionSource(cfg HTTPVerificationConfig) (*multiDecisionSource, error) {
+	if cfg.TimeoutProfile != "" && (cfg.TimeoutProfile != "004e-live" || cfg.EvidenceMode != "live" || cfg.TimeoutMS != 30000) {
+		return nil, errors.New("epochguard: inconsistent live timeout profile")
+	}
 	u, err := url.Parse(cfg.URL)
 	if err != nil || u.Path != "/v1/verify/multiclaim" || cfg.Mode != multiSchema || (cfg.EvidenceMode != "fixture" && cfg.EvidenceMode != "live") {
 		return nil, errors.New("epochguard: invalid multiclaim configuration")
@@ -361,16 +367,35 @@ func newMultiDecisionSource(cfg HTTPVerificationConfig) (*multiDecisionSource, e
 	// validating the discriminator/endpoint; this is not a request-time fallback.
 	u.Path = "/v1/verify"
 	transportCfg := cfg
+	transportCfg.TimeoutProfile = ""
 	transportCfg.URL, transportCfg.Mode, transportCfg.EvidenceMode = u.String(), verificationSchema, "tavily_live"
 	source, err := newHTTPDecisionSource(transportCfg)
 	if err != nil {
 		return nil, err
 	}
 	source.endpoint, source.evidenceMode = cfg.URL, cfg.EvidenceMode
-	return &multiDecisionSource{source}, nil
+	return &multiDecisionSource{httpDecisionSource: source, liveBudget: cfg.TimeoutProfile == "004e-live"}, nil
 }
 
 func (s *multiDecisionSource) Decide(ctx context.Context, resp *schemas.BifrostResponse) (Decision, error) {
+	if s.liveBudget {
+		// The real HTTP hook records a monotonic start. Bound post-provider work
+		// by the remaining total execution budget without retaining pooled state
+		// or starting a background timer against Bifrost's context.
+		trace, _ := ctx.Value(hookSequenceKey).(*hookTrace)
+		if trace == nil {
+			return Unavailable, verificationFailure{category: "request_failure"}
+		}
+		trace.mu.Lock()
+		start := trace.started
+		trace.mu.Unlock()
+		if start.IsZero() {
+			return Unavailable, verificationFailure{category: "request_failure"}
+		}
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithDeadline(ctx, start.Add(40*time.Second))
+		defer cancel()
+	}
 	started := time.Now()
 	text, err := bufferedCandidate(resp)
 	if err != nil || !multiTextBound(text) {
@@ -403,6 +428,7 @@ func (s *multiDecisionSource) Decide(ctx context.Context, resp *schemas.BifrostR
 		return Unavailable, verificationFailure{category: "request_failure"}
 	}
 	req.Header.Set("Content-Type", "application/json")
+	req.GetBody = nil // no automatic replay of verification POSTs
 	response, err := s.client.Do(req)
 	if err != nil {
 		return Unavailable, transportFailure(err)

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/maximhq/bifrost/core/schemas"
 	"github.com/maximhq/bifrost/plugins/semanticcache"
@@ -20,6 +21,7 @@ type hookTrace struct {
 	phases      []string
 	cacheAtPost string
 	attested    *attestationState
+	started     time.Time
 }
 
 func GetName() string { return "epochguard" }
@@ -44,7 +46,7 @@ func Cleanup() error {
 func record(ctx *schemas.BifrostContext, phase string) {
 	trace, _ := ctx.Value(hookSequenceKey).(*hookTrace)
 	if trace == nil {
-		trace = &hookTrace{}
+		trace = &hookTrace{started: time.Now()}
 		ctx.SetValue(hookSequenceKey, trace)
 	}
 	trace.mu.Lock()

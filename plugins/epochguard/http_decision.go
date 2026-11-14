@@ -31,10 +31,11 @@ var digestRE = regexp.MustCompile(`^[0-9a-f]{64}$`)
 var retrievalIDRE = regexp.MustCompile(`^[A-Za-z0-9_-]{1,128}$`)
 
 type HTTPVerificationConfig struct {
-	Mode         string `json:"mode,omitempty"`
-	URL          string `json:"url"`
-	TimeoutMS    int    `json:"timeout_ms"`
-	EvidenceMode string `json:"evidence_mode"`
+	Mode           string `json:"mode,omitempty"`
+	URL            string `json:"url"`
+	TimeoutMS      int    `json:"timeout_ms"`
+	EvidenceMode   string `json:"evidence_mode"`
+	TimeoutProfile string `json:"timeout_profile,omitempty"`
 }
 
 type verificationRequest struct {
@@ -80,6 +81,9 @@ type httpDecisionSource struct {
 }
 
 func newHTTPDecisionSource(config HTTPVerificationConfig) (*httpDecisionSource, error) {
+	if config.TimeoutProfile != "" {
+		return nil, errors.New("epochguard: unsupported timeout profile")
+	}
 	if config.Mode != "" && config.Mode != verificationSchema {
 		return nil, errors.New("epochguard: unknown verifier mode")
 	}

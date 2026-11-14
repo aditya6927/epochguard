@@ -12,6 +12,28 @@ the default and existing 003A deployments remain unchanged. It shares this
 service's dependencies, existing Python policy/retrieval and unchanged 004A
 schemas/alignment. No additional production microservice is introduced.
 
+The [004E live composition](../../docs/task-004e.md) uses a separate
+`verifier.multiclaim.deployment:live_app` factory. It requires explicit runtime
+opt-in, the fixed live deadline profile and a bounded Tavily secret file. It
+rejects fixture/endpoint/package/policy/timeout overrides and constructs the
+real fixed-source retrievers with `fixture=False`. Existing entry points retain
+their behavior. **LIVE QUALIFICATION PENDING**; offline transport faults are
+simulations and cannot establish current source versions or live success.
+
+From the repository root, the credential-free real-gateway demonstration is:
+
+```powershell
+& .venv-003a/Scripts/python.exe tests/livequalification/qualify.py --build
+```
+
+The report includes masked PowerShell credential setup and the separately gated
+`--live` command. Its one-shot preflight and two factual requests share a maximum
+of three retrieval invocations per source. Private bounded telemetry records
+canonical versions, evidence identifiers/digests, observations and timings without
+raw evidence text. These are observation times, not origin publication times.
+Routine live readiness uses an authenticated negative canary with zero source
+calls; readiness does not attest source health or successful factual support.
+
 ## Supported response format
 
 An eligible candidate contains one to eight exact sentences selected from:

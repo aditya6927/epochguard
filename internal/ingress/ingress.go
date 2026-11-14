@@ -26,6 +26,7 @@ const ReceiptHeader = "X-EpochGuard-Internal-Receipt"
 const Protocol = "004d.v1"
 const Policy = "004b.v1/multi-claim-templates-v1"
 const ResponseLimit = 256 * 1024
+const LiveCanary = "EpochGuard readiness canary: intentionally outside the trusted claim grammar."
 
 var digestRE = regexp.MustCompile(`^[0-9a-f]{64}$`)
 
@@ -46,6 +47,7 @@ type Config struct {
 	ProbeCandidate  string
 	Timeout         time.Duration
 	MaxActive       int
+	Profile         string
 }
 type Handler struct {
 	cfg    Config
@@ -54,6 +56,17 @@ type Handler struct {
 }
 
 func New(cfg Config) (*Handler, error) {
+	if cfg.Profile != "" && cfg.Profile != "004e-live" {
+		return nil, errors.New("invalid ingress profile")
+	}
+	ceiling := 10 * time.Second
+	if cfg.Profile == "004e-live" {
+		// One trusted fixed profile; no independent or request-selected overrides.
+		if cfg.Timeout != 0 || cfg.ProbeCandidate != LiveCanary {
+			return nil, errors.New("inconsistent live ingress bounds")
+		}
+		cfg.Timeout, ceiling = 44*time.Second, 44*time.Second
+	}
 	u, err := url.Parse(cfg.Gateway)
 	if err != nil || u.Host == "" || (u.Scheme != "http" && u.Scheme != "https") || u.Path != "" || u.RawQuery != "" || u.Fragment != "" || u.User != nil || len(cfg.Secret) != 32 || cfg.ManagementToken == "" || cfg.ProbeCandidate == "" {
 		return nil, errors.New("invalid ingress configuration")
@@ -64,7 +77,7 @@ func New(cfg Config) (*Handler, error) {
 	if cfg.MaxActive == 0 {
 		cfg.MaxActive = 16
 	}
-	if cfg.Timeout < 100*time.Millisecond || cfg.Timeout > 10*time.Second || cfg.MaxActive < 1 || cfg.MaxActive > 32 {
+	if cfg.Timeout < 100*time.Millisecond || cfg.Timeout > ceiling || cfg.MaxActive < 1 || cfg.MaxActive > 32 {
 		return nil, errors.New("invalid ingress bounds")
 	}
 	cfg.Secret = append([]byte(nil), cfg.Secret...)
@@ -372,6 +385,11 @@ func (h *Handler) ready(ctx context.Context) bool {
 	}
 	data, _ := json.Marshal(map[string]any{"model": "fixture/epochguard-test", "messages": []map[string]string{{"role": "user", "content": h.cfg.ProbeCandidate}}, "stream": false})
 	status, _, receipt, err := h.exchange(ctx, data)
+	if h.cfg.Profile == "004e-live" {
+		// Grammar rejection proves authenticated enforcement participation. It
+		// deliberately says nothing about evidence-source availability.
+		return err == nil && status == 503 && receipt.Outcome == "UNAVAILABLE"
+	}
 	return err == nil && status == 200 && receipt.Outcome == "ALLOW"
 }
 
