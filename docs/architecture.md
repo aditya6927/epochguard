@@ -170,10 +170,68 @@ intentional unsafe control. These components are not public deployment examples.
 
 Go establishes consistency within a trusted verifier boundary. It cannot prove
 retrieval occurred or authenticate a forged evidence record. Verifier-hop
-authentication, an external readiness gate and origin freshness remain absent.
+authentication, an external readiness gate and origin freshness remain absent
+from those direct-gateway profiles. The separate protected boundary below adds
+per-response enforcement integrity without changing them.
 The missing-plugin control demonstrates unchecked delivery despite gateway
 health. Qualification covers the exact grammar with fixtures, not live evidence,
 general prose, background work, arbitrary routes, streaming or protected caching.
+
+## Experimental protected ingress boundary
+
+[Task 004D](task-004d.md) adds an opt-in client entry point rather than changing
+the existing direct gateway deployments:
+
+```text
+Client network: client -> protected ingress (exact buffered chat route + /ready)
+                                  |
+Private network:               private Bifrost -> EpochGuard -> existing 004B verifier
+                                  |
+                    core decision recorded per request
+                    HTTP post-hook checks candidate/error binding
+                    HMAC receipt over nonce/status/policy/outcome/body digest/time
+                                  |
+                    ingress buffers actual received body and verifies receipt
+                    -> unchanged allowed body / safe refusal
+```
+
+The ingress generates a fresh 256-bit nonce and forwards no client headers.
+`attestation` configuration is accepted only with the explicit 004B verifier
+mode. A request-owned trace captures the immutable policy identity and final
+core outcome; each fallback replaces the previous attempt. The HTTP post-hook
+can sign only when the same policy remains active and the buffered HTTP content
+still matches the verified candidate or copied genuine error fields. It binds
+the exact HTTP entity body and status, not just a plugin-loaded marker. Later
+response mutation or missing body capture causes ingress refusal rather than
+unchecked delivery. Ordinary post-hook errors remain non-authoritative.
+
+Only the ingress bridges client and private Docker networks; Bifrost, verifier,
+provider, management and test controls have no client-network attachment or
+published ports. Receipts use HMAC-SHA256 with a runtime-generated fixture secret
+mounted read-only into the signer and ingress. No secret is stored in Git or
+returned to clients. MAC comparison is constant time, nonces are bound to one
+round trip, timestamp windows are bounded, and internal/debug headers are not
+forwarded to clients. The ingress never retries an unchecked inference response.
+
+`GET /ready` freshly checks gateway reachability, active plugin/order/placement,
+mode and cache absence, then obtains an authenticated ALLOW probe. Readiness
+does not replace the mandatory per-response receipt check. Runtime removal can
+leave Bifrost serving, but the ingress refuses those unsigned responses. The
+offline lifecycle qualification exercises actual disable and concurrent gateway
+restart; an unsafe direct no-plugin gateway is private test infrastructure.
+
+The new boundary caps request bodies at 64 KiB, entity bodies at 256 KiB, body
+receipt at two seconds and the shared ingress request budget at eight seconds.
+It admits at most sixteen active requests with no waiter queue. Valid ALLOW
+returns original bytes, authenticated policy failures return fixed terminal
+403/503 errors, and eligible authenticated genuine provider errors retain their
+original status/body. Missing/invalid proof or unsupported error shapes fail
+closed. This is not safe streaming or general proxy support.
+
+HMAC authenticates the configured enforcement process, not the truth or origin
+freshness of evidence. Hosts, native plugins, keys, clock, deployment configuration
+and the verifier remain trusted; verifier-hop authentication, production client
+authentication, broader routes and protected caching remain outside qualification.
 
 ## Proposed product components — not yet delivered
 

@@ -1,0 +1,71 @@
+{
+  "client": {
+    "enable_logging": false,
+    "enforce_auth_on_inference": false
+  },
+  "config_store": {
+    "enabled": true,
+    "type": "sqlite",
+    "config": {
+      "path": "/tmp/epochguard-004d.db"
+    }
+  },
+  "logs_store": {
+    "enabled": false
+  },
+  "providers": {
+    "fixture": {
+      "custom_provider_config": {
+        "base_provider_type": "openai"
+      },
+      "network_config": {
+        "base_url": "http://provider:9000",
+        "allow_private_network": true,
+        "max_retries": 0,
+        "default_request_timeout_in_seconds": 10
+      },
+      "keys": [
+        {
+          "name": "local-fixture",
+          "value": "not-a-real-secret",
+          "models": [
+            "epochguard-test",
+            "epochguard-fallback"
+          ],
+          "weight": 1
+        }
+      ]
+    }
+  },
+  "plugins": [
+    {
+      "name": "epochguard",
+      "enabled": true,
+      "path": "/app/plugins/initfailure.so",
+      "placement": "pre_builtin",
+      "order": 0,
+      "config": {
+        "verifier": {
+          "url": "http://faults:8000/v1/verify/multiclaim",
+          "timeout_ms": 1500,
+          "evidence_mode": "fixture",
+          "mode": "004b.v1"
+        },
+        "test_only": true,
+        "attestation": {
+          "protocol": "004d.v1",
+          "secret_file": "/run/receipt/receipt.hex"
+        }
+      }
+    }
+  ],
+  "framework": {
+    "pricing": {
+      "pricing_url": "file:///app/catalogs/pricing.json",
+      "model_parameters_url": "file:///app/catalogs/model-parameters.json",
+      "mcp_library_url": "file:///app/catalogs/mcp-library.json",
+      "mcp_library_sync_interval": 0,
+      "live_models_sync_interval": 0
+    }
+  }
+}

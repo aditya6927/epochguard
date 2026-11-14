@@ -55,6 +55,7 @@ func (d delayedDecision) Decide(ctx context.Context, resp *schemas.BifrostRespon
 type policy struct {
 	source       DecisionSource
 	cacheNoStore bool
+	attestation  *attestationKey
 }
 
 // Publication is atomic for concurrent hooks/reconfiguration. A policy and its
@@ -70,6 +71,7 @@ func configure(config any) error {
 		CacheNoStore        bool                    `json:"cache_no_store"`
 		TestDecisionDelayMS int                     `json:"test_decision_delay_ms"`
 		Verifier            *HTTPVerificationConfig `json:"verifier"`
+		Attestation         *attestationConfig      `json:"attestation"`
 	}
 	data, err := json.Marshal(config)
 	if err != nil {
@@ -97,15 +99,28 @@ func configure(config any) error {
 		if err != nil {
 			return err
 		}
+		var key *attestationKey
+		if cfg.Attestation != nil {
+			if cfg.Verifier.Mode != multiSchema {
+				return errors.New("epochguard: attestation requires explicit 004b.v1 mode")
+			}
+			key, err = loadAttestation(*cfg.Attestation)
+			if err != nil {
+				return errors.New("epochguard: attestation configuration unavailable")
+			}
+		}
 		// Cache is disabled in the 003A deployment. Suppress writes as defense
 		// in depth if a trusted deployment accidentally enables the built-in.
-		activePolicy.Store(&policy{source: source, cacheNoStore: true})
+		activePolicy.Store(&policy{source: source, cacheNoStore: true, attestation: key})
 		if cfg.Verifier.Mode == multiSchema {
 			safeLogf("epochguard event=init task=004c source=http policy=multi-claim-templates-v1")
 		} else {
 			safeLogf("epochguard event=init task=003a source=http policy=python-windows-latest-v1")
 		}
 		return nil
+	}
+	if cfg.Attestation != nil {
+		return errors.New("epochguard: attestation requires a verifier")
 	}
 	if cfg.Decision == "" {
 		cfg.Decision = Unavailable

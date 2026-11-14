@@ -31,20 +31,29 @@ RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache
     && go build -mod=readonly -trimpath -buildmode=plugin -o /out/epochguard.so .
 
 COPY go.mod /src/epochguard/go.mod
+COPY internal/ /src/epochguard/internal/
 COPY cmd/ /src/epochguard/cmd/
 COPY tests/ /src/epochguard/tests/
 WORKDIR /src/epochguard
 RUN --mount=type=cache,target=/root/.cache/go-build \
-    test -z "$(gofmt -l cmd tests)" \
+    test -z "$(gofmt -l cmd tests internal)" \
+    && go vet -mod=readonly ./internal/ingress \
+    && go test -mod=readonly -trimpath -v ./internal/ingress \
+    && go test -race -mod=readonly -trimpath ./internal/ingress \
+    && go test -mod=readonly -trimpath -v ./cmd/protected-ingress \
+    && go build -mod=readonly -trimpath -o /out/protected-ingress ./cmd/protected-ingress \
+    && go build -mod=readonly -trimpath -o /out/receipt-relay ./cmd/receipt-relay \
     && go test -mod=readonly -trimpath -v ./cmd/cache-store-proxy \
     && go build -mod=readonly -trimpath -o /out/provider-fixture ./cmd/provider-fixture \
     && go build -mod=readonly -trimpath -o /out/cache-store-proxy ./cmd/cache-store-proxy \
     && go test -mod=readonly -trimpath -c -o /out/smoke.test ./tests/smoke \
     && go test -mod=readonly -trimpath -c -o /out/cache.test ./tests/cachelifecycle \
     && go test -mod=readonly -trimpath -c -o /out/verification.test ./tests/verification \
-    && go test -mod=readonly -trimpath -c -o /out/multiclaim.test ./tests/multiclaim
+    && go test -mod=readonly -trimpath -c -o /out/multiclaim.test ./tests/multiclaim \
+    && go test -mod=readonly -trimpath -c -o /out/protectedingress.test ./tests/protectedingress
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
     go -C /src/epochguard/plugins/epochguard build -mod=readonly -trimpath -tags routeaudit -buildmode=plugin -o /out/routeobserver.so /src/epochguard/tests/routeobserver/main.go \
+    && go -C /src/epochguard/plugins/epochguard build -mod=readonly -trimpath -tags deploymenttest -buildmode=plugin -o /out/initfailure.so /src/epochguard/tests/initfailure/main.go \
     && go build -mod=readonly -trimpath -o /out/route-provider-fixture ./cmd/route-provider-fixture \
     && go test -mod=readonly -trimpath -c -o /out/routes.test ./tests/routesurface
 RUN --mount=type=cache,target=/go/pkg/mod mkdir -p /out/build-info \
@@ -64,6 +73,11 @@ RUN apk add --no-cache libgcc ca-certificates \
 COPY --from=build /out/bifrost-http /app/bifrost-http
 COPY --from=build /out/epochguard.so /app/plugins/epochguard.so
 COPY --from=build /out/provider-fixture /app/provider-fixture
+COPY --from=build /out/protected-ingress /app/protected-ingress
+COPY --from=build /out/receipt-relay /app/receipt-relay
+COPY --from=build /out/protectedingress.test /app/protectedingress.test
+COPY --from=build /out/initfailure.so /app/plugins/initfailure.so
+COPY dev/ingress/probe.txt /app/probe-004d.txt
 COPY --from=build /out/cache-store-proxy /app/cache-store-proxy
 COPY --from=build /out/cache.test /app/cache.test
 COPY --from=build /out/verification.test /app/verification.test

@@ -19,6 +19,7 @@ type hookTrace struct {
 	mu          sync.Mutex
 	phases      []string
 	cacheAtPost string
+	attested    *attestationState
 }
 
 func GetName() string { return "epochguard" }
@@ -54,6 +55,7 @@ func record(ctx *schemas.BifrostContext, phase string) {
 
 func HTTPTransportPreHook(ctx *schemas.BifrostContext, req *schemas.HTTPRequest) (*schemas.HTTPResponse, error) {
 	record(ctx, "http_pre")
+	beginAttestation(ctx, req)
 	return guardHTTP(req), nil
 }
 
@@ -92,10 +94,13 @@ func PostLLMHook(ctx *schemas.BifrostContext, resp *schemas.BifrostResponse, bif
 	}
 	safeLogf("epochguard cache_at_post=%s request_id=%v", cacheState, ctx.Value(schemas.BifrostContextKeyRequestID))
 	var source DecisionSource
-	if policy := activePolicy.Load(); policy != nil {
-		source = policy.source
+	p := activePolicy.Load()
+	if p != nil {
+		source = p.source
 	}
-	return enforce(ctx, resp, bifrostErr, source)
+	out, failure, err := enforce(ctx, resp, bifrostErr, source)
+	recordAttestation(ctx, p, resp, bifrostErr, out, failure)
+	return out, failure, err
 }
 
 // These headers prove execution on this response; they do not certify freshness.
@@ -120,5 +125,6 @@ func HTTPTransportPostHook(ctx *schemas.BifrostContext, _ *schemas.HTTPRequest, 
 	}
 	trace.mu.Unlock()
 	resp.Headers["X-EpochGuard-Plugin"] = GetName()
+	finishAttestation(ctx, resp)
 	return nil
 }

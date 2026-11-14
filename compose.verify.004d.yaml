@@ -1,0 +1,156 @@
+# Experimental protected ingress. Two isolated networks; no published ports.
+name: epochguard-004d
+x-native: &native
+  image: epochguard-dev:002a
+  platform: linux/amd64
+x-python: &python
+  image: epochguard-verifier:004c
+  platform: linux/amd64
+  networks: [private]
+  healthcheck:
+    test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=2)"]
+    interval: 2s
+    timeout: 3s
+    retries: 30
+x-gateway: &gateway
+  <<: *native
+  command: ["/app/bifrost-http", "-app-dir", "/app/verify", "-host", "0.0.0.0", "-port", "8080"]
+  environment: {BIFROST_SETUP_TOKEN: epochguard-local-dev-only}
+  networks: [private]
+  tmpfs: ["/tmp:uid=10001,gid=10001,mode=1777"]
+  volumes: ["receipt:/run/receipt:ro"]
+  depends_on:
+    key-init: {condition: service_completed_successfully}
+    provider: {condition: service_healthy}
+    faults: {condition: service_healthy}
+  healthcheck:
+    test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+    interval: 2s
+    timeout: 2s
+    retries: 60
+    start_period: 10s
+x-ingress-env: &ingress-env
+  EPOCHGUARD_GATEWAY_URL: http://gateway:8080
+  EPOCHGUARD_ATTESTATION_SECRET_FILE: /run/receipt/receipt.hex
+  EPOCHGUARD_SETUP_TOKEN: epochguard-local-dev-only
+  EPOCHGUARD_PROBE_FILE: /app/probe-004d.txt
+x-ingress: &ingress
+  <<: *native
+  command: ["/app/protected-ingress"]
+  networks: [client, private]
+  volumes: ["receipt:/run/receipt:ro"]
+  depends_on:
+    key-init: {condition: service_completed_successfully}
+    wrong-key-init: {condition: service_completed_successfully}
+  # Startup deliberately does not depend on gateway health. /ready is a fresh
+  # management + authenticated-probe check; every inference still needs a receipt.
+services:
+  key-init:
+    <<: *native
+    user: "0:0"
+    command: ["/app/protected-ingress", "-generate-fixture-secret", "/run/receipt/receipt.hex"]
+    environment: {EPOCHGUARD_TEST_MODE: "1"}
+    network_mode: none
+    volumes: ["receipt:/run/receipt"]
+  wrong-key-init:
+    <<: *native
+    user: "0:0"
+    command: ["/app/protected-ingress", "-generate-fixture-secret", "/run/receipt/wrong.hex"]
+    environment: {EPOCHGUARD_TEST_MODE: "1"}
+    network_mode: none
+    volumes: ["receipt:/run/receipt"]
+  provider:
+    <<: *native
+    networks: [private]
+    command: ["/app/provider-fixture", "-answer-mode", "claim", "-qualification-004c"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9000/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  verifier-supported:
+    <<: *python
+    environment: {EPOCHGUARD_TEST_MODE: "1", EPOCHGUARD_004C_FIXTURE_CASE: "A"}
+  verifier-missing:
+    <<: *python
+    environment: {EPOCHGUARD_TEST_MODE: "1", EPOCHGUARD_004C_FIXTURE_CASE: "C"}
+  verifier-injected:
+    <<: *python
+    environment: {EPOCHGUARD_TEST_MODE: "1", EPOCHGUARD_004C_FIXTURE_CASE: "E"}
+  verifier-wrong:
+    <<: *python
+    environment: {EPOCHGUARD_TEST_MODE: "1", EPOCHGUARD_004C_FIXTURE_CASE: "F"}
+  faults:
+    <<: *python
+    command: ["python", "-m", "uvicorn", "tests_gateway.fault_relay:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    environment: {EPOCHGUARD_TEST_MODE: "1"}
+    depends_on:
+      verifier-supported: {condition: service_healthy}
+      verifier-missing: {condition: service_healthy}
+      verifier-injected: {condition: service_healthy}
+      verifier-wrong: {condition: service_healthy}
+  gateway:
+    <<: *gateway
+    networks:
+      private: {ipv4_address: 10.77.14.10}
+    volumes: ["receipt:/run/receipt:ro", "./dev/ingress/gateway.json:/app/verify/config.json:ro"]
+  gateway-control:
+    <<: *gateway
+    volumes: ["./dev/ingress/gateway-control.json:/app/verify/config.json:ro"]
+  gateway-invalid:
+    <<: *gateway
+    volumes: ["receipt:/run/receipt:ro", "./dev/ingress/gateway-invalid.json:/app/verify/config.json:ro"]
+  gateway-initfail:
+    <<: *gateway
+    volumes: ["./dev/ingress/gateway-initfail.json:/app/verify/config.json:ro"]
+  gateway-loadfail:
+    <<: *gateway
+    volumes: ["./dev/ingress/gateway-loadfail.json:/app/verify/config.json:ro"]
+  receipt-relay:
+    <<: *native
+    networks: [private]
+    command: ["/app/receipt-relay"]
+    environment: {EPOCHGUARD_TEST_MODE: "1"}
+  ingress:
+    <<: *ingress
+    environment: *ingress-env
+  ingress-faults:
+    <<: *ingress
+    environment:
+      <<: *ingress-env
+      EPOCHGUARD_GATEWAY_URL: http://receipt-relay:9003
+  ingress-unsafe:
+    <<: *ingress
+    environment:
+      <<: *ingress-env
+      EPOCHGUARD_GATEWAY_URL: http://gateway-control:8080
+  ingress-badkey:
+    <<: *ingress
+    environment:
+      <<: *ingress-env
+      EPOCHGUARD_ATTESTATION_SECRET_FILE: /run/receipt/wrong.hex
+  ingress-unavailable:
+    <<: *ingress
+    environment:
+      <<: *ingress-env
+      EPOCHGUARD_GATEWAY_URL: http://127.0.0.1:1
+  qualification-client:
+    <<: *native
+    networks: [client]
+    command: ["/app/protectedingress.test", "-test.v", "-test.run=^TestClient(Baseline|MissingPluginAndWrongKey|NetworkBoundary|UnsupportedTraffic)$", "-test.timeout=120s"]
+  qualification-operator:
+    <<: *native
+    networks: [private]
+    command: ["/app/protectedingress.test", "-test.v", "-test.run=^TestOperator(ReceiptAttacks|FailureControls|VerifierFailures|ProviderErrors)$", "-test.timeout=120s"]
+volumes:
+  receipt:
+networks:
+  client:
+    internal: true
+    ipam:
+      config: [{subnet: 10.77.15.0/24}]
+  private:
+    internal: true
+    ipam:
+      # Reserve .10 for the gateway; automatic allocations use the upper half.
+      config: [{subnet: 10.77.14.0/24, ip_range: 10.77.14.128/25}]

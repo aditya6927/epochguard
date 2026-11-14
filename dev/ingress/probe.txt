@@ -1,0 +1,2 @@
+The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.
+The version reported for requests by the PyPI JSON API is 2.88.7.

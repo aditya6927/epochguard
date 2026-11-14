@@ -35,13 +35,14 @@ Offline verification tests substitute a deterministic HTTP fixture for Tavily. T
 | Component | Current state |
 | --- | --- |
 | Gateway enforcement | Implemented: synchronous decisions, typed refusals, cancellation/deadline handling, upstream-error preservation, and terminal policy refusals |
+| Protected ingress | Experimental isolated profile: authenticated per-response receipts, buffered release, private gateway networking and fresh readiness probes |
 | Verification service | Implemented: one exact claim parser, explicit comparison rules, a typed contract, and bounded HTTP retrieval |
 | Tavily integration | Implemented fixed-URL Extract client; no search ranking or LLM judge determines ALLOW |
 | Evidence metadata | Implemented request/hash binding, source URL, content hash, retrieval identifier, observation timestamps, verdict, and reason codes; no durable evidence store |
 | Verified response cache | Proposed: evidence/policy-bound admission, trusted identity scope, read-time validity checks, and atomic generation/version checks |
 | Evidence persistence and revalidation | Proposed: retain evidence/decision state and recheck or revoke reusable answers when validity changes |
 | Claim identification | Standalone experimental baseline/model adapter and draft evaluation set; not connected to gateway verification; human label review and real-model quality qualification pending |
-| Broader verification | Proposed: additional bounded evidence policies and response-level aggregation |
+| Broader verification | Experimental exact-template multi-claim aggregation and independent Go validation; general prose verification remains proposed |
 
 Bifrost is pinned to HTTP `transports/v2.4.0`. The development build compiles a dynamically linked Linux/amd64 gateway and the external Go `.so` with the same pinned toolchain and dependency graph, without modifying Bifrost core. This is not a drop-in extension for the default statically linked Bifrost binary. See the [architecture](docs/architecture.md) and [integration investigation](docs/bifrost-integration-spike.md).
 
@@ -80,7 +81,15 @@ SUPPORTED. Its explicitly configured `004b.v1` mode adds independent Go coverage
 and contract checks. Existing `003a.v1` deployments keep their current behavior;
 the separate demo qualifies synthetic fixtures, not broader live verification.
 
-You need Git, Docker Desktop running **Linux containers** or Docker Engine on Linux, and Docker Compose with `--wait` support. Builds target Linux/amd64 and use Buildx; other host architectures require emulation. No host Go/Python installation, paid model-provider key, or Tavily key is needed for offline tests. Initial builds require internet access to fetch source, images, and dependencies.
+A separate [protected-ingress demonstration](docs/task-004d.md) places Bifrost on
+a private network and releases responses only after checking a nonce-bound HMAC
+receipt from the active enforcement path. Missing or disabled plugins cannot
+silently restore unchecked delivery through that entry point. Its fixture-only
+qualification includes runtime disable, restart and forged/replayed receipts;
+existing deployments are unchanged, and production authentication remains work
+to do. The report includes a reproducible host-Python lifecycle driver.
+
+You need Git, Docker Desktop running **Linux containers** or Docker Engine on Linux, and Docker Compose with `--wait` support. Builds target Linux/amd64 and use Buildx; other host architectures require emulation. The development commands below need no host Go/Python installation, paid model-provider key, or Tavily key. Initial builds require internet access to fetch source, images, and dependencies.
 
 Clone the repository, then run the development commands from its root. These commands work in PowerShell and a Linux shell:
 
@@ -254,7 +263,7 @@ Remove-Variable tavilyKey
 - The [HTTP route audit](docs/task-003c.md) tests all eight registered passthrough prefixes and raw path variants against the pinned gateway. Tested passthrough, Responses, realtime/live and relay requests are refused before dispatch. Management routes bypass the HTTP transport hook: configured Warp chat is stopped by the core request-type guard, but wraps that refusal in HTTP 200 JSON/SSE. Warp background jobs can explicitly skip plugins and remain outside this qualification. Keep management/configuration trusted; the plugin is not an all-route ingress firewall.
 - Evidence verification requires one complete plain assistant choice with finish reason `stop`. Tools, reasoning extensions, multimodal content, multiple choices, partial completions, and additional claims are unsupported.
 - Timeouts, cancellation, invalid contracts, and insufficient evidence fail closed while the plugin is active. Refusals discard the provider answer and disallow model fallback. Genuine upstream errors are preserved rather than treated as successful candidates.
-- A missing or failed-to-load plugin can leave Bifrost healthy and serving. Tests detect this condition; an external ready-to-serve gate is not implemented. `/health` and diagnostic headers do not establish protection.
+- A missing or failed-to-load plugin can leave direct Bifrost deployments healthy and serving. The separate protected-ingress profile refuses responses without valid enforcement receipts and checks readiness independently. `/health` and unsigned diagnostic headers alone do not establish protection.
 - Development inference authentication is disabled. The public development setup token authenticates management probes only. Keep published gateways on loopback; the verifier hop, configuration, management access, and sibling plugins are trusted development inputs. Production authentication and deployment hardening remain work to do.
 - There is no protected response cache, durable evidence database, revalidation worker, dashboard, or general factual verifier. Tavily/source lag, source compromise, layout changes, and clock assumptions limit the narrow policy. Detailed reports document the exact checks and remaining gaps.
 
@@ -265,7 +274,7 @@ The documented design directions are:
 1. Develop additional bounded verification policies and the proposed claim-extraction/time-sensitivity components with their own acceptance criteria.
 2. Implement evidence persistence and an EpochGuard-owned verified cache, including trusted scope, policy/evidence validity, and atomic admission/revocation checks described in ADR 0003.
 3. Add revalidation/invalidation workflows, and qualify concurrency, outages, and stale-writer races before claiming safe reuse.
-4. Add production authentication and a readiness gate; qualify additional providers and request modes before expanding the supported surface.
+4. Add production authentication and qualify deployment readiness beyond the experimental protected ingress; qualify additional providers and request modes before expanding the supported surface.
 
 These are plans, not delivered capabilities or a release schedule.
 
