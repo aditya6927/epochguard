@@ -1,0 +1,578 @@
+{
+  "$defs": {
+    "BoundClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/Claim"
+        },
+        "candidate_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Candidate Sha256",
+          "type": "string"
+        },
+        "policy_id": {
+          "enum": [
+            "python-windows-latest-v1",
+            "pypi-requests-reported-v1"
+          ],
+          "title": "Policy Id",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^(0|[1-9][0-9]{0,2})\\.(0|[1-9][0-9]{0,2})\\.(0|[1-9][0-9]{0,2})$",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "candidate_sha256",
+        "policy_id",
+        "version"
+      ],
+      "title": "BoundClaim",
+      "type": "object"
+    },
+    "Claim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "pattern": "^c[0-9]{3}$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "source_text": {
+          "maxLength": 8192,
+          "minLength": 1,
+          "title": "Source Text",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "exclusiveMinimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "normalized_proposition": {
+          "anyOf": [
+            {
+              "maxLength": 8192,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Normalized Proposition"
+        },
+        "factuality": {
+          "enum": [
+            "FACTUAL",
+            "NON_FACTUAL",
+            "UNCERTAIN"
+          ],
+          "title": "Factuality",
+          "type": "string"
+        },
+        "temporal": {
+          "enum": [
+            "DYNAMIC",
+            "HISTORICAL",
+            "STABLE",
+            "UNCERTAIN"
+          ],
+          "title": "Temporal",
+          "type": "string"
+        },
+        "fresh_evidence": {
+          "enum": [
+            "REQUIRED",
+            "NOT_REQUIRED",
+            "UNCERTAIN",
+            "NOT_APPLICABLE"
+          ],
+          "title": "Fresh Evidence",
+          "type": "string"
+        },
+        "uncertainty": {
+          "items": {
+            "enum": [
+              "MISSING_CONTEXT",
+              "AMBIGUOUS_REFERENCE",
+              "MIXED_REQUIREMENTS",
+              "MODEL_ABSTENTION",
+              "BASELINE_HEURISTIC",
+              "UNTRUSTED_INSTRUCTION"
+            ],
+            "type": "string"
+          },
+          "maxItems": 6,
+          "title": "Uncertainty",
+          "type": "array"
+        },
+        "temporal_reference": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Temporal Reference"
+        }
+      },
+      "required": [
+        "claim_id",
+        "source_text",
+        "start",
+        "end",
+        "normalized_proposition",
+        "factuality",
+        "temporal",
+        "fresh_evidence",
+        "uncertainty",
+        "temporal_reference"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "ClaimResult": {
+      "additionalProperties": false,
+      "properties": {
+        "claim": {
+          "$ref": "#/$defs/BoundClaim"
+        },
+        "verdict": {
+          "enum": [
+            "SUPPORTED",
+            "CONTRADICTED",
+            "INSUFFICIENT"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        },
+        "reason_code": {
+          "anyOf": [
+            {
+              "enum": [
+                "MATCHED_PRIMARY_LABEL",
+                "OLDER_THAN_PRIMARY_LABEL",
+                "CLAIM_AHEAD_OF_SOURCE",
+                "UNSUPPORTED_CLAIM",
+                "INSUFFICIENT_EVIDENCE",
+                "AMBIGUOUS_EVIDENCE",
+                "RETRIEVAL_TIMEOUT",
+                "RETRIEVAL_FAILURE",
+                "VERIFIER_ERROR",
+                "STALE_OBSERVATION"
+              ],
+              "type": "string"
+            },
+            {
+              "enum": [
+                "MATCHED_PYPI_VERSION",
+                "OLDER_THAN_PYPI_VERSION"
+              ],
+              "type": "string"
+            }
+          ],
+          "title": "Reason Code"
+        },
+        "evidence_requirements_satisfied": {
+          "title": "Evidence Requirements Satisfied",
+          "type": "boolean"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "maxItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "claim",
+        "verdict",
+        "reason_code",
+        "evidence_requirements_satisfied",
+        "evidence"
+      ],
+      "title": "ClaimResult",
+      "type": "object"
+    },
+    "Coverage": {
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "COMPLETE",
+            "UNCERTAIN"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "reason_code": {
+          "enum": [
+            "EXACT_TEMPLATES",
+            "UNRECOGNIZED_CONTENT",
+            "NO_CLAIMS",
+            "CLAIM_LIMIT",
+            "REPEATED_CLAIM",
+            "HASH_MISMATCH",
+            "EXTRACTION_FAILURE",
+            "SOURCE_BINDING_FAILURE",
+            "EXTRACTION_CONFLICT"
+          ],
+          "title": "Reason Code",
+          "type": "string"
+        },
+        "required_claim_ids": {
+          "items": {
+            "pattern": "^c[0-9]{3}$",
+            "type": "string"
+          },
+          "maxItems": 8,
+          "title": "Required Claim Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "status",
+        "reason_code",
+        "required_claim_ids"
+      ],
+      "title": "Coverage",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "url": {
+          "enum": [
+            "https://www.python.org/downloads/windows/",
+            "https://pypi.org/pypi/requests/json"
+          ],
+          "title": "Url",
+          "type": "string"
+        },
+        "retrieval_mode": {
+          "enum": [
+            "fixture",
+            "tavily_live",
+            "pypi_live"
+          ],
+          "title": "Retrieval Mode",
+          "type": "string"
+        },
+        "retrieval_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,128}$",
+          "title": "Retrieval Id",
+          "type": "string"
+        },
+        "content_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Sha256",
+          "type": "string"
+        },
+        "observed_version": {
+          "pattern": "^(0|[1-9][0-9]{0,2})\\.(0|[1-9][0-9]{0,2})\\.(0|[1-9][0-9]{0,2})$",
+          "title": "Observed Version",
+          "type": "string"
+        },
+        "retrieved_at": {
+          "format": "date-time",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "url",
+        "retrieval_mode",
+        "retrieval_id",
+        "content_sha256",
+        "observed_version",
+        "retrieved_at",
+        "observed_at"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "Extraction": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "004a.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "claims": {
+          "items": {
+            "$ref": "#/$defs/Claim"
+          },
+          "maxItems": 64,
+          "title": "Claims",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "claims"
+      ],
+      "title": "Extraction",
+      "type": "object"
+    },
+    "Mapping": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "pattern": "^c[0-9]{3}$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "source_text": {
+          "maxLength": 8192,
+          "title": "Source Text",
+          "type": "string"
+        },
+        "start": {
+          "maximum": 8192,
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "maximum": 8192,
+          "minimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "policy_id": {
+          "enum": [
+            "python-windows-latest-v1",
+            "pypi-requests-reported-v1"
+          ],
+          "title": "Policy Id",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^(0|[1-9][0-9]{0,2})\\.(0|[1-9][0-9]{0,2})\\.(0|[1-9][0-9]{0,2})$",
+          "title": "Version",
+          "type": "string"
+        },
+        "canonical": {
+          "maxLength": 200,
+          "title": "Canonical",
+          "type": "string"
+        }
+      },
+      "required": [
+        "claim_id",
+        "source_text",
+        "start",
+        "end",
+        "policy_id",
+        "version",
+        "canonical"
+      ],
+      "title": "Mapping",
+      "type": "object"
+    },
+    "Result": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "004b.v1",
+          "default": "004b.v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "policy_id": {
+          "const": "multi-claim-templates-v1",
+          "default": "multi-claim-templates-v1",
+          "title": "Policy Id",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,128}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "candidate": {
+          "maxLength": 8192,
+          "title": "Candidate",
+          "type": "string"
+        },
+        "candidate_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Candidate Sha256",
+          "type": "string"
+        },
+        "extraction_status": {
+          "enum": [
+            "TRUSTED_GRAMMAR",
+            "VALIDATED",
+            "FAILED",
+            "NOT_RUN"
+          ],
+          "title": "Extraction Status",
+          "type": "string"
+        },
+        "binding_status": {
+          "enum": [
+            "VALID",
+            "FAILED",
+            "NOT_RUN"
+          ],
+          "title": "Binding Status",
+          "type": "string"
+        },
+        "extraction": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Extraction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "coverage": {
+          "$ref": "#/$defs/Coverage"
+        },
+        "claims": {
+          "items": {
+            "$ref": "#/$defs/ClaimResult"
+          },
+          "maxItems": 8,
+          "title": "Claims",
+          "type": "array"
+        },
+        "verdict": {
+          "enum": [
+            "SUPPORTED",
+            "CONTRADICTED",
+            "INSUFFICIENT"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        },
+        "checked_at": {
+          "format": "date-time",
+          "title": "Checked At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_id",
+        "candidate",
+        "candidate_sha256",
+        "extraction_status",
+        "binding_status",
+        "extraction",
+        "coverage",
+        "claims",
+        "verdict",
+        "checked_at"
+      ],
+      "title": "Result",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "004g.v1",
+      "default": "004g.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "policy_id": {
+      "const": "bounded-prose-v1",
+      "default": "bounded-prose-v1",
+      "title": "Policy Id",
+      "type": "string"
+    },
+    "request_id": {
+      "pattern": "^[A-Za-z0-9_-]{1,128}$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "candidate": {
+      "maxLength": 8192,
+      "title": "Candidate",
+      "type": "string"
+    },
+    "candidate_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Candidate Sha256",
+      "type": "string"
+    },
+    "coverage": {
+      "enum": [
+        "COMPLETE",
+        "UNCERTAIN"
+      ],
+      "title": "Coverage",
+      "type": "string"
+    },
+    "reason_code": {
+      "enum": [
+        "BOUNDED_GRAMMAR",
+        "UNRECOGNIZED_CONTENT",
+        "REPEATED_CLAIM",
+        "CLAIM_LIMIT",
+        "NO_CLAIMS"
+      ],
+      "title": "Reason Code",
+      "type": "string"
+    },
+    "mappings": {
+      "items": {
+        "$ref": "#/$defs/Mapping"
+      },
+      "maxItems": 8,
+      "title": "Mappings",
+      "type": "array"
+    },
+    "verification": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Result"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "request_id",
+    "candidate",
+    "candidate_sha256",
+    "coverage",
+    "reason_code",
+    "mappings",
+    "verification"
+  ],
+  "title": "Result",
+  "type": "object"
+}

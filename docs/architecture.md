@@ -1,6 +1,6 @@
 # EpochGuard architecture
 
-**Status:** the maintainer-authorized November 14, 2026 protected live multi-claim run met its narrow acceptance checks, based on subsequent report inspection: unchanged supported two-claim delivery, contradiction/unsupported/missing-plugin refusals and genuine provider-error preservation. The [004E assessment](task-004e.md) qualifies the 004D ingress boundary and real Tavily/PyPI path together with a controlled provider and exact templates. The runner collected results rather than printing a final live PASS. The legacy single-policy path remains unchanged; its [003B report](task-003b.md) retains the November 8 result and initial blocked attempts. Caching remains disabled; general factual verification, production readiness/authentication and protected caching remain unqualified. Updated: 2026-11-14.
+**Status:** the maintainer-authorized November 14, 2026 protected live multi-claim run met its narrow acceptance checks, based on subsequent report inspection: unchanged supported two-claim delivery, contradiction/unsupported/missing-plugin refusals and genuine provider-error preservation. The [004E assessment](task-004e.md) qualifies the 004D ingress boundary and real Tavily/PyPI path together with a controlled provider and exact templates. The runner collected results rather than printing a final live PASS. The legacy single-policy path remains unchanged; its [003B report](task-003b.md) retains the November 8 result and initial blocked attempts. Caching remains disabled; general factual verification, production readiness/authentication and protected caching remain unqualified. A separate [004G bounded-prose mode](task-004g.md) is qualified offline; **004G LIVE QUALIFICATION PENDING**. Updated: 2026-11-15.
 
 ## Problem and system boundary
 
@@ -12,6 +12,9 @@ whole-response grammar and two-policy comparisons through
 `/v1/verify/multiclaim`; 004C adds independent Go validation/enforcement, 004D
 adds authenticated protected ingress and isolated readiness, and 004E qualifies
 that composition using real Tavily/Python.org and requests PyPI observations.
+The separate 004G path uses `/v1/verify/prose` for nine finite sentence forms
+with independently reconstructed original/canonical bindings and its own receipt
+policy identity; its gateway qualification is offline.
 The two-policy implementation is not a general factual verifier. Production-wide
 readiness and authentication remain outside qualification.
 
@@ -207,7 +210,7 @@ Private network:               private Bifrost -> EpochGuard -> existing 004B ve
 ```
 
 The ingress generates a fresh 256-bit nonce and forwards no client headers.
-`attestation` configuration is accepted only with the explicit 004B verifier
+`attestation` configuration is accepted with an explicit 004B or 004G verifier
 mode. A request-owned trace captures the immutable policy identity and final
 core outcome; each fallback replaces the previous attempt. The HTTP post-hook
 can sign only when the same policy remains active and the buffered HTTP content
@@ -283,8 +286,7 @@ There is no retry, source polling, live fallback to fixtures or Gemini call.
 
 ### Non-authorizing prose analysis
 
-[Task 004F](task-004f.md) adds a standalone `verifier.prose` branch with no gateway
-mode or HTTP app import. It sends the original bounded response to the unchanged
+[Task 004F](task-004f.md) adds a standalone `verifier.prose` planner branch whose audit, results and model extraction cannot authorize gateway delivery. It sends the original bounded response to the unchanged
 004A ModelExtractor/Gemini adapter when explicitly selected, while an independent
 scanner derives risk units from the original text. A closed paraphrase grammar
 maps only the two existing policies. Exact alignment does not prove atomicity,
@@ -298,8 +300,42 @@ comparisons reuse existing 004B policy code and cannot repair a coverage failure
 The separate 66-case draft evaluation measures omissions and false-complete
 claims; human review and real-model quality qualification remain pending. No
 004A dataset, 004B contract/policy, Go validator, receipt, deployment or gateway
-route changes. Integrating a future prose verifier would require a new reviewed
-cross-language enforcement contract and gateway qualification.
+route changes. The separate 004G integration below uses only the finite mapping registry, not
+these planning records or model-selected subsets.
+
+## Protected bounded-prose enforcement
+
+[Task 004G](task-004g.md) adds a separate `004g.v1` / `bounded-prose-v1`
+contract and private `/v1/verify/prose` composition. The ASCII-only full response
+must consist of one to eight recognized factual sentences separated only by
+space, tab, CR or LF. Nine exact forms are admitted: the original two 004B
+sentences and seven 004F paraphrases. There are no nonfactual exemptions.
+Repeated policy/version assertions, unknown tails and compound/contextual
+variations are refused before retrieval.
+
+Python reconstructs original spans, policy/version and canonical comparison
+sentences, then invokes the unchanged bounded 004B pipeline on their newline
+join. The outer record binds the original response/hash and mappings to the
+nested evidence result. Go independently parses the entire original response,
+reconstructs every mapping and canonical candidate, requires every ordered claim
+result, and invokes its unchanged evidence validator. Python COMPLETE or an
+outer mapping list alone cannot authorize release. Model/planner output is not
+an accepted input. Contradiction is terminal; missing evidence is unavailable.
+
+The existing receipt envelope remains `004d.v1`; the immutable configured policy
+now selects the signed identity. New ingress profiles `004g` and `004g-live`
+require **only** `004g.v1/bounded-prose-v1`. Older profiles still require only
+`004b.v1/multi-claim-templates-v1`. Nonce, actual entity-body hash, original
+candidate hash, MAC, issue-time and replay checks are unchanged. Readiness for
+both new profiles is a source-free authenticated negative canary plus management
+placement/cache checks. Only ingress joins the client and private networks.
+
+The new Compose stack is entirely offline with simulated Tavily/PyPI transports,
+a real fixture provider, native Bifrost and ingress. A separately gated Python
+live factory reuses 004E's runtime credential checks, fixed deadline hierarchy
+and three-attempt-per-source process budget; it additionally requires the 004G
+opt-in. No live 004G qualification was run or automated. No new cache, background
+job, persistent candidate store or production authentication is introduced.
 
 ## Proposed product components — not yet delivered
 
@@ -354,6 +390,7 @@ Bifrost execution deadline.
 - [004A claim-analysis experiment](task-004a.md) and [004A-H hardening](task-004a-hardening.md) — identification only; human review and model quality remain pending.
 - [004B whole-response verification](task-004b.md) and [004C gateway integration](task-004c.md) — two fixed policies, independent Go validation and original offline qualification.
 - [004D protected ingress](task-004d.md) — authenticated release and isolated lifecycle/readiness qualification.
+- [004G bounded-prose enforcement](task-004g.md) ? independent grammar, original/canonical binding, policy-bound receipts and offline qualification.
 - [004E live composition and assessment](task-004e.md) — bounded real-source protected-gateway run and remaining trust limits.
 - `docs/decisions/0003-protected-cache-ownership.md` — proposed verified admission/revocation design.
 - `docs/decisions/0001-native-bifrost-plugin.md` — rationale and alternatives.

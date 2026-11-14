@@ -1,0 +1,11 @@
+{
+  "schema_version": "004g.v1",
+  "policy_id": "bounded-prose-v1",
+  "request_id": "conformance",
+  "candidate": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.\nUnsupported.",
+  "candidate_sha256": "34df33ec563dcb2bc87830a144befe2a518b9dd67d8b2745f9cb6619f09e0ec0",
+  "coverage": "UNCERTAIN",
+  "reason_code": "UNRECOGNIZED_CONTENT",
+  "mappings": [],
+  "verification": null
+}

@@ -1,5 +1,16 @@
 # Evidence verifier
 
+The separate [004G bounded-prose mode](../../docs/task-004g.md) uses private
+`/v1/verify/prose`, contract `004g.v1` and policy `bounded-prose-v1`. It admits
+exactly the original two sentences plus seven finite 004F paraphrases, with
+independent full-response Go/Python parsing and policy-specific protected
+receipts. It invokes the unchanged two-policy evidence pipeline on reconstructed
+canonical sentences; the original candidate and exact ASCII spans remain bound
+separately. Extra prose and nonfactual exceptions are refused. The 004F planner
+and model cannot authorize this mode. Its separate Compose stack and host driver
+are offline; **004G LIVE QUALIFICATION PENDING**. Existing entry points below
+retain their behavior.
+
 The qualified FastAPI `/v1/verify` route implements the unchanged `003a.v1`
 Python Windows release-label policy. Its Go client validates that contract before
 gateway delivery. See [the policy specification](../../docs/task-003a.md) and

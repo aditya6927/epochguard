@@ -37,11 +37,13 @@ func main() {
 	profile := os.Getenv("EPOCHGUARD_INGRESS_PROFILE")
 	probe := []byte(ingress.LiveCanary)
 	writeTimeout := 15 * time.Second
-	if profile == "004e-live" {
+	if profile == "004e-live" || profile == "004g" || profile == "004g-live" {
 		if os.Getenv("EPOCHGUARD_PROBE_FILE") != "" {
 			log.Fatal("ingress configuration unavailable")
 		}
-		writeTimeout = 48 * time.Second
+		if profile == "004e-live" || profile == "004g-live" {
+			writeTimeout = 48 * time.Second
+		}
 	} else {
 		probe, err = os.ReadFile(os.Getenv("EPOCHGUARD_PROBE_FILE"))
 		if err != nil || len(probe) > 8192 {

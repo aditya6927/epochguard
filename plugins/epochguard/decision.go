@@ -53,9 +53,10 @@ func (d delayedDecision) Decide(ctx context.Context, resp *schemas.BifrostRespon
 }
 
 type policy struct {
-	source       DecisionSource
-	cacheNoStore bool
-	attestation  *attestationKey
+	source        DecisionSource
+	cacheNoStore  bool
+	attestation   *attestationKey
+	receiptPolicy string
 }
 
 // Publication is atomic for concurrent hooks/reconfiguration. A policy and its
@@ -91,7 +92,9 @@ func configure(config any) error {
 		}
 		var source DecisionSource
 		var err error
-		if cfg.Verifier.Mode == multiSchema {
+		if cfg.Verifier.Mode == proseSchema {
+			source, err = newProseDecisionSource(*cfg.Verifier)
+		} else if cfg.Verifier.Mode == multiSchema {
 			source, err = newMultiDecisionSource(*cfg.Verifier)
 		} else {
 			source, err = newHTTPDecisionSource(*cfg.Verifier)
@@ -101,7 +104,7 @@ func configure(config any) error {
 		}
 		var key *attestationKey
 		if cfg.Attestation != nil {
-			if cfg.Verifier.Mode != multiSchema {
+			if cfg.Verifier.Mode != multiSchema && cfg.Verifier.Mode != proseSchema {
 				return errors.New("epochguard: attestation requires explicit 004b.v1 mode")
 			}
 			key, err = loadAttestation(*cfg.Attestation)
@@ -111,8 +114,14 @@ func configure(config any) error {
 		}
 		// Cache is disabled in the 003A deployment. Suppress writes as defense
 		// in depth if a trusted deployment accidentally enables the built-in.
-		activePolicy.Store(&policy{source: source, cacheNoStore: true, attestation: key})
-		if cfg.Verifier.Mode == multiSchema {
+		identity := receiptPolicy
+		if cfg.Verifier.Mode == proseSchema {
+			identity = proseSchema + "/" + prosePolicy
+		}
+		activePolicy.Store(&policy{source: source, cacheNoStore: true, attestation: key, receiptPolicy: identity})
+		if cfg.Verifier.Mode == proseSchema {
+			safeLogf("epochguard event=init task=004g source=http policy=bounded-prose-v1")
+		} else if cfg.Verifier.Mode == multiSchema {
 			safeLogf("epochguard event=init task=004c source=http policy=multi-claim-templates-v1")
 		} else {
 			safeLogf("epochguard event=init task=003a source=http policy=python-windows-latest-v1")

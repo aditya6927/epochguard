@@ -2,9 +2,9 @@
 
 EpochGuard explores evidence-aware verification of time-sensitive AI answers and the prevention of unsafe reuse through stale caches. It places an enforcement boundary at the AI gateway: a buffered answer must receive a policy decision before the gateway can return it.
 
-The broader goal is to connect answers to evidence, policy, and validity over time, including when an answer is reused from a cache. The current implementation is deliberately narrow: a native Go plugin for Bifrost, a Python/FastAPI verifier and an experimental protected ingress. Its multi-claim profile checks two fixed policies: the Python.org Windows release label through Tavily Extract and the version reported for requests by the PyPI JSON API. The original single-policy `003a.v1` route remains available and unchanged. An EpochGuard-owned verified cache is proposed, not implemented.
+The broader goal is to connect answers to evidence, policy, and validity over time, including when an answer is reused from a cache. The current implementation is deliberately narrow: a native Go plugin for Bifrost, a Python/FastAPI verifier and an experimental protected ingress. Its multi-claim and bounded-prose profiles check two fixed policies: the Python.org Windows release label through Tavily Extract and the version reported for requests by the PyPI JSON API. The original single-policy `003a.v1` route remains available and unchanged. An EpochGuard-owned verified cache is proposed, not implemented.
 
-**Status:** experimental development software. The maintainer-authorized **November 14, 2026 protected live multi-claim run met its narrow acceptance checks**, based on subsequent inspection of its reports: unchanged two-claim delivery, contradiction/unsupported/missing-plugin refusals and preserved genuine provider error. This qualified the authenticated ingress release boundary and real Tavily/PyPI retrieval path together under exact-template restrictions, using a controlled provider. The [004E report](docs/task-004e.md) distinguishes collected data, successful client expectations and report assessment; the runner did not print a final live PASS. General factual verification, commercial LLM providers, production readiness/authentication and protected caching remain unqualified. The [earlier single-policy result](docs/task-003b.md) retains its own historical scope.
+**Status:** experimental development software. [Task 004G](docs/task-004g.md) adds an isolated, offline-qualified bounded-prose mode: nine finite sentence forms, independent whole-response parsing in Go/Python and policy-bound protected receipts. **004G LIVE QUALIFICATION PENDING.** The 004F model planner remains non-authorizing. The maintainer-authorized **November 14, 2026 protected live multi-claim run met its narrow acceptance checks**, based on subsequent inspection of its reports: unchanged two-claim delivery, contradiction/unsupported/missing-plugin refusals and preserved genuine provider error. This qualified the authenticated ingress release boundary and real Tavily/PyPI retrieval path together under exact-template restrictions, using a controlled provider. The [004E report](docs/task-004e.md) distinguishes collected data, successful client expectations and report assessment; the runner did not print a final live PASS. General factual verification, commercial LLM providers, production readiness/authentication and protected caching remain unqualified. The [earlier single-policy result](docs/task-003b.md) retains its own historical scope.
 
 ## Why enforce at the gateway?
 
@@ -24,7 +24,7 @@ flowchart LR
     Ingress --> Gateway["Private Bifrost + EpochGuard Go plugin"]
     Gateway --> Provider["Provider: local fixture in qualified tests"]
     Provider -->|Buffered candidate| Gateway
-    Gateway --> Verifier["004B FastAPI: two fixed policies"]
+    Gateway --> Verifier["004B / 004G FastAPI: two fixed policies"]
     Verifier --> Tavily["Tavily Extract: live opt-in"]
     Tavily --> Source["Fixed Python.org source"]
     Verifier --> PyPI["Fixed requests PyPI JSON endpoint"]
@@ -33,19 +33,19 @@ flowchart LR
     Ingress -->|Allowed answer or safe refusal| Client
 ```
 
-Offline tests substitute deterministic evidence for the external sources while retaining the real gateway, plugin loader, verifier and refusal path. The separate legacy deployment checks one Python claim through `/v1/verify`; the protected profile uses `/v1/verify/multiclaim`. Neither path uses model classifications to authorize release.
+Offline tests substitute deterministic evidence for the external sources while retaining the real gateway, plugin loader, verifier and refusal path. The separate legacy deployment checks one Python claim through `/v1/verify`; the existing protected profile uses `/v1/verify/multiclaim`; the separate 004G profile uses `/v1/verify/prose`. Neither path uses model classifications to authorize release.
 
 | Component | Current state |
 | --- | --- |
 | Gateway enforcement | Implemented: synchronous decisions, typed refusals, cancellation/deadline handling, upstream-error preservation, and terminal policy refusals |
 | Protected ingress | Experimental isolated profile: authenticated per-response receipts, buffered release, private gateway networking and independent readiness; qualified with the narrow live multi-claim path |
-| Verification service | Two fixed policies under whole-response template coverage and independent Go validation; unchanged single-policy legacy endpoint also available |
+| Verification service | Two fixed policies under whole-response template or finite prose coverage and independent Go validation; unchanged single-policy legacy endpoint also available |
 | Tavily integration | Implemented fixed-URL Extract client; no search ranking or LLM judge determines ALLOW |
 | Evidence metadata | Implemented request/hash binding, source URL, content hash, retrieval identifier, observation timestamps, verdict, and reason codes; no durable evidence store |
 | Verified response cache | Proposed: evidence/policy-bound admission, trusted identity scope, read-time validity checks, and atomic generation/version checks |
 | Evidence persistence and revalidation | Proposed: retain evidence/decision state and recheck or revoke reusable answers when validity changes |
 | Claim identification | Standalone experimental baseline/model adapter and draft evaluation set; not connected to gateway verification; human label review and real-model quality qualification pending |
-| Broader verification | Experimental exact-template multi-claim aggregation and independent Go validation; general prose verification remains proposed |
+| Broader verification | Exact-template and nine-form bounded-prose enforcement; unrestricted natural-language verification remains unqualified |
 
 Bifrost is pinned to HTTP `transports/v2.4.0`. The development build compiles a dynamically linked Linux/amd64 gateway and the external Go `.so` with the same pinned toolchain and dependency graph, without modifying Bifrost core. This is not a drop-in extension for the default statically linked Bifrost binary. See the [architecture](docs/architecture.md) and [integration investigation](docs/bifrost-integration-spike.md).
 
@@ -62,6 +62,15 @@ The version reported for requests by the PyPI JSON API is X.Y.Z.
 
 Python versions must be `3.<0..99>.<0..999>`; PyPI versions have three components, each `0..999`, without leading zeros or suffixes. Every required claim must be accounted for; prose, instructions or content outside the grammar prevent support. Tavily retrieves only `https://www.python.org/downloads/windows/`, requiring a unique release label in the expected context. PyPI retrieval uses only `https://pypi.org/pypi/requests/json`, requiring the exact project identity, canonical reported version and non-yanked metadata. See the [verifier grammar and policy rules](services/verifier/README.md).
 
+The isolated `004g.v1` / `bounded-prose-v1` mode additionally admits the seven [004F paraphrases](docs/task-004g.md#exact-grammar), for example:
+
+```text
+Python.org currently lists Python 3.15.2 as its latest stable Windows release.
+PyPI reports requests version 2.34.2.
+```
+
+These are synthetic fixture versions. Both policies must have supporting evidence; extra prose, greetings, compounds and semantic variations fail closed. This mode has offline real-gateway qualification, not live or unrestricted prose qualification. Reproduce it with `& .venv-003a/Scripts/python.exe tests/boundedprose/qualify.py --build` in PowerShell (the existing verifier environment is required for this host driver). No API credentials are needed.
+
 The unchanged `003a.v1` legacy mode accepts only the single exact Python sentence as the entire answer, with its original bounds. Multi-claim support requires explicitly selected trusted configuration.
 
 | Evidence outcome | Gateway decision | Client response |
@@ -76,7 +85,7 @@ These policies compare an extracted label or reported package metadata. They do 
 
 ## Experimental claim identification
 
-A separate [Python analyzer and evaluation CLI](services/claim_analysis/README.md) identifies verbatim claim spans and temporal evidence requirements in ordinary responses. It includes a deterministic baseline, a bounded opt-in Gemini adapter, and 112 synthetic draft examples with 184 factual annotations. Independent human review and real-model performance qualification remain pending. The baseline's low held-out fresh-evidence recall is recorded in [the evaluation report](docs/task-004a.md). Identification is not verification and cannot authorize delivery; gateway verification remains restricted to the fixed policies and exact templates above.
+A separate [Python analyzer and evaluation CLI](services/claim_analysis/README.md) identifies verbatim claim spans and temporal evidence requirements in ordinary responses. It includes a deterministic baseline, a bounded opt-in Gemini adapter, and 112 synthetic draft examples with 184 factual annotations. Independent human review and real-model performance qualification remain pending. The baseline's low held-out fresh-evidence recall is recorded in [the evaluation report](docs/task-004a.md). Identification is not verification and cannot authorize delivery; gateway verification remains restricted to the fixed policies and finite sentence forms above.
 
 ## Quick start: offline verification
 
@@ -142,6 +151,7 @@ Create that named builder once. Use an approved resolver instead on networks req
 
 | Environment | Compose configuration | Purpose / exposure |
 | --- | --- | --- |
+| Protected bounded-prose offline qualification | [compose.verify.004g.yaml](compose.verify.004g.yaml) | Nine sentence forms, independent parsing and policy-bound receipts; internal networks, no host ports or live calls |
 | Protected multi-claim offline qualification | [compose.verify.004e.offline.yaml](compose.verify.004e.offline.yaml) | Two fixed policies, protected ingress and simulated source failures; internal networks, no host ports |
 | Opt-in protected live multi-claim qualification | [compose.verify.004e.yaml](compose.verify.004e.yaml) | Real Tavily/PyPI evidence through receipt-gated ingress; verifier-only egress, runtime secret file, no host ports |
 | Offline evidence verification | [compose.verify.yaml](compose.verify.yaml) | Real gateway/service with deterministic evidence; internal network, no host ports |

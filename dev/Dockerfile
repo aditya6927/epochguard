@@ -26,7 +26,7 @@ COPY tests/conformance/ /src/epochguard/tests/conformance/
 COPY plugins/epochguard/ /src/epochguard/plugins/epochguard/
 WORKDIR /src/epochguard/plugins/epochguard
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
-    test -z "$(gofmt -l .)" && go test -mod=readonly -trimpath -v ./... \
+    test -z "$(gofmt -l .)" && go vet -mod=readonly ./... && go test -mod=readonly -trimpath -v ./... \
     && go test -race -p=2 -mod=readonly -trimpath ./... \
     && go build -mod=readonly -trimpath -buildmode=plugin -o /out/epochguard.so .
 

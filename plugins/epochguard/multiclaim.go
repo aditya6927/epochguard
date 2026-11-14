@@ -151,6 +151,10 @@ func multiGrammar(text string) ([]multiBound, string) {
 // required fields, types, nullable positions, array counts and depth before decode.
 // The existing 003A parser is deliberately left unchanged.
 func strictMultiJSON(data []byte, target *multiResult) error {
+	return strictRecordJSON(data, target, 8)
+}
+
+func strictRecordJSON(data []byte, target any, maxDepth int) error {
 	bad := errors.New("epochguard: invalid multiclaim contract")
 	if len(data) > multiBodyLimit || !utf8.Valid(data) {
 		return bad
@@ -159,7 +163,7 @@ func strictMultiJSON(data []byte, target *multiResult) error {
 	dec.UseNumber()
 	var walk func(reflect.Type, int) error
 	walk = func(t reflect.Type, depth int) error {
-		if depth > 8 {
+		if depth > maxDepth {
 			return bad
 		}
 		token, err := dec.Token()
@@ -235,7 +239,7 @@ func strictMultiJSON(data []byte, target *multiResult) error {
 		}
 		return nil
 	}
-	if walk(reflect.TypeOf(*target), 0) != nil {
+	if walk(reflect.TypeOf(target).Elem(), 0) != nil {
 		return bad
 	}
 	if _, err := dec.Token(); err != io.EOF {
@@ -353,6 +357,7 @@ func validateMulti(req verificationRequest, v multiResult, mode string, started,
 type multiDecisionSource struct {
 	*httpDecisionSource
 	liveBudget bool
+	prose      bool
 }
 
 func newMultiDecisionSource(cfg HTTPVerificationConfig) (*multiDecisionSource, error) {
@@ -419,6 +424,9 @@ func (s *multiDecisionSource) Decide(ctx context.Context, resp *schemas.BifrostR
 		return Unavailable, verificationFailure{category: "verification_unavailable"}
 	}
 	payload := verificationRequest{multiSchema, multiPolicy, hex.EncodeToString(nonce), text, shaText(text)}
+	if s.prose {
+		payload.SchemaVersion, payload.PolicyID = proseSchema, prosePolicy
+	}
 	body, err := json.Marshal(payload)
 	if err != nil || len(body) > 65536 {
 		return Unavailable, verificationFailure{category: "request_failure"}
@@ -443,6 +451,17 @@ func (s *multiDecisionSource) Decide(ctx context.Context, resp *schemas.BifrostR
 		return Unavailable, transportFailure(err)
 	}
 	var result multiResult
+	if s.prose {
+		var result proseResult
+		if media != "application/json" || strictRecordJSON(data, &result, 10) != nil {
+			return Unavailable, verificationFailure{category: "invalid_contract", status: 200}
+		}
+		decision, err := validateProse(payload, result, s.evidenceMode, started, time.Now())
+		if err != nil {
+			return Unavailable, verificationFailure{category: "invalid_contract", status: 200}
+		}
+		return decision, nil
+	}
 	if media != "application/json" || strictMultiJSON(data, &result) != nil {
 		return Unavailable, verificationFailure{category: "invalid_contract", status: 200}
 	}

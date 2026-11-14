@@ -1,0 +1,144 @@
+# Offline simulated source failures; no live credentials or egress.
+name: epochguard-004g
+x-native: &native
+  image: epochguard-dev:002a
+  platform: linux/amd64
+x-gateway: &gateway
+  <<: *native
+  command: ["/app/bifrost-http", "-app-dir", "/app/verify", "-host", "0.0.0.0", "-port", "8080"]
+  environment: {BIFROST_SETUP_TOKEN: epochguard-local-dev-only}
+  networks: [private]
+  tmpfs: ["/tmp:uid=10001,gid=10001,mode=1777"]
+  depends_on:
+    key-init: {condition: service_completed_successfully}
+    provider: {condition: service_healthy}
+    verifier: {condition: service_healthy}
+  healthcheck:
+    test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+    interval: 2s
+    timeout: 2s
+    retries: 60
+    start_period: 10s
+x-ingress-env: &ingress-env
+  EPOCHGUARD_GATEWAY_URL: http://gateway:8080
+  EPOCHGUARD_ATTESTATION_SECRET_FILE: /run/receipt/receipt.hex
+  EPOCHGUARD_SETUP_TOKEN: epochguard-local-dev-only
+  EPOCHGUARD_INGRESS_PROFILE: 004g
+x-ingress: &ingress
+  <<: *native
+  command: ["/app/protected-ingress"]
+  networks: [client, private]
+  volumes: ["receipt:/run/receipt:ro"]
+  depends_on:
+    gateway: {condition: service_healthy}
+services:
+  key-init:
+    <<: *native
+    user: "0:0"
+    command: ["/app/protected-ingress", "-generate-fixture-secret", "/run/receipt/receipt.hex"]
+    environment: {EPOCHGUARD_TEST_MODE: "1"}
+    network_mode: none
+    volumes: ["receipt:/run/receipt"]
+  provider:
+    <<: *native
+    networks: [private]
+    command: ["/app/provider-fixture", "-answer-mode", "claim", "-qualification-004c"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9000/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  verifier:
+    image: epochguard-verifier:004g
+    platform: linux/amd64
+    networks: [private]
+    command: ["python", "-m", "uvicorn", "tests_bounded_prose.simulated:fixture_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    environment: {EPOCHGUARD_TEST_MODE: "1"}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=2)"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  gateway:
+    <<: *gateway
+    networks:
+      private: {ipv4_address: 10.77.34.10}
+    volumes: ["receipt:/run/receipt:ro", "./dev/prose/gateway.json:/app/verify/config.json:ro"]
+  gateway-control:
+    <<: *gateway
+    volumes: ["./dev/live/gateway-control.json:/app/verify/config.json:ro"]
+  gateway-old:
+    <<: *gateway
+    volumes: ["receipt:/run/receipt:ro", "./dev/prose/gateway-old.json:/app/verify/config.json:ro"]
+  ingress:
+    <<: *ingress
+    environment: *ingress-env
+  ingress-unsafe:
+    <<: *ingress
+    environment:
+      <<: *ingress-env
+      EPOCHGUARD_GATEWAY_URL: http://gateway-control:8080
+    depends_on:
+      gateway-control: {condition: service_healthy}
+  ingress-cross-g:
+    <<: *ingress
+    environment:
+      <<: *ingress-env
+      EPOCHGUARD_GATEWAY_URL: http://gateway-old:8080
+    depends_on:
+      gateway-old: {condition: service_healthy}
+  qualification-client:
+    profiles: [qualification]
+    image: epochguard-verifier:004g
+    platform: linux/amd64
+    networks: [client]
+    environment: {EPOCHGUARD_TEST_MODE: "1"}
+    command: ["python", "/app/prose_runner.py", "client"]
+  qualification-operator:
+    profiles: [qualification]
+    image: epochguard-verifier:004g
+    platform: linux/amd64
+    networks: [private]
+    environment: {EPOCHGUARD_TEST_MODE: "1"}
+    command: ["python", "/app/prose_runner.py", "operator"]
+  verifier-old:
+    image: epochguard-verifier:004g
+    networks: [private]
+    command: ["python", "-m", "uvicorn", "verifier.multiclaim.app:fixture_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    environment: {EPOCHGUARD_TEST_MODE: "1", EPOCHGUARD_004C_FIXTURE_CASE: A}
+  ingress-old:
+    <<: *ingress
+    environment:
+      <<: *ingress-env
+      EPOCHGUARD_GATEWAY_URL: http://gateway-old:8080
+      EPOCHGUARD_INGRESS_PROFILE: 004e-live
+    depends_on:
+      gateway-old: {condition: service_healthy}
+  ingress-cross-b:
+    <<: *ingress
+    environment:
+      <<: *ingress-env
+      EPOCHGUARD_INGRESS_PROFILE: 004e-live
+  receipt-relay:
+    <<: *native
+    command: ["/app/receipt-relay"]
+    environment: {EPOCHGUARD_TEST_MODE: "1"}
+    networks: [private]
+    depends_on:
+      gateway: {condition: service_healthy}
+  ingress-faults:
+    <<: *ingress
+    depends_on:
+      receipt-relay: {condition: service_started}
+    environment:
+      <<: *ingress-env
+      EPOCHGUARD_GATEWAY_URL: http://receipt-relay:9003
+volumes:
+  receipt:
+networks:
+  client:
+    internal: true
+  private:
+    internal: true
+    ipam:
+      config: [{subnet: 10.77.34.0/24, ip_range: 10.77.34.128/25}]

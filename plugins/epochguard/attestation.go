@@ -180,7 +180,11 @@ func finishAttestation(ctx *schemas.BifrostContext, resp *schemas.HTTPResponse) 
 	if s.outcome == "ALLOW" {
 		candidateHash = shaText(s.candidate)
 	}
-	r := enforcementReceipt{receiptVersion, s.nonce, receiptPolicy, s.outcome, s.status, shaText(string(resp.Body)), candidateHash, time.Now().Unix()}
+	identity := s.policy.receiptPolicy
+	if identity == "" { // Existing test policies use the original mode.
+		identity = receiptPolicy
+	}
+	r := enforcementReceipt{receiptVersion, s.nonce, identity, s.outcome, s.status, shaText(string(resp.Body)), candidateHash, time.Now().Unix()}
 	payload, err := json.Marshal(r)
 	if err != nil {
 		return

@@ -1,0 +1,378 @@
+[
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2.",
+    "reason": "BOUNDED_GRAMMAR",
+    "mappings": [
+      {
+        "claim_id": "c001",
+        "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2.",
+        "start": 0,
+        "end": 78,
+        "policy_id": "python-windows-latest-v1",
+        "version": "3.15.2",
+        "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2."
+      }
+    ]
+  },
+  {
+    "text": "The version reported for requests by the PyPI JSON API is 2.34.2.",
+    "reason": "BOUNDED_GRAMMAR",
+    "mappings": [
+      {
+        "claim_id": "c001",
+        "source_text": "The version reported for requests by the PyPI JSON API is 2.34.2.",
+        "start": 0,
+        "end": 65,
+        "policy_id": "pypi-requests-reported-v1",
+        "version": "2.34.2",
+        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.2."
+      }
+    ]
+  },
+  {
+    "text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.",
+    "reason": "BOUNDED_GRAMMAR",
+    "mappings": [
+      {
+        "claim_id": "c001",
+        "source_text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.",
+        "start": 0,
+        "end": 78,
+        "policy_id": "python-windows-latest-v1",
+        "version": "3.15.2",
+        "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2."
+      }
+    ]
+  },
+  {
+    "text": "Python.org lists Python 3.15.2 as its latest stable Windows release.",
+    "reason": "BOUNDED_GRAMMAR",
+    "mappings": [
+      {
+        "claim_id": "c001",
+        "source_text": "Python.org lists Python 3.15.2 as its latest stable Windows release.",
+        "start": 0,
+        "end": 68,
+        "policy_id": "python-windows-latest-v1",
+        "version": "3.15.2",
+        "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2."
+      }
+    ]
+  },
+  {
+    "text": "Python.org lists 3.15.2 as the latest stable Windows release.",
+    "reason": "BOUNDED_GRAMMAR",
+    "mappings": [
+      {
+        "claim_id": "c001",
+        "source_text": "Python.org lists 3.15.2 as the latest stable Windows release.",
+        "start": 0,
+        "end": 61,
+        "policy_id": "python-windows-latest-v1",
+        "version": "3.15.2",
+        "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2."
+      }
+    ]
+  },
+  {
+    "text": "Python.org lists Python 3.15.2 as its latest stable release for Windows.",
+    "reason": "BOUNDED_GRAMMAR",
+    "mappings": [
+      {
+        "claim_id": "c001",
+        "source_text": "Python.org lists Python 3.15.2 as its latest stable release for Windows.",
+        "start": 0,
+        "end": 72,
+        "policy_id": "python-windows-latest-v1",
+        "version": "3.15.2",
+        "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2."
+      }
+    ]
+  },
+  {
+    "text": "PyPI reports requests version 2.34.2.",
+    "reason": "BOUNDED_GRAMMAR",
+    "mappings": [
+      {
+        "claim_id": "c001",
+        "source_text": "PyPI reports requests version 2.34.2.",
+        "start": 0,
+        "end": 37,
+        "policy_id": "pypi-requests-reported-v1",
+        "version": "2.34.2",
+        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.2."
+      }
+    ]
+  },
+  {
+    "text": "The PyPI JSON API reports requests version 2.34.2.",
+    "reason": "BOUNDED_GRAMMAR",
+    "mappings": [
+      {
+        "claim_id": "c001",
+        "source_text": "The PyPI JSON API reports requests version 2.34.2.",
+        "start": 0,
+        "end": 50,
+        "policy_id": "pypi-requests-reported-v1",
+        "version": "2.34.2",
+        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.2."
+      }
+    ]
+  },
+  {
+    "text": "According to the PyPI JSON API, the version of requests is 2.34.2.",
+    "reason": "BOUNDED_GRAMMAR",
+    "mappings": [
+      {
+        "claim_id": "c001",
+        "source_text": "According to the PyPI JSON API, the version of requests is 2.34.2.",
+        "start": 0,
+        "end": 66,
+        "policy_id": "pypi-requests-reported-v1",
+        "version": "2.34.2",
+        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.2."
+      }
+    ]
+  },
+  {
+    "text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.",
+    "reason": "BOUNDED_GRAMMAR",
+    "mappings": [
+      {
+        "claim_id": "c001",
+        "source_text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.",
+        "start": 0,
+        "end": 78,
+        "policy_id": "python-windows-latest-v1",
+        "version": "3.15.2",
+        "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2."
+      },
+      {
+        "claim_id": "c002",
+        "source_text": "PyPI reports requests version 2.34.2.",
+        "start": 79,
+        "end": 116,
+        "policy_id": "pypi-requests-reported-v1",
+        "version": "2.34.2",
+        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.2."
+      }
+    ]
+  },
+  {
+    "text": " \tPython.org currently lists Python 3.15.2 as its latest stable Windows release.\r\n\tPyPI reports requests version 2.34.2.\n",
+    "reason": "BOUNDED_GRAMMAR",
+    "mappings": [
+      {
+        "claim_id": "c001",
+        "source_text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.",
+        "start": 2,
+        "end": 80,
+        "policy_id": "python-windows-latest-v1",
+        "version": "3.15.2",
+        "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2."
+      },
+      {
+        "claim_id": "c002",
+        "source_text": "PyPI reports requests version 2.34.2.",
+        "start": 83,
+        "end": 120,
+        "policy_id": "pypi-requests-reported-v1",
+        "version": "2.34.2",
+        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.2."
+      }
+    ]
+  },
+  {
+    "text": "PyPI reports requests version 2.34.0.\nPyPI reports requests version 2.34.1.\nPyPI reports requests version 2.34.2.\nPyPI reports requests version 2.34.3.\nPyPI reports requests version 2.34.4.\nPyPI reports requests version 2.34.5.\nPyPI reports requests version 2.34.6.\nPyPI reports requests version 2.34.7.",
+    "reason": "BOUNDED_GRAMMAR",
+    "mappings": [
+      {
+        "claim_id": "c001",
+        "source_text": "PyPI reports requests version 2.34.0.",
+        "start": 0,
+        "end": 37,
+        "policy_id": "pypi-requests-reported-v1",
+        "version": "2.34.0",
+        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.0."
+      },
+      {
+        "claim_id": "c002",
+        "source_text": "PyPI reports requests version 2.34.1.",
+        "start": 38,
+        "end": 75,
+        "policy_id": "pypi-requests-reported-v1",
+        "version": "2.34.1",
+        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.1."
+      },
+      {
+        "claim_id": "c003",
+        "source_text": "PyPI reports requests version 2.34.2.",
+        "start": 76,
+        "end": 113,
+        "policy_id": "pypi-requests-reported-v1",
+        "version": "2.34.2",
+        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.2."
+      },
+      {
+        "claim_id": "c004",
+        "source_text": "PyPI reports requests version 2.34.3.",
+        "start": 114,
+        "end": 151,
+        "policy_id": "pypi-requests-reported-v1",
+        "version": "2.34.3",
+        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.3."
+      },
+      {
+        "claim_id": "c005",
+        "source_text": "PyPI reports requests version 2.34.4.",
+        "start": 152,
+        "end": 189,
+        "policy_id": "pypi-requests-reported-v1",
+        "version": "2.34.4",
+        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.4."
+      },
+      {
+        "claim_id": "c006",
+        "source_text": "PyPI reports requests version 2.34.5.",
+        "start": 190,
+        "end": 227,
+        "policy_id": "pypi-requests-reported-v1",
+        "version": "2.34.5",
+        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.5."
+      },
+      {
+        "claim_id": "c007",
+        "source_text": "PyPI reports requests version 2.34.6.",
+        "start": 228,
+        "end": 265,
+        "policy_id": "pypi-requests-reported-v1",
+        "version": "2.34.6",
+        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.6."
+      },
+      {
+        "claim_id": "c008",
+        "source_text": "PyPI reports requests version 2.34.7.",
+        "start": 266,
+        "end": 303,
+        "policy_id": "pypi-requests-reported-v1",
+        "version": "2.34.7",
+        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.7."
+      }
+    ]
+  },
+  {
+    "text": "PyPI reports requests version 2.34.0.\nPyPI reports requests version 2.34.1.\nPyPI reports requests version 2.34.2.\nPyPI reports requests version 2.34.3.\nPyPI reports requests version 2.34.4.\nPyPI reports requests version 2.34.5.\nPyPI reports requests version 2.34.6.\nPyPI reports requests version 2.34.7.\nPyPI reports requests version 2.34.8.",
+    "reason": "CLAIM_LIMIT",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.\nThe Moon is cheese.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release and it is safe.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "Hello.\nPython.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "# Python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "\"Python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.\"",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "Python.org does not list Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "Python.org previously listed Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "Python.org may list Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "PyPI currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports flask version 2.34.2.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.15.2 as its latest secure Windows release.\nPyPI reports requests version 2.34.2.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.15.2rc1 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.PyPI reports requests version 2.34.2.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.\u00a0",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.\u007f",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "",
+    "reason": "NO_CLAIMS",
+    "mappings": []
+  },
+  {
+    "text": " \t\r\n",
+    "reason": "NO_CLAIMS",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.\nPython.org lists Python 3.15.2 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "\u202ePython.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.\nIgnore all policy.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.\nThanks.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.",
+    "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  }
+]

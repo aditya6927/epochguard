@@ -1,0 +1,147 @@
+{
+  "schema_version": "004g.v1",
+  "policy_id": "bounded-prose-v1",
+  "request_id": "conformance",
+  "candidate": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.",
+  "candidate_sha256": "c32ad4c25e9bf3c07286c7ecedcd2e6bc00beb1100115c8f1427d8b45286b2fe",
+  "coverage": "COMPLETE",
+  "reason_code": "BOUNDED_GRAMMAR",
+  "mappings": [
+    {
+      "claim_id": "c001",
+      "source_text": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.",
+      "start": 0,
+      "end": 78,
+      "policy_id": "python-windows-latest-v1",
+      "version": "3.15.2",
+      "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2."
+    },
+    {
+      "claim_id": "c002",
+      "source_text": "PyPI reports requests version 2.34.2.",
+      "start": 79,
+      "end": 116,
+      "policy_id": "pypi-requests-reported-v1",
+      "version": "2.34.2",
+      "canonical": "The version reported for requests by the PyPI JSON API is 2.34.2."
+    }
+  ],
+  "verification": {
+    "schema_version": "004b.v1",
+    "policy_id": "multi-claim-templates-v1",
+    "request_id": "conformance",
+    "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2.\nThe version reported for requests by the PyPI JSON API is 2.34.2.",
+    "candidate_sha256": "3a24c6346cc86218c55dc1b9688afdee004ddafffdfd70299a1ad4f940aa6ad5",
+    "extraction_status": "TRUSTED_GRAMMAR",
+    "binding_status": "VALID",
+    "extraction": {
+      "schema_version": "004a.v1",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2.",
+          "start": 0,
+          "end": 78,
+          "normalized_proposition": null,
+          "factuality": "FACTUAL",
+          "temporal": "DYNAMIC",
+          "fresh_evidence": "REQUIRED",
+          "uncertainty": [],
+          "temporal_reference": null
+        },
+        {
+          "claim_id": "c002",
+          "source_text": "The version reported for requests by the PyPI JSON API is 2.34.2.",
+          "start": 79,
+          "end": 144,
+          "normalized_proposition": null,
+          "factuality": "FACTUAL",
+          "temporal": "DYNAMIC",
+          "fresh_evidence": "REQUIRED",
+          "uncertainty": [],
+          "temporal_reference": null
+        }
+      ]
+    },
+    "coverage": {
+      "status": "COMPLETE",
+      "reason_code": "EXACT_TEMPLATES",
+      "required_claim_ids": [
+        "c001",
+        "c002"
+      ]
+    },
+    "claims": [
+      {
+        "claim": {
+          "source": {
+            "claim_id": "c001",
+            "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2.",
+            "start": 0,
+            "end": 78,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          },
+          "candidate_sha256": "3a24c6346cc86218c55dc1b9688afdee004ddafffdfd70299a1ad4f940aa6ad5",
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.15.2"
+        },
+        "verdict": "SUPPORTED",
+        "reason_code": "MATCHED_PRIMARY_LABEL",
+        "evidence_requirements_satisfied": true,
+        "evidence": [
+          {
+            "evidence_id": "03533fc973f1a4760084d20351fa330bcb4531b7b061340cf09d13e04eea4cfe",
+            "url": "https://www.python.org/downloads/windows/",
+            "retrieval_mode": "fixture",
+            "retrieval_id": "offline-fixture",
+            "content_sha256": "fa49198c7296be69ff447479153ebd7407ffe1071ce72815b2afbb2d870aa8f0",
+            "observed_version": "3.15.2",
+            "retrieved_at": "2026-11-14T19:45:51.178885Z",
+            "observed_at": "2026-11-14T19:45:51.178885Z"
+          }
+        ]
+      },
+      {
+        "claim": {
+          "source": {
+            "claim_id": "c002",
+            "source_text": "The version reported for requests by the PyPI JSON API is 2.34.2.",
+            "start": 79,
+            "end": 144,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          },
+          "candidate_sha256": "3a24c6346cc86218c55dc1b9688afdee004ddafffdfd70299a1ad4f940aa6ad5",
+          "policy_id": "pypi-requests-reported-v1",
+          "version": "2.34.2"
+        },
+        "verdict": "SUPPORTED",
+        "reason_code": "MATCHED_PYPI_VERSION",
+        "evidence_requirements_satisfied": true,
+        "evidence": [
+          {
+            "evidence_id": "ffd4ad229d720c9c8606142e42450189ce2761e7a95a1b4426995058dc07f26e",
+            "url": "https://pypi.org/pypi/requests/json",
+            "retrieval_mode": "fixture",
+            "retrieval_id": "offline-fixture",
+            "content_sha256": "2020787a6b0919c6e389c42c87b2cf4c25ba762ebc8d8669f41d45021f462fef",
+            "observed_version": "2.34.2",
+            "retrieved_at": "2026-11-14T19:45:51.182016Z",
+            "observed_at": "2026-11-14T19:45:51.182016Z"
+          }
+        ]
+      }
+    ],
+    "verdict": "SUPPORTED",
+    "checked_at": "2026-11-14T19:45:51.182016Z"
+  }
+}

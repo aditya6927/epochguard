@@ -25,6 +25,7 @@ const NonceHeader = "X-EpochGuard-Internal-Nonce"
 const ReceiptHeader = "X-EpochGuard-Internal-Receipt"
 const Protocol = "004d.v1"
 const Policy = "004b.v1/multi-claim-templates-v1"
+const ProsePolicy = "004g.v1/bounded-prose-v1"
 const ResponseLimit = 256 * 1024
 const LiveCanary = "EpochGuard readiness canary: intentionally outside the trusted claim grammar."
 
@@ -56,11 +57,14 @@ type Handler struct {
 }
 
 func New(cfg Config) (*Handler, error) {
-	if cfg.Profile != "" && cfg.Profile != "004e-live" {
+	if cfg.Profile != "" && cfg.Profile != "004e-live" && cfg.Profile != "004g" && cfg.Profile != "004g-live" {
 		return nil, errors.New("invalid ingress profile")
 	}
 	ceiling := 10 * time.Second
-	if cfg.Profile == "004e-live" {
+	if cfg.Profile == "004g" && cfg.ProbeCandidate != LiveCanary {
+		return nil, errors.New("invalid prose readiness canary")
+	}
+	if cfg.Profile == "004e-live" || cfg.Profile == "004g-live" {
 		// One trusted fixed profile; no independent or request-selected overrides.
 		if cfg.Timeout != 0 || cfg.ProbeCandidate != LiveCanary {
 			return nil, errors.New("inconsistent live ingress bounds")
@@ -123,7 +127,7 @@ func (h *Handler) exchange(ctx context.Context, data []byte) (int, []byte, Recei
 	if media != "application/json" || (response.Header.Get("Content-Encoding") != "" && response.Header.Get("Content-Encoding") != "identity") || len(response.Header.Values(ReceiptHeader)) != 1 {
 		return 0, nil, receipt, errors.New("receipt unavailable")
 	}
-	receipt, err = Verify(response.Header.Get(ReceiptHeader), h.cfg.Secret, nonce, response.StatusCode, body, started, time.Now())
+	receipt, err = verifyPolicy(response.Header.Get(ReceiptHeader), h.cfg.Secret, nonce, response.StatusCode, body, started, time.Now(), h.policy())
 	if err != nil {
 		return 0, nil, receipt, errors.New("invalid receipt")
 	}
@@ -131,6 +135,17 @@ func (h *Handler) exchange(ctx context.Context, data []byte) (int, []byte, Recei
 }
 
 func Verify(header string, secret []byte, nonce string, status int, body []byte, started, now time.Time) (Receipt, error) {
+	return verifyPolicy(header, secret, nonce, status, body, started, now, Policy)
+}
+
+func (h *Handler) policy() string {
+	if h.cfg.Profile == "004g" || h.cfg.Profile == "004g-live" {
+		return ProsePolicy
+	}
+	return Policy
+}
+
+func verifyPolicy(header string, secret []byte, nonce string, status int, body []byte, started, now time.Time, policy string) (Receipt, error) {
 	var r Receipt
 	bad := errors.New("invalid enforcement receipt")
 	if len(secret) != 32 || len(header) > 2048 || !digestRE.MatchString(nonce) {
@@ -164,7 +179,7 @@ func Verify(header string, secret []byte, nonce string, status int, body []byte,
 	// Requiring the exact canonical payload also rejects aliases, omitted zero
 	// fields and alternate encodings. The signer emits this one representation.
 	canonical, err := json.Marshal(r)
-	if err != nil || !bytes.Equal(payload, canonical) || r.Version != Protocol || r.PolicyID != Policy || r.Nonce != nonce || r.Status != status || r.BodySHA256 != Hash(body) || !digestRE.MatchString(r.BodySHA256) || r.IssuedAt < started.Unix()-2 || r.IssuedAt > now.Unix()+2 || now.Unix()-r.IssuedAt > 20 {
+	if err != nil || !bytes.Equal(payload, canonical) || r.Version != Protocol || r.PolicyID != policy || r.Nonce != nonce || r.Status != status || r.BodySHA256 != Hash(body) || !digestRE.MatchString(r.BodySHA256) || r.IssuedAt < started.Unix()-2 || r.IssuedAt > now.Unix()+2 || now.Unix()-r.IssuedAt > 20 {
 		return r, bad
 	}
 	switch r.Outcome {
@@ -373,9 +388,13 @@ func (h *Handler) ready(ctx context.Context) bool {
 				return false
 			}
 			found := false
+			expectedMode := "004b.v1"
+			if h.cfg.Profile == "004g" || h.cfg.Profile == "004g-live" {
+				expectedMode = "004g.v1"
+			}
 			for _, plugin := range plugins.Plugins {
 				if plugin.Name == "epochguard" {
-					found = plugin.Enabled && plugin.Placement == "pre_builtin" && plugin.Order != nil && *plugin.Order == 0 && plugin.Status.Status == "active" && plugin.Config.Verifier.Mode == "004b.v1" && plugin.Config.Attestation.Protocol == Protocol
+					found = plugin.Enabled && plugin.Placement == "pre_builtin" && plugin.Order != nil && *plugin.Order == 0 && plugin.Status.Status == "active" && plugin.Config.Verifier.Mode == expectedMode && plugin.Config.Attestation.Protocol == Protocol
 				}
 			}
 			if !found {
@@ -385,7 +404,7 @@ func (h *Handler) ready(ctx context.Context) bool {
 	}
 	data, _ := json.Marshal(map[string]any{"model": "fixture/epochguard-test", "messages": []map[string]string{{"role": "user", "content": h.cfg.ProbeCandidate}}, "stream": false})
 	status, _, receipt, err := h.exchange(ctx, data)
-	if h.cfg.Profile == "004e-live" {
+	if h.cfg.Profile == "004e-live" || h.cfg.Profile == "004g" || h.cfg.Profile == "004g-live" {
 		// Grammar rejection proves authenticated enforcement participation. It
 		// deliberately says nothing about evidence-source availability.
 		return err == nil && status == 503 && receipt.Outcome == "UNAVAILABLE"
