@@ -1,0 +1,794 @@
+{
+  "$defs": {
+    "Code": {
+      "enum": [
+        "HTTP_FAILURE",
+        "TRANSPORT_FAILURE",
+        "TIMEOUT",
+        "UNEXPECTED_PROVIDER_FAILURE",
+        "ENVELOPE_INVALID",
+        "ENVELOPE_INCOMPLETE",
+        "ENVELOPE_CONTENT_INVALID",
+        "ENVELOPE_USAGE_INVALID",
+        "OUTPUT_TOO_LARGE",
+        "JSON_INVALID_OR_INCOMPLETE",
+        "JSON_INVALID_ENCODING",
+        "JSON_DUPLICATE_KEY",
+        "JSON_NONFINITE_NUMBER",
+        "SCHEMA_MISSING_FIELD",
+        "SCHEMA_EXTRA_FIELD",
+        "SCHEMA_LITERAL_INVALID",
+        "SCHEMA_TYPE_INVALID",
+        "SCHEMA_LIMIT",
+        "SCHEMA_CONSTRAINT",
+        "SCHEMA_INVALID",
+        "CLAIM_SPAN_ORDER",
+        "CLAIM_DUPLICATE_UNCERTAINTY",
+        "CLAIM_REFERENCE_MISMATCH",
+        "CLAIM_NONFACTUAL_COMBINATION",
+        "CLAIM_EVIDENCE_NOT_APPLICABLE",
+        "CLAIM_UNCERTAINTY_MISSING",
+        "CLAIM_UNCERTAIN_TEMPORAL_COMBINATION",
+        "CLAIM_DYNAMIC_REQUIRES_FRESH",
+        "CLAIM_NON_DYNAMIC_EVIDENCE",
+        "BINDING_ID_SEQUENCE",
+        "BINDING_OVERLAP",
+        "BINDING_RANGE",
+        "BINDING_TEXT_MISMATCH",
+        "ALIGNMENT_TEXT_NOT_FOUND",
+        "ALIGNMENT_AMBIGUOUS",
+        "ALIGNMENT_OUT_OF_ORDER",
+        "ALIGNMENT_OVERLAP",
+        "EMPTY_MODEL_ANALYSIS",
+        "BUDGET_EXCEEDED",
+        "NOT_ENABLED",
+        "INVALID_CONFIGURATION"
+      ],
+      "title": "Code",
+      "type": "string"
+    },
+    "Correspondence": {
+      "additionalProperties": false,
+      "properties": {
+        "disposition": {
+          "enum": [
+            "COVERED_FACT",
+            "NONFACTUAL_RULE",
+            "UNACCOUNTED",
+            "UNSUPPORTED",
+            "UNCERTAIN"
+          ],
+          "title": "Disposition",
+          "type": "string"
+        },
+        "overlapping_claim_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8,
+          "title": "Overlapping Claim Ids",
+          "type": "array"
+        },
+        "reason": {
+          "enum": [
+            "EXACT_ATOMIC_MATCH",
+            "EXPLICIT_NONFACTUAL",
+            "MISSING_PROPOSAL",
+            "CLASSIFICATION_CONFLICT",
+            "NONATOMIC_OR_PARTIAL",
+            "NO_SUPPORTED_POLICY",
+            "AUDIT_UNCERTAIN"
+          ],
+          "title": "Reason",
+          "type": "string"
+        },
+        "unit_id": {
+          "title": "Unit Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "unit_id",
+        "overlapping_claim_ids",
+        "disposition",
+        "reason"
+      ],
+      "title": "Correspondence",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "content_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Sha256",
+          "type": "string"
+        },
+        "evidence_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "observed_version": {
+          "pattern": "^(0|[1-9][0-9]{0,2})\\.(0|[1-9][0-9]{0,2})\\.(0|[1-9][0-9]{0,2})$",
+          "title": "Observed Version",
+          "type": "string"
+        },
+        "retrieval_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,128}$",
+          "title": "Retrieval Id",
+          "type": "string"
+        },
+        "retrieval_mode": {
+          "enum": [
+            "fixture",
+            "tavily_live",
+            "pypi_live"
+          ],
+          "title": "Retrieval Mode",
+          "type": "string"
+        },
+        "retrieved_at": {
+          "format": "date-time",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "url": {
+          "enum": [
+            "https://www.python.org/downloads/windows/",
+            "https://pypi.org/pypi/requests/json"
+          ],
+          "title": "Url",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "url",
+        "retrieval_mode",
+        "retrieval_id",
+        "content_sha256",
+        "observed_version",
+        "retrieved_at",
+        "observed_at"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "Mapping": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_text": {
+          "maxLength": 512,
+          "title": "Canonical Text",
+          "type": "string"
+        },
+        "policy_id": {
+          "enum": [
+            "python-windows-latest-v1",
+            "pypi-requests-reported-v1"
+          ],
+          "title": "Policy Id",
+          "type": "string"
+        },
+        "unit_id": {
+          "title": "Unit Id",
+          "type": "string"
+        },
+        "version": {
+          "pattern": "^(0|[1-9][0-9]{0,2})\\.(0|[1-9][0-9]{0,2})\\.(0|[1-9][0-9]{0,2})$",
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "unit_id",
+        "policy_id",
+        "version",
+        "canonical_text"
+      ],
+      "title": "Mapping",
+      "type": "object"
+    },
+    "Proposal": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "pattern": "^c[0-9]{3}$",
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "end": {
+          "exclusiveMinimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "factuality": {
+          "enum": [
+            "FACTUAL",
+            "NON_FACTUAL",
+            "UNCERTAIN"
+          ],
+          "title": "Factuality",
+          "type": "string"
+        },
+        "fresh_evidence": {
+          "enum": [
+            "REQUIRED",
+            "NOT_REQUIRED",
+            "UNCERTAIN",
+            "NOT_APPLICABLE"
+          ],
+          "title": "Fresh Evidence",
+          "type": "string"
+        },
+        "normalized_proposition": {
+          "anyOf": [
+            {
+              "maxLength": 8192,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Normalized Proposition"
+        },
+        "source_text": {
+          "maxLength": 8192,
+          "minLength": 1,
+          "title": "Source Text",
+          "type": "string"
+        },
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "temporal": {
+          "enum": [
+            "DYNAMIC",
+            "HISTORICAL",
+            "STABLE",
+            "UNCERTAIN"
+          ],
+          "title": "Temporal",
+          "type": "string"
+        },
+        "temporal_reference": {
+          "anyOf": [
+            {
+              "maxLength": 160,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Temporal Reference"
+        },
+        "uncertainty": {
+          "items": {
+            "enum": [
+              "MISSING_CONTEXT",
+              "AMBIGUOUS_REFERENCE",
+              "MIXED_REQUIREMENTS",
+              "MODEL_ABSTENTION",
+              "BASELINE_HEURISTIC",
+              "UNTRUSTED_INSTRUCTION"
+            ],
+            "type": "string"
+          },
+          "maxItems": 6,
+          "title": "Uncertainty",
+          "type": "array"
+        }
+      },
+      "required": [
+        "claim_id",
+        "source_text",
+        "start",
+        "end",
+        "normalized_proposition",
+        "factuality",
+        "temporal",
+        "fresh_evidence",
+        "uncertainty",
+        "temporal_reference"
+      ],
+      "title": "Proposal",
+      "type": "object"
+    },
+    "Request": {
+      "additionalProperties": false,
+      "properties": {
+        "analysis_policy": {
+          "const": "bounded-prose-audit-v1",
+          "default": "bounded-prose-audit-v1",
+          "title": "Analysis Policy",
+          "type": "string"
+        },
+        "candidate": {
+          "title": "Candidate",
+          "type": "string"
+        },
+        "candidate_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Candidate Sha256",
+          "type": "string"
+        },
+        "reference_date": {
+          "title": "Reference Date",
+          "type": "string"
+        },
+        "request_id": {
+          "pattern": "^[A-Za-z0-9_-]{1,128}$",
+          "title": "Request Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "004f.prose-plan.v1",
+          "default": "004f.prose-plan.v1",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_id",
+        "candidate",
+        "candidate_sha256",
+        "reference_date"
+      ],
+      "title": "Request",
+      "type": "object"
+    },
+    "Resources": {
+      "additionalProperties": false,
+      "properties": {
+        "elapsed_ms": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Elapsed Ms"
+        },
+        "estimated_cost_usd": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Estimated Cost Usd"
+        },
+        "extractor_ms": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Extractor Ms"
+        },
+        "input_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Input Tokens"
+        },
+        "output_tokens": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Output Tokens"
+        },
+        "work_seconds": {
+          "maximum": 60,
+          "minimum": 0.1,
+          "title": "Work Seconds",
+          "type": "number"
+        }
+      },
+      "required": [
+        "work_seconds",
+        "elapsed_ms",
+        "extractor_ms",
+        "input_tokens",
+        "output_tokens",
+        "estimated_cost_usd"
+      ],
+      "title": "Resources",
+      "type": "object"
+    },
+    "ShadowObservation": {
+      "additionalProperties": false,
+      "properties": {
+        "checked_at": {
+          "format": "date-time",
+          "title": "Checked At",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "maxItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        },
+        "reason_code": {
+          "anyOf": [
+            {
+              "enum": [
+                "MATCHED_PRIMARY_LABEL",
+                "OLDER_THAN_PRIMARY_LABEL",
+                "CLAIM_AHEAD_OF_SOURCE",
+                "UNSUPPORTED_CLAIM",
+                "INSUFFICIENT_EVIDENCE",
+                "AMBIGUOUS_EVIDENCE",
+                "RETRIEVAL_TIMEOUT",
+                "RETRIEVAL_FAILURE",
+                "VERIFIER_ERROR",
+                "STALE_OBSERVATION"
+              ],
+              "type": "string"
+            },
+            {
+              "enum": [
+                "MATCHED_PYPI_VERSION",
+                "OLDER_THAN_PYPI_VERSION"
+              ],
+              "type": "string"
+            }
+          ],
+          "title": "Reason Code"
+        },
+        "unit_id": {
+          "title": "Unit Id",
+          "type": "string"
+        },
+        "verdict": {
+          "enum": [
+            "SUPPORTED",
+            "CONTRADICTED",
+            "INSUFFICIENT"
+          ],
+          "title": "Verdict",
+          "type": "string"
+        }
+      },
+      "required": [
+        "unit_id",
+        "verdict",
+        "reason_code",
+        "evidence",
+        "checked_at"
+      ],
+      "title": "ShadowObservation",
+      "type": "object"
+    },
+    "Stage": {
+      "enum": [
+        "PROVIDER_TRANSPORT",
+        "PROVIDER_HTTP",
+        "PROVIDER_ENVELOPE",
+        "MODEL_JSON",
+        "MODEL_SCHEMA",
+        "SOURCE_BINDING",
+        "ALIGNMENT",
+        "EMPTY_ANALYSIS",
+        "CONTROL"
+      ],
+      "title": "Stage",
+      "type": "string"
+    },
+    "Unit": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "exclusiveMinimum": 0,
+          "maximum": 8192,
+          "title": "End",
+          "type": "integer"
+        },
+        "kind": {
+          "enum": [
+            "KNOWN_FACT",
+            "NONFACTUAL_RULE",
+            "POTENTIAL_FACT",
+            "MIXED",
+            "AMBIGUOUS",
+            "UNRECOGNIZED",
+            "LIMIT_TAIL"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "reason": {
+          "enum": [
+            "CLOSED_FORM",
+            "EXPLICIT_NONFACTUAL",
+            "UNSUPPORTED_PREDICATE",
+            "COMPOUND_MARKER",
+            "CONTEXT_OR_FORMAT",
+            "UNKNOWN_CONTENT",
+            "UNIT_LIMIT"
+          ],
+          "title": "Reason",
+          "type": "string"
+        },
+        "source_text": {
+          "maxLength": 8192,
+          "minLength": 1,
+          "title": "Source Text",
+          "type": "string"
+        },
+        "start": {
+          "maximum": 8192,
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "unit_id": {
+          "pattern": "^u[0-9]{3}$",
+          "title": "Unit Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_text",
+        "start",
+        "end",
+        "unit_id",
+        "kind",
+        "reason"
+      ],
+      "title": "Unit",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "analysis_policy": {
+      "const": "bounded-prose-audit-v1",
+      "default": "bounded-prose-audit-v1",
+      "title": "Analysis Policy",
+      "type": "string"
+    },
+    "authorization": {
+      "const": false,
+      "default": false,
+      "title": "Authorization",
+      "type": "boolean"
+    },
+    "correspondences": {
+      "items": {
+        "$ref": "#/$defs/Correspondence"
+      },
+      "maxItems": 64,
+      "title": "Correspondences",
+      "type": "array"
+    },
+    "coverage": {
+      "enum": [
+        "BOUNDED_ACCOUNTED",
+        "UNRESOLVED",
+        "NO_ASSERTIONS"
+      ],
+      "title": "Coverage",
+      "type": "string"
+    },
+    "diagnostic_code": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Code"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "diagnostic_stage": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Stage"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "extractor": {
+      "enum": [
+        "baseline",
+        "auditor",
+        "fake-model",
+        "gemini"
+      ],
+      "title": "Extractor",
+      "type": "string"
+    },
+    "extractor_identity": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Extractor Identity",
+      "type": "string"
+    },
+    "extractor_status": {
+      "enum": [
+        "VALIDATED",
+        "INDEPENDENT_ONLY",
+        "FAILED"
+      ],
+      "title": "Extractor Status",
+      "type": "string"
+    },
+    "failure_code": {
+      "anyOf": [
+        {
+          "enum": [
+            "EXTRACTION_FAILED",
+            "CLAIM_LIMIT",
+            "DEADLINE",
+            "BUSY",
+            "OUTPUT_LIMIT"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Failure Code"
+    },
+    "overall_status": {
+      "enum": [
+        "PLAN_READY",
+        "PLAN_UNCERTAIN",
+        "PLAN_UNSUPPORTED",
+        "ANALYSIS_FAILED"
+      ],
+      "title": "Overall Status",
+      "type": "string"
+    },
+    "policy_mappings": {
+      "items": {
+        "$ref": "#/$defs/Mapping"
+      },
+      "maxItems": 8,
+      "title": "Policy Mappings",
+      "type": "array"
+    },
+    "proposals": {
+      "items": {
+        "$ref": "#/$defs/Proposal"
+      },
+      "maxItems": 8,
+      "title": "Proposals",
+      "type": "array"
+    },
+    "request": {
+      "$ref": "#/$defs/Request"
+    },
+    "resources": {
+      "$ref": "#/$defs/Resources"
+    },
+    "risk_units": {
+      "items": {
+        "$ref": "#/$defs/Unit"
+      },
+      "maxItems": 64,
+      "title": "Risk Units",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "004f.prose-plan.v1",
+      "default": "004f.prose-plan.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "semantic_completeness": {
+      "const": "NOT_PROVEN",
+      "default": "NOT_PROVEN",
+      "title": "Semantic Completeness",
+      "type": "string"
+    },
+    "shadow_fixture": {
+      "const": true,
+      "default": true,
+      "title": "Shadow Fixture",
+      "type": "boolean"
+    },
+    "shadow_observations": {
+      "items": {
+        "$ref": "#/$defs/ShadowObservation"
+      },
+      "maxItems": 8,
+      "title": "Shadow Observations",
+      "type": "array"
+    },
+    "shadow_verdict": {
+      "enum": [
+        "NOT_RUN",
+        "MAPPED_CLAIMS_SUPPORTED",
+        "MAPPED_CLAIM_CONTRADICTED",
+        "MAPPED_CLAIMS_INSUFFICIENT"
+      ],
+      "title": "Shadow Verdict",
+      "type": "string"
+    },
+    "syntactic_covered_characters": {
+      "maximum": 8192,
+      "minimum": 0,
+      "title": "Syntactic Covered Characters",
+      "type": "integer"
+    },
+    "unaccounted_unit_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 64,
+      "title": "Unaccounted Unit Ids",
+      "type": "array"
+    },
+    "unsupported_unit_ids": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 64,
+      "title": "Unsupported Unit Ids",
+      "type": "array"
+    }
+  },
+  "required": [
+    "request",
+    "extractor",
+    "extractor_identity",
+    "extractor_status",
+    "failure_code",
+    "diagnostic_stage",
+    "diagnostic_code",
+    "proposals",
+    "risk_units",
+    "correspondences",
+    "policy_mappings",
+    "unaccounted_unit_ids",
+    "unsupported_unit_ids",
+    "coverage",
+    "syntactic_covered_characters",
+    "overall_status",
+    "shadow_observations",
+    "shadow_verdict",
+    "resources"
+  ],
+  "title": "Result",
+  "type": "object"
+}

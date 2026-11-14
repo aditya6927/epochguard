@@ -281,6 +281,26 @@ retrieval invocations per source including preflight. Report counters/timings
 describe this process, not Tavily billing, origin fetches or publication times.
 There is no retry, source polling, live fallback to fixtures or Gemini call.
 
+### Non-authorizing prose analysis
+
+[Task 004F](task-004f.md) adds a standalone `verifier.prose` branch with no gateway
+mode or HTTP app import. It sends the original bounded response to the unchanged
+004A ModelExtractor/Gemini adapter when explicitly selected, while an independent
+scanner derives risk units from the original text. A closed paraphrase grammar
+maps only the two existing policies. Exact alignment does not prove atomicity,
+coverage or semantic equivalence: omissions, compounds, unknown content and
+classification conflicts prevent bounded accounting.
+
+Its immutable `004f.prose-plan.v1` records always carry `authorization=false`
+and `semantic_completeness=NOT_PROVEN`. PLAN_READY is a plan within the closed
+grammar, not a response release or factual verdict. Optional fixture-only shadow
+comparisons reuse existing 004B policy code and cannot repair a coverage failure.
+The separate 66-case draft evaluation measures omissions and false-complete
+claims; human review and real-model quality qualification remain pending. No
+004A dataset, 004B contract/policy, Go validator, receipt, deployment or gateway
+route changes. Integrating a future prose verifier would require a new reviewed
+cross-language enforcement contract and gateway qualification.
+
 ## Proposed product components — not yet delivered
 
 ```text

@@ -1,0 +1,3065 @@
+{
+  "schema_version": "004f.evaluation.v1",
+  "engine": "auditor",
+  "split": "dev",
+  "authorization": false,
+  "semantic_completeness": "NOT_PROVEN",
+  "qualification": "DRAFT_LABEL_MEASUREMENT",
+  "model_quality_status": "MODEL QUALITY QUALIFICATION PENDING",
+  "model_execution": "NOT_EXECUTED",
+  "selected_case_ids": [
+    "eg004f-0001",
+    "eg004f-0003",
+    "eg004f-0005",
+    "eg004f-0007",
+    "eg004f-0009",
+    "eg004f-0011",
+    "eg004f-0013",
+    "eg004f-0015",
+    "eg004f-0017",
+    "eg004f-0019",
+    "eg004f-0021",
+    "eg004f-0023",
+    "eg004f-0025",
+    "eg004f-0027",
+    "eg004f-0029",
+    "eg004f-0031",
+    "eg004f-0033",
+    "eg004f-0035",
+    "eg004f-0037",
+    "eg004f-0039",
+    "eg004f-0041",
+    "eg004f-0043",
+    "eg004f-0045",
+    "eg004f-0047",
+    "eg004f-0049",
+    "eg004f-0051",
+    "eg004f-0053",
+    "eg004f-0055",
+    "eg004f-0057",
+    "eg004f-0059",
+    "eg004f-0061",
+    "eg004f-0063",
+    "eg004f-0065"
+  ],
+  "dataset_sha256": "156639cc9cb027565b8e7bd8f18f874912145a81dcf7e61fe18d6f5a3a789561",
+  "manifest_sha256": "7c75e3fc8e790dbd782877755a7dbdea6687298edfc93b3261e1d6e7293948b2",
+  "implementation_sha256": {
+    "__init__.py": "22ea77caa6bea1f490f05d5a0a1e456c8adc28d57a4493a440dc7f84f4fe4f4e",
+    "__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+    "audit.py": "fe1b4c2d387885ff02eb93dd484a0b7afe8948f302d444de7cd1edac69422e0c",
+    "cli.py": "1fc3b184b287be111410996c9c8c5cbf62f82e3f8c0c04a09632b7890609667e",
+    "dataset.py": "fc73f2d62d3fcb7d7e0079624cd4736e0bd56d9669012323b07bc6b6a79f07fa",
+    "evaluation.py": "e159c78b34d777c02501f281d014a7fde229b0299940cfc725c383ca9fa0020f",
+    "mapping.py": "b8d432a5abf9a012bc10cf93ae4a80cd4daafe14ff39d36583234a0d5df6545c",
+    "pipeline.py": "b0cc00db4ee2cfbe2260d4493e821e5d26b08e20f07ab6dfe1f194891be8e09b",
+    "schema.py": "75adc412f6a2cd4de21641b458a96d6ddab8f90552d4c0b5c6d18a35d7fe871f"
+  },
+  "prompt_version": "004a.prompt.v2",
+  "prompt_sha256": "fc3dd211240062ba0a1e7471cc622e64c6eea4139a2e43ec1cb1e1259fca9a53",
+  "identification_schema_sha256": "b4672a669e113fd216d29b9415bf00d3d5fb1e1bc9021dbbc0fb9ada767c5d3c",
+  "source_hashes": {
+    "eg004f-0001": "df79712ecdc990a94d58e5c56cdbeaa6504395e4ff323543bb76a5b91ec1cdd3",
+    "eg004f-0003": "57155ba071bd1c486f3189eaf464b02155649ed0833f14f25d9fba39c34c078d",
+    "eg004f-0005": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+    "eg004f-0007": "406eed0db4d72b13ab09ad9179a981442babf035d572022282914a177dd62855",
+    "eg004f-0009": "0b939a5281db80aca2aee6039b51901b97a44a10ef50de3de412b3f9b3469e49",
+    "eg004f-0011": "5535f6959c437ec744cfcfef8c6b850033c5c5ec28db526d02f93137b816ddf3",
+    "eg004f-0013": "cacb99f88298e9cbbd7d948324f1338131621e20eaca4857abfdfad09e141492",
+    "eg004f-0015": "69d625198486e262bb02f109972d845e7c70a12ac0785445c1e9dad4bf912fa8",
+    "eg004f-0017": "a3bdaaa7bddb1f4b0bb4fd592748642f938f1dfe6c5e7b7bda2768eea4b3aaab",
+    "eg004f-0019": "3d651cc3a96a9563383c0346cd44777fabd5e23fe97751824fc2d204b633bd65",
+    "eg004f-0021": "2665ddeec32962464134df1cbdf7a33d7e08e752de695c84799abf8d0370f2fe",
+    "eg004f-0023": "6895b4b41a96eceb911f6adaea72c3c86f1be635b257b71a2f36858607923100",
+    "eg004f-0025": "76b4e0cf2ea8e2cee13aa3243d5cad64569486cd119fe74fadc862cbc2ed487b",
+    "eg004f-0027": "df7b2afa7fe7eb8ed2d4508dc49ee870ab201653e108ba421630ad44132a50c4",
+    "eg004f-0029": "682d9b5772e83fb009dc14ef32e7e3080731b04cc3ae2c03ae392d2f0998c3fd",
+    "eg004f-0031": "3141e4a89b5dbc0ebf291b44e163f13c87873e91ab30b6c0bd20cdcc66dd1624",
+    "eg004f-0033": "ad2c90612fce5d0bb766fb93ab20ae372b092c10668c3840af0414980c199c6a",
+    "eg004f-0035": "501dd8c3ac82427f2a842a1d78254ca234ca3b3f722f99d8694ed4c9ef585f22",
+    "eg004f-0037": "f0a1ecacddb487d0468b8ea5bd8b07ab73090291663c7d7c38cb9857b20a41ea",
+    "eg004f-0039": "c0772bc8ce637aa9f115a9fec2cfeb39b6ea52eec841789f7e3292e38726c466",
+    "eg004f-0041": "e9016497876cb676f6780e8c2cc08bf9598eec6aa4c8e3750c21d327a86a33e3",
+    "eg004f-0043": "19904baaca511089d30656968e0b84f69f008849599cc8fdcf6a4ed9ef172ea5",
+    "eg004f-0045": "0bb66b95a9032193f4cc54c285149c3a02dfea802fc44fcb710c8c32faf47941",
+    "eg004f-0047": "e6e52e9169d0c24f4cd5a7ac7027557e733a365bcf5c6344da3d45467cbd0e0e",
+    "eg004f-0049": "1161e690bfa318b319a12b81e19485cacdd3eb8be8d69d4cf94cc7c6abccb477",
+    "eg004f-0051": "5b437c212abb9117a001cfe9a9a2f6e58f22be1e1299735d314e72dfce7e4137",
+    "eg004f-0053": "52118cc4eb3735aa9f7a669a5ebe31caceabe60c46d7f33456701f3899b9f4bf",
+    "eg004f-0055": "db9e335d2146ee59b0a7e5d57548c234b34573b40646b786a683ceadf6050675",
+    "eg004f-0057": "a4c5639e77738e22f1fcd67696b772b246ae9060af37537318c3b1bdf63baff2",
+    "eg004f-0059": "4a1fc97b227588c357049238853c0b114283e5efa48afa84707ebc83dcb84c19",
+    "eg004f-0061": "99645b38ff103516a86ade43cffa0116d31f6136a83f99d4fa5b6c19e29c20cf",
+    "eg004f-0063": "362000e5f2d00eb8c943386bfb6aa89b2b03e4c613bec5b26d92fb2829f4dc2e",
+    "eg004f-0065": "8e33705d3eeecec8bb1730a9e2731860917bc24a46faa17428347031d1f15e1e"
+  },
+  "model_configuration": null,
+  "model_attempts": 0,
+  "reserved_planning_cost_usd": null,
+  "analysis_latency_ms": null,
+  "model_measurements": {
+    "observed_calls": 0,
+    "reported_usage_calls": 0,
+    "input_tokens": null,
+    "output_tokens_including_thoughts": null,
+    "estimated_cost_usd_reported": null,
+    "latency_ms": null,
+    "scope": "reported subset at operator-supplied rates; failures may have unknown usage; not billing evidence"
+  },
+  "review_pending": 33,
+  "metrics": {
+    "extractor_only": {
+      "responses": 33,
+      "claim": {
+        "precision": 1.0,
+        "recall": 0.42857142857142855,
+        "f1": 0.6,
+        "matched": 12,
+        "predicted": 12,
+        "gold": 28
+      },
+      "exact_span": {
+        "precision": 1.0,
+        "recall": 0.42857142857142855,
+        "f1": 0.6,
+        "matched": 12,
+        "predicted": 12,
+        "gold": 28
+      },
+      "fresh_evidence": {
+        "precision": 1.0,
+        "recall": 0.48,
+        "f1": 0.6486486486486487,
+        "matched": 12,
+        "predicted": 12,
+        "gold": 25
+      },
+      "dynamic_gold": 25,
+      "dynamic_omitted": 13,
+      "dynamic_incorrectly_nonfresh_or_nonfactual": 0,
+      "dynamic_failure_cases": [
+        {
+          "case_id": "eg004f-0017",
+          "claim_id": "c003",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0019",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0019",
+          "claim_id": "c002",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0033",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0035",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0035",
+          "claim_id": "c002",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0045",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0047",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0049",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0051",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0053",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0057",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0059",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        }
+      ],
+      "unsupported_assertions_mapped": null,
+      "wrong_mapping_cases": null,
+      "unaccounted_risk_units": null,
+      "coverage_decision_scope": "not supplied by extractor; syntactic spans are not completeness",
+      "false_complete_count": null,
+      "false_complete_rate": null,
+      "false_complete_cases": null,
+      "correct_abstentions": null,
+      "ambiguous_or_unsupported_cases": 25,
+      "correct_abstention_rate": null,
+      "safe_refusals_including_failures": null,
+      "extraction_failures": 1,
+      "extraction_failure_rate": 0.030303030303030304
+    },
+    "combined_extractor_and_auditor": {
+      "responses": 33,
+      "claim": {
+        "precision": 1.0,
+        "recall": 0.42857142857142855,
+        "f1": 0.6,
+        "matched": 12,
+        "predicted": 12,
+        "gold": 28
+      },
+      "exact_span": {
+        "precision": 1.0,
+        "recall": 0.42857142857142855,
+        "f1": 0.6,
+        "matched": 12,
+        "predicted": 12,
+        "gold": 28
+      },
+      "fresh_evidence": {
+        "precision": 1.0,
+        "recall": 0.48,
+        "f1": 0.6486486486486487,
+        "matched": 12,
+        "predicted": 12,
+        "gold": 25
+      },
+      "dynamic_gold": 25,
+      "dynamic_omitted": 13,
+      "dynamic_incorrectly_nonfresh_or_nonfactual": 0,
+      "dynamic_failure_cases": [
+        {
+          "case_id": "eg004f-0017",
+          "claim_id": "c003",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0019",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0019",
+          "claim_id": "c002",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0033",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0035",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0035",
+          "claim_id": "c002",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0045",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0047",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0049",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0051",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0053",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0057",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0059",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        }
+      ],
+      "unsupported_assertions_mapped": 0,
+      "wrong_mapping_cases": [],
+      "unaccounted_risk_units": 29,
+      "coverage_decision_scope": "bounded audit",
+      "false_complete_count": 0,
+      "false_complete_rate": 0.0,
+      "false_complete_cases": [],
+      "correct_abstentions": 24,
+      "ambiguous_or_unsupported_cases": 25,
+      "correct_abstention_rate": 0.96,
+      "safe_refusals_including_failures": 25,
+      "extraction_failures": 1,
+      "extraction_failure_rate": 0.030303030303030304
+    },
+    "independent_auditor": {
+      "responses": 33,
+      "claim": {
+        "precision": 1.0,
+        "recall": 0.42857142857142855,
+        "f1": 0.6,
+        "matched": 12,
+        "predicted": 12,
+        "gold": 28
+      },
+      "exact_span": {
+        "precision": 1.0,
+        "recall": 0.42857142857142855,
+        "f1": 0.6,
+        "matched": 12,
+        "predicted": 12,
+        "gold": 28
+      },
+      "fresh_evidence": {
+        "precision": 1.0,
+        "recall": 0.48,
+        "f1": 0.6486486486486487,
+        "matched": 12,
+        "predicted": 12,
+        "gold": 25
+      },
+      "dynamic_gold": 25,
+      "dynamic_omitted": 13,
+      "dynamic_incorrectly_nonfresh_or_nonfactual": 0,
+      "dynamic_failure_cases": [
+        {
+          "case_id": "eg004f-0017",
+          "claim_id": "c003",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0019",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0019",
+          "claim_id": "c002",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0033",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0035",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0035",
+          "claim_id": "c002",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0045",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0047",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0049",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0051",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0053",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0057",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        },
+        {
+          "case_id": "eg004f-0059",
+          "claim_id": "c001",
+          "category": "DYNAMIC_OMITTED"
+        }
+      ],
+      "unsupported_assertions_mapped": 0,
+      "wrong_mapping_cases": [],
+      "unaccounted_risk_units": 29,
+      "coverage_decision_scope": "bounded audit",
+      "false_complete_count": 0,
+      "false_complete_rate": 0.0,
+      "false_complete_cases": [],
+      "correct_abstentions": 24,
+      "ambiguous_or_unsupported_cases": 25,
+      "correct_abstention_rate": 0.96,
+      "safe_refusals_including_failures": 25,
+      "extraction_failures": 1,
+      "extraction_failure_rate": 0.030303030303030304
+    }
+  },
+  "records": [
+    {
+      "case_id": "eg004f-0001",
+      "source_sha256": "df79712ecdc990a94d58e5c56cdbeaa6504395e4ff323543bb76a5b91ec1cdd3",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0001",
+          "candidate": "Python.org lists Python 3.88.7 as its latest stable Windows release.",
+          "candidate_sha256": "df79712ecdc990a94d58e5c56cdbeaa6504395e4ff323543bb76a5b91ec1cdd3",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [
+          {
+            "claim_id": "c001",
+            "source_text": "Python.org lists Python 3.88.7 as its latest stable Windows release.",
+            "start": 0,
+            "end": 68,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          }
+        ],
+        "risk_units": [
+          {
+            "source_text": "Python.org lists Python 3.88.7 as its latest stable Windows release.",
+            "start": 0,
+            "end": 68,
+            "unit_id": "u001",
+            "kind": "KNOWN_FACT",
+            "reason": "CLOSED_FORM"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [
+              "c001"
+            ],
+            "disposition": "COVERED_FACT",
+            "reason": "EXACT_ATOMIC_MATCH"
+          }
+        ],
+        "policy_mappings": [
+          {
+            "unit_id": "u001",
+            "policy_id": "python-windows-latest-v1",
+            "version": "3.88.7",
+            "canonical_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+          }
+        ],
+        "unaccounted_unit_ids": [],
+        "unsupported_unit_ids": [],
+        "coverage": "BOUNDED_ACCOUNTED",
+        "syntactic_covered_characters": 68,
+        "overall_status": "PLAN_READY",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0003",
+      "source_sha256": "57155ba071bd1c486f3189eaf464b02155649ed0833f14f25d9fba39c34c078d",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0003",
+          "candidate": "Python.org lists 3.88.7 as the latest stable Windows release.",
+          "candidate_sha256": "57155ba071bd1c486f3189eaf464b02155649ed0833f14f25d9fba39c34c078d",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [
+          {
+            "claim_id": "c001",
+            "source_text": "Python.org lists 3.88.7 as the latest stable Windows release.",
+            "start": 0,
+            "end": 61,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          }
+        ],
+        "risk_units": [
+          {
+            "source_text": "Python.org lists 3.88.7 as the latest stable Windows release.",
+            "start": 0,
+            "end": 61,
+            "unit_id": "u001",
+            "kind": "KNOWN_FACT",
+            "reason": "CLOSED_FORM"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [
+              "c001"
+            ],
+            "disposition": "COVERED_FACT",
+            "reason": "EXACT_ATOMIC_MATCH"
+          }
+        ],
+        "policy_mappings": [
+          {
+            "unit_id": "u001",
+            "policy_id": "python-windows-latest-v1",
+            "version": "3.88.7",
+            "canonical_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+          }
+        ],
+        "unaccounted_unit_ids": [],
+        "unsupported_unit_ids": [],
+        "coverage": "BOUNDED_ACCOUNTED",
+        "syntactic_covered_characters": 61,
+        "overall_status": "PLAN_READY",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0005",
+      "source_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0005",
+          "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+          "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [
+          {
+            "claim_id": "c001",
+            "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+            "start": 0,
+            "end": 78,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          }
+        ],
+        "risk_units": [
+          {
+            "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+            "start": 0,
+            "end": 78,
+            "unit_id": "u001",
+            "kind": "KNOWN_FACT",
+            "reason": "CLOSED_FORM"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [
+              "c001"
+            ],
+            "disposition": "COVERED_FACT",
+            "reason": "EXACT_ATOMIC_MATCH"
+          }
+        ],
+        "policy_mappings": [
+          {
+            "unit_id": "u001",
+            "policy_id": "python-windows-latest-v1",
+            "version": "3.88.7",
+            "canonical_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+          }
+        ],
+        "unaccounted_unit_ids": [],
+        "unsupported_unit_ids": [],
+        "coverage": "BOUNDED_ACCOUNTED",
+        "syntactic_covered_characters": 78,
+        "overall_status": "PLAN_READY",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0007",
+      "source_sha256": "406eed0db4d72b13ab09ad9179a981442babf035d572022282914a177dd62855",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0007",
+          "candidate": "The PyPI JSON API reports requests version 2.88.7.",
+          "candidate_sha256": "406eed0db4d72b13ab09ad9179a981442babf035d572022282914a177dd62855",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [
+          {
+            "claim_id": "c001",
+            "source_text": "The PyPI JSON API reports requests version 2.88.7.",
+            "start": 0,
+            "end": 50,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          }
+        ],
+        "risk_units": [
+          {
+            "source_text": "The PyPI JSON API reports requests version 2.88.7.",
+            "start": 0,
+            "end": 50,
+            "unit_id": "u001",
+            "kind": "KNOWN_FACT",
+            "reason": "CLOSED_FORM"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [
+              "c001"
+            ],
+            "disposition": "COVERED_FACT",
+            "reason": "EXACT_ATOMIC_MATCH"
+          }
+        ],
+        "policy_mappings": [
+          {
+            "unit_id": "u001",
+            "policy_id": "pypi-requests-reported-v1",
+            "version": "2.88.7",
+            "canonical_text": "The version reported for requests by the PyPI JSON API is 2.88.7."
+          }
+        ],
+        "unaccounted_unit_ids": [],
+        "unsupported_unit_ids": [],
+        "coverage": "BOUNDED_ACCOUNTED",
+        "syntactic_covered_characters": 50,
+        "overall_status": "PLAN_READY",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0009",
+      "source_sha256": "0b939a5281db80aca2aee6039b51901b97a44a10ef50de3de412b3f9b3469e49",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0009",
+          "candidate": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+          "candidate_sha256": "0b939a5281db80aca2aee6039b51901b97a44a10ef50de3de412b3f9b3469e49",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [
+          {
+            "claim_id": "c001",
+            "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+            "start": 0,
+            "end": 65,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          }
+        ],
+        "risk_units": [
+          {
+            "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+            "start": 0,
+            "end": 65,
+            "unit_id": "u001",
+            "kind": "KNOWN_FACT",
+            "reason": "CLOSED_FORM"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [
+              "c001"
+            ],
+            "disposition": "COVERED_FACT",
+            "reason": "EXACT_ATOMIC_MATCH"
+          }
+        ],
+        "policy_mappings": [
+          {
+            "unit_id": "u001",
+            "policy_id": "pypi-requests-reported-v1",
+            "version": "2.88.7",
+            "canonical_text": "The version reported for requests by the PyPI JSON API is 2.88.7."
+          }
+        ],
+        "unaccounted_unit_ids": [],
+        "unsupported_unit_ids": [],
+        "coverage": "BOUNDED_ACCOUNTED",
+        "syntactic_covered_characters": 65,
+        "overall_status": "PLAN_READY",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0011",
+      "source_sha256": "5535f6959c437ec744cfcfef8c6b850033c5c5ec28db526d02f93137b816ddf3",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0011",
+          "candidate": "PyPI reports requests version 2.88.7. Python.org lists Python 3.88.7 as its latest stable Windows release.",
+          "candidate_sha256": "5535f6959c437ec744cfcfef8c6b850033c5c5ec28db526d02f93137b816ddf3",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [
+          {
+            "claim_id": "c001",
+            "source_text": "PyPI reports requests version 2.88.7.",
+            "start": 0,
+            "end": 37,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          },
+          {
+            "claim_id": "c002",
+            "source_text": "Python.org lists Python 3.88.7 as its latest stable Windows release.",
+            "start": 38,
+            "end": 106,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          }
+        ],
+        "risk_units": [
+          {
+            "source_text": "PyPI reports requests version 2.88.7.",
+            "start": 0,
+            "end": 37,
+            "unit_id": "u001",
+            "kind": "KNOWN_FACT",
+            "reason": "CLOSED_FORM"
+          },
+          {
+            "source_text": "Python.org lists Python 3.88.7 as its latest stable Windows release.",
+            "start": 38,
+            "end": 106,
+            "unit_id": "u002",
+            "kind": "KNOWN_FACT",
+            "reason": "CLOSED_FORM"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [
+              "c001"
+            ],
+            "disposition": "COVERED_FACT",
+            "reason": "EXACT_ATOMIC_MATCH"
+          },
+          {
+            "unit_id": "u002",
+            "overlapping_claim_ids": [
+              "c002"
+            ],
+            "disposition": "COVERED_FACT",
+            "reason": "EXACT_ATOMIC_MATCH"
+          }
+        ],
+        "policy_mappings": [
+          {
+            "unit_id": "u001",
+            "policy_id": "pypi-requests-reported-v1",
+            "version": "2.88.7",
+            "canonical_text": "The version reported for requests by the PyPI JSON API is 2.88.7."
+          },
+          {
+            "unit_id": "u002",
+            "policy_id": "python-windows-latest-v1",
+            "version": "3.88.7",
+            "canonical_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+          }
+        ],
+        "unaccounted_unit_ids": [],
+        "unsupported_unit_ids": [],
+        "coverage": "BOUNDED_ACCOUNTED",
+        "syntactic_covered_characters": 105,
+        "overall_status": "PLAN_READY",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0013",
+      "source_sha256": "cacb99f88298e9cbbd7d948324f1338131621e20eaca4857abfdfad09e141492",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0013",
+          "candidate": "Hello.\nPyPI reports requests version 2.88.7.",
+          "candidate_sha256": "cacb99f88298e9cbbd7d948324f1338131621e20eaca4857abfdfad09e141492",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [
+          {
+            "claim_id": "c001",
+            "source_text": "Hello.",
+            "start": 0,
+            "end": 6,
+            "normalized_proposition": null,
+            "factuality": "NON_FACTUAL",
+            "temporal": "UNCERTAIN",
+            "fresh_evidence": "NOT_APPLICABLE",
+            "uncertainty": [],
+            "temporal_reference": null
+          },
+          {
+            "claim_id": "c002",
+            "source_text": "PyPI reports requests version 2.88.7.",
+            "start": 7,
+            "end": 44,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          }
+        ],
+        "risk_units": [
+          {
+            "source_text": "Hello.",
+            "start": 0,
+            "end": 6,
+            "unit_id": "u001",
+            "kind": "NONFACTUAL_RULE",
+            "reason": "EXPLICIT_NONFACTUAL"
+          },
+          {
+            "source_text": "PyPI reports requests version 2.88.7.",
+            "start": 7,
+            "end": 44,
+            "unit_id": "u002",
+            "kind": "KNOWN_FACT",
+            "reason": "CLOSED_FORM"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [
+              "c001"
+            ],
+            "disposition": "NONFACTUAL_RULE",
+            "reason": "EXPLICIT_NONFACTUAL"
+          },
+          {
+            "unit_id": "u002",
+            "overlapping_claim_ids": [
+              "c002"
+            ],
+            "disposition": "COVERED_FACT",
+            "reason": "EXACT_ATOMIC_MATCH"
+          }
+        ],
+        "policy_mappings": [
+          {
+            "unit_id": "u002",
+            "policy_id": "pypi-requests-reported-v1",
+            "version": "2.88.7",
+            "canonical_text": "The version reported for requests by the PyPI JSON API is 2.88.7."
+          }
+        ],
+        "unaccounted_unit_ids": [],
+        "unsupported_unit_ids": [],
+        "coverage": "BOUNDED_ACCOUNTED",
+        "syntactic_covered_characters": 43,
+        "overall_status": "PLAN_READY",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0015",
+      "source_sha256": "69d625198486e262bb02f109972d845e7c70a12ac0785445c1e9dad4bf912fa8",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0015",
+          "candidate": "Python.org lists 3.88.6 as the latest stable Windows release. PyPI reports requests version 2.88.7.",
+          "candidate_sha256": "69d625198486e262bb02f109972d845e7c70a12ac0785445c1e9dad4bf912fa8",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [
+          {
+            "claim_id": "c001",
+            "source_text": "Python.org lists 3.88.6 as the latest stable Windows release.",
+            "start": 0,
+            "end": 61,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          },
+          {
+            "claim_id": "c002",
+            "source_text": "PyPI reports requests version 2.88.7.",
+            "start": 62,
+            "end": 99,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          }
+        ],
+        "risk_units": [
+          {
+            "source_text": "Python.org lists 3.88.6 as the latest stable Windows release.",
+            "start": 0,
+            "end": 61,
+            "unit_id": "u001",
+            "kind": "KNOWN_FACT",
+            "reason": "CLOSED_FORM"
+          },
+          {
+            "source_text": "PyPI reports requests version 2.88.7.",
+            "start": 62,
+            "end": 99,
+            "unit_id": "u002",
+            "kind": "KNOWN_FACT",
+            "reason": "CLOSED_FORM"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [
+              "c001"
+            ],
+            "disposition": "COVERED_FACT",
+            "reason": "EXACT_ATOMIC_MATCH"
+          },
+          {
+            "unit_id": "u002",
+            "overlapping_claim_ids": [
+              "c002"
+            ],
+            "disposition": "COVERED_FACT",
+            "reason": "EXACT_ATOMIC_MATCH"
+          }
+        ],
+        "policy_mappings": [
+          {
+            "unit_id": "u001",
+            "policy_id": "python-windows-latest-v1",
+            "version": "3.88.6",
+            "canonical_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.6."
+          },
+          {
+            "unit_id": "u002",
+            "policy_id": "pypi-requests-reported-v1",
+            "version": "2.88.7",
+            "canonical_text": "The version reported for requests by the PyPI JSON API is 2.88.7."
+          }
+        ],
+        "unaccounted_unit_ids": [],
+        "unsupported_unit_ids": [],
+        "coverage": "BOUNDED_ACCOUNTED",
+        "syntactic_covered_characters": 98,
+        "overall_status": "PLAN_READY",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0017",
+      "source_sha256": "a3bdaaa7bddb1f4b0bb4fd592748642f938f1dfe6c5e7b7bda2768eea4b3aaab",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0017",
+          "candidate": "Python.org lists Python 3.88.7 as its latest stable Windows release. PyPI reports requests version 2.88.7. The package has 500 unresolved security vulnerabilities.",
+          "candidate_sha256": "a3bdaaa7bddb1f4b0bb4fd592748642f938f1dfe6c5e7b7bda2768eea4b3aaab",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [
+          {
+            "claim_id": "c001",
+            "source_text": "Python.org lists Python 3.88.7 as its latest stable Windows release.",
+            "start": 0,
+            "end": 68,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          },
+          {
+            "claim_id": "c002",
+            "source_text": "PyPI reports requests version 2.88.7.",
+            "start": 69,
+            "end": 106,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          }
+        ],
+        "risk_units": [
+          {
+            "source_text": "Python.org lists Python 3.88.7 as its latest stable Windows release.",
+            "start": 0,
+            "end": 68,
+            "unit_id": "u001",
+            "kind": "KNOWN_FACT",
+            "reason": "CLOSED_FORM"
+          },
+          {
+            "source_text": "PyPI reports requests version 2.88.7.",
+            "start": 69,
+            "end": 106,
+            "unit_id": "u002",
+            "kind": "KNOWN_FACT",
+            "reason": "CLOSED_FORM"
+          },
+          {
+            "source_text": "The package has 500 unresolved security vulnerabilities.",
+            "start": 107,
+            "end": 163,
+            "unit_id": "u003",
+            "kind": "POTENTIAL_FACT",
+            "reason": "UNSUPPORTED_PREDICATE"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [
+              "c001"
+            ],
+            "disposition": "COVERED_FACT",
+            "reason": "EXACT_ATOMIC_MATCH"
+          },
+          {
+            "unit_id": "u002",
+            "overlapping_claim_ids": [
+              "c002"
+            ],
+            "disposition": "COVERED_FACT",
+            "reason": "EXACT_ATOMIC_MATCH"
+          },
+          {
+            "unit_id": "u003",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [
+          {
+            "unit_id": "u001",
+            "policy_id": "python-windows-latest-v1",
+            "version": "3.88.7",
+            "canonical_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+          },
+          {
+            "unit_id": "u002",
+            "policy_id": "pypi-requests-reported-v1",
+            "version": "2.88.7",
+            "canonical_text": "The version reported for requests by the PyPI JSON API is 2.88.7."
+          }
+        ],
+        "unaccounted_unit_ids": [
+          "u003"
+        ],
+        "unsupported_unit_ids": [
+          "u003"
+        ],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 105,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0019",
+      "source_sha256": "3d651cc3a96a9563383c0346cd44777fabd5e23fe97751824fc2d204b633bd65",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0019",
+          "candidate": "Python.org lists 3.88.7 as the latest stable Windows release, and requests has more than 100 million weekly downloads.",
+          "candidate_sha256": "3d651cc3a96a9563383c0346cd44777fabd5e23fe97751824fc2d204b633bd65",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "Python.org lists 3.88.7 as the latest stable Windows release, and requests has more than 100 million weekly downloads.",
+            "start": 0,
+            "end": 118,
+            "unit_id": "u001",
+            "kind": "MIXED",
+            "reason": "COMPOUND_MARKER"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0021",
+      "source_sha256": "2665ddeec32962464134df1cbdf7a33d7e08e752de695c84799abf8d0370f2fe",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0021",
+          "candidate": "Python.org does not list Python 3.88.7 as its latest stable Windows release.",
+          "candidate_sha256": "2665ddeec32962464134df1cbdf7a33d7e08e752de695c84799abf8d0370f2fe",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "Python.org does not list Python 3.88.7 as its latest stable Windows release.",
+            "start": 0,
+            "end": 76,
+            "unit_id": "u001",
+            "kind": "AMBIGUOUS",
+            "reason": "CONTEXT_OR_FORMAT"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0023",
+      "source_sha256": "6895b4b41a96eceb911f6adaea72c3c86f1be635b257b71a2f36858607923100",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0023",
+          "candidate": "Python.org might list Python 3.88.7 as its latest stable Windows release.",
+          "candidate_sha256": "6895b4b41a96eceb911f6adaea72c3c86f1be635b257b71a2f36858607923100",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "Python.org might list Python 3.88.7 as its latest stable Windows release.",
+            "start": 0,
+            "end": 73,
+            "unit_id": "u001",
+            "kind": "AMBIGUOUS",
+            "reason": "CONTEXT_OR_FORMAT"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0025",
+      "source_sha256": "76b4e0cf2ea8e2cee13aa3243d5cad64569486cd119fe74fadc862cbc2ed487b",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0025",
+          "candidate": "Python.org guarantees that 3.88.7 is the safest release.",
+          "candidate_sha256": "76b4e0cf2ea8e2cee13aa3243d5cad64569486cd119fe74fadc862cbc2ed487b",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "Python.org guarantees that 3.88.7 is the safest release.",
+            "start": 0,
+            "end": 56,
+            "unit_id": "u001",
+            "kind": "AMBIGUOUS",
+            "reason": "CONTEXT_OR_FORMAT"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0027",
+      "source_sha256": "df7b2afa7fe7eb8ed2d4508dc49ee870ab201653e108ba421630ad44132a50c4",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0027",
+          "candidate": "Last year, Python 3.88.7 was the latest version.",
+          "candidate_sha256": "df7b2afa7fe7eb8ed2d4508dc49ee870ab201653e108ba421630ad44132a50c4",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "Last year, Python 3.88.7 was the latest version.",
+            "start": 0,
+            "end": 48,
+            "unit_id": "u001",
+            "kind": "AMBIGUOUS",
+            "reason": "CONTEXT_OR_FORMAT"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0029",
+      "source_sha256": "682d9b5772e83fb009dc14ef32e7e3080731b04cc3ae2c03ae392d2f0998c3fd",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0029",
+          "candidate": "Yesterday PyPI reported requests version 2.88.7.",
+          "candidate_sha256": "682d9b5772e83fb009dc14ef32e7e3080731b04cc3ae2c03ae392d2f0998c3fd",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "Yesterday PyPI reported requests version 2.88.7.",
+            "start": 0,
+            "end": 48,
+            "unit_id": "u001",
+            "kind": "AMBIGUOUS",
+            "reason": "CONTEXT_OR_FORMAT"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0031",
+      "source_sha256": "3141e4a89b5dbc0ebf291b44e163f13c87873e91ab30b6c0bd20cdcc66dd1624",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0031",
+          "candidate": "I think Python.org lists 3.88.7 as the latest release.",
+          "candidate_sha256": "3141e4a89b5dbc0ebf291b44e163f13c87873e91ab30b6c0bd20cdcc66dd1624",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "I think Python.org lists 3.88.7 as the latest release.",
+            "start": 0,
+            "end": 54,
+            "unit_id": "u001",
+            "kind": "POTENTIAL_FACT",
+            "reason": "UNSUPPORTED_PREDICATE"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [
+          "u001"
+        ],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0033",
+      "source_sha256": "ad2c90612fce5d0bb766fb93ab20ae372b092c10668c3840af0414980c199c6a",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0033",
+          "candidate": "Python.org lists version 3.88.7. It is the safest one.",
+          "candidate_sha256": "ad2c90612fce5d0bb766fb93ab20ae372b092c10668c3840af0414980c199c6a",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "Python.org lists version 3.88.7.",
+            "start": 0,
+            "end": 32,
+            "unit_id": "u001",
+            "kind": "POTENTIAL_FACT",
+            "reason": "UNSUPPORTED_PREDICATE"
+          },
+          {
+            "source_text": "It is the safest one.",
+            "start": 33,
+            "end": 54,
+            "unit_id": "u002",
+            "kind": "POTENTIAL_FACT",
+            "reason": "UNSUPPORTED_PREDICATE"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          },
+          {
+            "unit_id": "u002",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001",
+          "u002"
+        ],
+        "unsupported_unit_ids": [
+          "u001",
+          "u002"
+        ],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0035",
+      "source_sha256": "501dd8c3ac82427f2a842a1d78254ca234ca3b3f722f99d8694ed4c9ef585f22",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0035",
+          "candidate": "Python.org lists Python 3.88.7 as its latest stable Windows release. Python.org lists Python 3.88.7 as its latest stable Windows release.",
+          "candidate_sha256": "501dd8c3ac82427f2a842a1d78254ca234ca3b3f722f99d8694ed4c9ef585f22",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "FAILED",
+        "failure_code": "EXTRACTION_FAILED",
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "Python.org lists Python 3.88.7 as its latest stable Windows release.",
+            "start": 0,
+            "end": 68,
+            "unit_id": "u001",
+            "kind": "KNOWN_FACT",
+            "reason": "CLOSED_FORM"
+          },
+          {
+            "source_text": "Python.org lists Python 3.88.7 as its latest stable Windows release.",
+            "start": 69,
+            "end": 137,
+            "unit_id": "u002",
+            "kind": "KNOWN_FACT",
+            "reason": "CLOSED_FORM"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          },
+          {
+            "unit_id": "u002",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [
+          {
+            "unit_id": "u001",
+            "policy_id": "python-windows-latest-v1",
+            "version": "3.88.7",
+            "canonical_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+          },
+          {
+            "unit_id": "u002",
+            "policy_id": "python-windows-latest-v1",
+            "version": "3.88.7",
+            "canonical_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+          }
+        ],
+        "unaccounted_unit_ids": [
+          "u001",
+          "u002"
+        ],
+        "unsupported_unit_ids": [],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "ANALYSIS_FAILED",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "NOT_COMPLETED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0037",
+      "source_sha256": "f0a1ecacddb487d0468b8ea5bd8b07ab73090291663c7d7c38cb9857b20a41ea",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0037",
+          "candidate": "> Python.org lists Python 3.88.7 as its latest stable Windows release.",
+          "candidate_sha256": "f0a1ecacddb487d0468b8ea5bd8b07ab73090291663c7d7c38cb9857b20a41ea",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "> Python.org lists Python 3.88.7 as its latest stable Windows release.",
+            "start": 0,
+            "end": 70,
+            "unit_id": "u001",
+            "kind": "AMBIGUOUS",
+            "reason": "CONTEXT_OR_FORMAT"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0039",
+      "source_sha256": "c0772bc8ce637aa9f115a9fec2cfeb39b6ea52eec841789f7e3292e38726c466",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0039",
+          "candidate": "# Current releases\nPython.org lists Python 3.88.7 as its latest stable Windows release.",
+          "candidate_sha256": "c0772bc8ce637aa9f115a9fec2cfeb39b6ea52eec841789f7e3292e38726c466",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "# Current releases",
+            "start": 0,
+            "end": 18,
+            "unit_id": "u001",
+            "kind": "AMBIGUOUS",
+            "reason": "CONTEXT_OR_FORMAT"
+          },
+          {
+            "source_text": "Python.org lists Python 3.88.7 as its latest stable Windows release.",
+            "start": 19,
+            "end": 87,
+            "unit_id": "u002",
+            "kind": "AMBIGUOUS",
+            "reason": "CONTEXT_OR_FORMAT"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          },
+          {
+            "unit_id": "u002",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001",
+          "u002"
+        ],
+        "unsupported_unit_ids": [],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0041",
+      "source_sha256": "e9016497876cb676f6780e8c2cc08bf9598eec6aa4c8e3750c21d327a86a33e3",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0041",
+          "candidate": "```text\nPyPI reports requests version 2.88.7.\n```",
+          "candidate_sha256": "e9016497876cb676f6780e8c2cc08bf9598eec6aa4c8e3750c21d327a86a33e3",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "```text",
+            "start": 0,
+            "end": 7,
+            "unit_id": "u001",
+            "kind": "AMBIGUOUS",
+            "reason": "CONTEXT_OR_FORMAT"
+          },
+          {
+            "source_text": "PyPI reports requests version 2.88.7.",
+            "start": 8,
+            "end": 45,
+            "unit_id": "u002",
+            "kind": "AMBIGUOUS",
+            "reason": "CONTEXT_OR_FORMAT"
+          },
+          {
+            "source_text": "```",
+            "start": 46,
+            "end": 49,
+            "unit_id": "u003",
+            "kind": "AMBIGUOUS",
+            "reason": "CONTEXT_OR_FORMAT"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          },
+          {
+            "unit_id": "u002",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          },
+          {
+            "unit_id": "u003",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001",
+          "u002",
+          "u003"
+        ],
+        "unsupported_unit_ids": [],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0043",
+      "source_sha256": "19904baaca511089d30656968e0b84f69f008849599cc8fdcf6a4ed9ef172ea5",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0043",
+          "candidate": "\ud83d\ude00 PyPI reports requests version 2.88.7.",
+          "candidate_sha256": "19904baaca511089d30656968e0b84f69f008849599cc8fdcf6a4ed9ef172ea5",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "\ud83d\ude00 PyPI reports requests version 2.88.7.",
+            "start": 0,
+            "end": 39,
+            "unit_id": "u001",
+            "kind": "AMBIGUOUS",
+            "reason": "CONTEXT_OR_FORMAT"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0045",
+      "source_sha256": "0bb66b95a9032193f4cc54c285149c3a02dfea802fc44fcb710c8c32faf47941",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0045",
+          "candidate": "PyPI reports httpx version 2.88.7.",
+          "candidate_sha256": "0bb66b95a9032193f4cc54c285149c3a02dfea802fc44fcb710c8c32faf47941",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "PyPI reports httpx version 2.88.7.",
+            "start": 0,
+            "end": 34,
+            "unit_id": "u001",
+            "kind": "POTENTIAL_FACT",
+            "reason": "UNSUPPORTED_PREDICATE"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [
+          "u001"
+        ],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0047",
+      "source_sha256": "e6e52e9169d0c24f4cd5a7ac7027557e733a365bcf5c6344da3d45467cbd0e0e",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0047",
+          "candidate": "https://evil.invalid says requests version 2.88.7.",
+          "candidate_sha256": "e6e52e9169d0c24f4cd5a7ac7027557e733a365bcf5c6344da3d45467cbd0e0e",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "https://evil.invalid says requests version 2.88.7.",
+            "start": 0,
+            "end": 50,
+            "unit_id": "u001",
+            "kind": "AMBIGUOUS",
+            "reason": "CONTEXT_OR_FORMAT"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0049",
+      "source_sha256": "1161e690bfa318b319a12b81e19485cacdd3eb8be8d69d4cf94cc7c6abccb477",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0049",
+          "candidate": "Python.org lists Python 3.88.7 as an available Windows release.",
+          "candidate_sha256": "1161e690bfa318b319a12b81e19485cacdd3eb8be8d69d4cf94cc7c6abccb477",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "Python.org lists Python 3.88.7 as an available Windows release.",
+            "start": 0,
+            "end": 63,
+            "unit_id": "u001",
+            "kind": "POTENTIAL_FACT",
+            "reason": "UNSUPPORTED_PREDICATE"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [
+          "u001"
+        ],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0051",
+      "source_sha256": "5b437c212abb9117a001cfe9a9a2f6e58f22be1e1299735d314e72dfce7e4137",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0051",
+          "candidate": "Python.org lists Python 3.88.7rc1 as its latest stable Windows release.",
+          "candidate_sha256": "5b437c212abb9117a001cfe9a9a2f6e58f22be1e1299735d314e72dfce7e4137",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "Python.org lists Python 3.88.7rc1 as its latest stable Windows release.",
+            "start": 0,
+            "end": 71,
+            "unit_id": "u001",
+            "kind": "POTENTIAL_FACT",
+            "reason": "UNSUPPORTED_PREDICATE"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [
+          "u001"
+        ],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0053",
+      "source_sha256": "52118cc4eb3735aa9f7a669a5ebe31caceabe60c46d7f33456701f3899b9f4bf",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0053",
+          "candidate": "PyPI reports Requests version 2.88.7.",
+          "candidate_sha256": "52118cc4eb3735aa9f7a669a5ebe31caceabe60c46d7f33456701f3899b9f4bf",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "PyPI reports Requests version 2.88.7.",
+            "start": 0,
+            "end": 37,
+            "unit_id": "u001",
+            "kind": "POTENTIAL_FACT",
+            "reason": "UNSUPPORTED_PREDICATE"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [
+          "u001"
+        ],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0055",
+      "source_sha256": "db9e335d2146ee59b0a7e5d57548c234b34573b40646b786a683ceadf6050675",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0055",
+          "candidate": "A triangle has three sides.",
+          "candidate_sha256": "db9e335d2146ee59b0a7e5d57548c234b34573b40646b786a683ceadf6050675",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "A triangle has three sides.",
+            "start": 0,
+            "end": 27,
+            "unit_id": "u001",
+            "kind": "POTENTIAL_FACT",
+            "reason": "UNSUPPORTED_PREDICATE"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [
+          "u001"
+        ],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0057",
+      "source_sha256": "a4c5639e77738e22f1fcd67696b772b246ae9060af37537318c3b1bdf63baff2",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0057",
+          "candidate": "The server is currently offline.",
+          "candidate_sha256": "a4c5639e77738e22f1fcd67696b772b246ae9060af37537318c3b1bdf63baff2",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "The server is currently offline.",
+            "start": 0,
+            "end": 32,
+            "unit_id": "u001",
+            "kind": "POTENTIAL_FACT",
+            "reason": "UNSUPPORTED_PREDICATE"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [
+          "u001"
+        ],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0059",
+      "source_sha256": "4a1fc97b227588c357049238853c0b114283e5efa48afa84707ebc83dcb84c19",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0059",
+          "candidate": "The package has no known security issues.",
+          "candidate_sha256": "4a1fc97b227588c357049238853c0b114283e5efa48afa84707ebc83dcb84c19",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "The package has no known security issues.",
+            "start": 0,
+            "end": 41,
+            "unit_id": "u001",
+            "kind": "POTENTIAL_FACT",
+            "reason": "UNSUPPORTED_PREDICATE"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [
+          "u001"
+        ],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0061",
+      "source_sha256": "99645b38ff103516a86ade43cffa0116d31f6136a83f99d4fa5b6c19e29c20cf",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0061",
+          "candidate": "What a wonderful day!",
+          "candidate_sha256": "99645b38ff103516a86ade43cffa0116d31f6136a83f99d4fa5b6c19e29c20cf",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "What a wonderful day!",
+            "start": 0,
+            "end": 21,
+            "unit_id": "u001",
+            "kind": "UNRECOGNIZED",
+            "reason": "UNKNOWN_CONTENT"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0063",
+      "source_sha256": "362000e5f2d00eb8c943386bfb6aa89b2b03e4c613bec5b26d92fb2829f4dc2e",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0063",
+          "candidate": "I prefer blue.",
+          "candidate_sha256": "362000e5f2d00eb8c943386bfb6aa89b2b03e4c613bec5b26d92fb2829f4dc2e",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [],
+        "risk_units": [
+          {
+            "source_text": "I prefer blue.",
+            "start": 0,
+            "end": 14,
+            "unit_id": "u001",
+            "kind": "UNRECOGNIZED",
+            "reason": "UNKNOWN_CONTENT"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [],
+            "disposition": "UNACCOUNTED",
+            "reason": "MISSING_PROPOSAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [
+          "u001"
+        ],
+        "unsupported_unit_ids": [],
+        "coverage": "UNRESOLVED",
+        "syntactic_covered_characters": 0,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    },
+    {
+      "case_id": "eg004f-0065",
+      "source_sha256": "8e33705d3eeecec8bb1730a9e2731860917bc24a46faa17428347031d1f15e1e",
+      "analysis": {
+        "schema_version": "004f.prose-plan.v1",
+        "analysis_policy": "bounded-prose-audit-v1",
+        "request": {
+          "schema_version": "004f.prose-plan.v1",
+          "analysis_policy": "bounded-prose-audit-v1",
+          "request_id": "eg004f-0065",
+          "candidate": "Hello. Thank you.",
+          "candidate_sha256": "8e33705d3eeecec8bb1730a9e2731860917bc24a46faa17428347031d1f15e1e",
+          "reference_date": "2026-11-14"
+        },
+        "authorization": false,
+        "semantic_completeness": "NOT_PROVEN",
+        "extractor": "auditor",
+        "extractor_identity": "auditor",
+        "extractor_status": "INDEPENDENT_ONLY",
+        "failure_code": null,
+        "diagnostic_stage": null,
+        "diagnostic_code": null,
+        "proposals": [
+          {
+            "claim_id": "c001",
+            "source_text": "Hello.",
+            "start": 0,
+            "end": 6,
+            "normalized_proposition": null,
+            "factuality": "NON_FACTUAL",
+            "temporal": "UNCERTAIN",
+            "fresh_evidence": "NOT_APPLICABLE",
+            "uncertainty": [],
+            "temporal_reference": null
+          },
+          {
+            "claim_id": "c002",
+            "source_text": "Thank you.",
+            "start": 7,
+            "end": 17,
+            "normalized_proposition": null,
+            "factuality": "NON_FACTUAL",
+            "temporal": "UNCERTAIN",
+            "fresh_evidence": "NOT_APPLICABLE",
+            "uncertainty": [],
+            "temporal_reference": null
+          }
+        ],
+        "risk_units": [
+          {
+            "source_text": "Hello.",
+            "start": 0,
+            "end": 6,
+            "unit_id": "u001",
+            "kind": "NONFACTUAL_RULE",
+            "reason": "EXPLICIT_NONFACTUAL"
+          },
+          {
+            "source_text": "Thank you.",
+            "start": 7,
+            "end": 17,
+            "unit_id": "u002",
+            "kind": "NONFACTUAL_RULE",
+            "reason": "EXPLICIT_NONFACTUAL"
+          }
+        ],
+        "correspondences": [
+          {
+            "unit_id": "u001",
+            "overlapping_claim_ids": [
+              "c001"
+            ],
+            "disposition": "NONFACTUAL_RULE",
+            "reason": "EXPLICIT_NONFACTUAL"
+          },
+          {
+            "unit_id": "u002",
+            "overlapping_claim_ids": [
+              "c002"
+            ],
+            "disposition": "NONFACTUAL_RULE",
+            "reason": "EXPLICIT_NONFACTUAL"
+          }
+        ],
+        "policy_mappings": [],
+        "unaccounted_unit_ids": [],
+        "unsupported_unit_ids": [],
+        "coverage": "NO_ASSERTIONS",
+        "syntactic_covered_characters": 16,
+        "overall_status": "PLAN_UNCERTAIN",
+        "shadow_fixture": true,
+        "shadow_observations": [],
+        "shadow_verdict": "NOT_RUN",
+        "resources": {
+          "work_seconds": 5.0,
+          "elapsed_ms": null,
+          "extractor_ms": null,
+          "input_tokens": null,
+          "output_tokens": null,
+          "estimated_cost_usd": null
+        }
+      },
+      "alignment_outcome": "VALIDATED",
+      "model_call_attempted": false,
+      "provider_measurement": null
+    }
+  ]
+}

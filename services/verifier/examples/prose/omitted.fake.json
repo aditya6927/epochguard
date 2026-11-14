@@ -1,0 +1,25 @@
+{
+  "schema_version": "004a.identification.v1",
+  "claims": [
+    {
+      "claim_id": "c001",
+      "source_text": "Python.org lists Python 3.88.7 as its latest stable Windows release.",
+      "normalized_proposition": null,
+      "factuality": "FACTUAL",
+      "temporal": "DYNAMIC",
+      "fresh_evidence": "REQUIRED",
+      "uncertainty": [],
+      "temporal_reference": null
+    },
+    {
+      "claim_id": "c002",
+      "source_text": "PyPI reports requests version 2.88.7.",
+      "normalized_proposition": null,
+      "factuality": "FACTUAL",
+      "temporal": "DYNAMIC",
+      "fresh_evidence": "REQUIRED",
+      "uncertainty": [],
+      "temporal_reference": null
+    }
+  ]
+}

@@ -42,6 +42,31 @@ raw evidence text. These are observation times, not origin publication times.
 Routine live readiness uses an authenticated negative canary with zero source
 calls; readiness does not attest source health or successful factual support.
 
+## Experimental natural-language planning
+
+`verifier.prose` is the separate [004F analysis experiment](../../docs/task-004f.md).
+It reuses 004A ModelExtractor/Gemini proposals, exact source alignment and cost
+controls, then independently audits original-text risk units and closed policy
+paraphrases. It emits `004f.prose-plan.v1` with `authorization=false` and
+`semantic_completeness=NOT_PROVEN`. PLAN_READY means bounded planning only; it
+cannot be used as gateway ALLOW. No gateway mode, app route, 004B contract or
+evidence policy is changed. Optional shadow comparison accepts injected offline
+fixtures only and never overrides unresolved coverage.
+
+```powershell
+$env:PYTHONPATH = 'services/verifier;services/claim_analysis'
+& .venv-003a/Scripts/python.exe -m verifier.prose analyze --engine baseline --text-file services/verifier/examples/prose/mapped.txt
+& .venv-003a/Scripts/python.exe -m verifier.prose analyze --engine fake-model --text-file services/verifier/examples/prose/omitted.txt --fake-reply services/verifier/examples/prose/omitted.fake.json --shadow-fixtures
+& .venv-003a/Scripts/python.exe -m verifier.prose evaluate --split dev --output artifacts/004f/baseline-dev.json
+```
+
+Human output omits candidate text; `--json` and explicit evaluation exports include
+source-bound records. The separate 66-case [draft collection](data/prose-v1/README.md)
+and [offline reports](reports/prose-v1/README.md) preserve failures, omissions and
+false-complete metrics. **MODEL QUALITY QUALIFICATION PENDING**; fake-provider
+tests are not model-quality evidence. The report gives the separate operator-run
+Gemini diagnostic (explicit credentials/prices, at most ten selected calls).
+
 ## Supported response format
 
 An eligible candidate contains one to eight exact sentences selected from:

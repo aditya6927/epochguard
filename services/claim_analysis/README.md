@@ -1,5 +1,13 @@
 # Experimental claim analysis
 
+The separate [004F prose-planning experiment](../../docs/task-004f.md) now reuses
+this package's unchanged ModelExtractor, Gemini controls, exact alignment and
+canonical classifications. Its independent risk auditor challenges omissions,
+nonfresh classifications and unsupported policy mappings; even PLAN_READY is
+non-authorizing. The gateway remains restricted to the existing 004B templates.
+004F has its own 66-case draft collection and reports and does not tune against
+or replace the historical 004A data/metrics below. **MODEL QUALITY QUALIFICATION PENDING**; no fake-provider result establishes real-model performance.
+
 Identify assertions and their temporal requirements without verifying them or authorizing response release. This package is independent of FastAPI `/v1/verify`, Bifrost and Tavily. It reuses Pydantic/httpx from the existing lockfile. See [annotation rules](ANNOTATION.md), [JSON schema](schema-004a.v1.json) and [the qualification report](../../docs/task-004a.md).
 
 The dataset has 112 synthetic draft examples and 184 factual assertions. **Independent human review is pending.** A narrow historical ten-case Gemini development run had seven extraction failures. The revised exact-alignment pipeline has not yet been live-qualified. Fake outputs exercise plumbing only. Baseline measurements and error records are in [reports](reports/).
