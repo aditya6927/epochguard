@@ -1,0 +1,22 @@
+FROM node:24.13.0-alpine AS frontend
+WORKDIR /src
+COPY web/lab/package.json web/lab/package-lock.json ./
+RUN npm ci --ignore-scripts --no-fund
+COPY web/lab/ ./
+RUN --network=none npm run build && npm test
+
+FROM epochguard-dev:002a AS backend
+USER root
+ENV CGO_ENABLED=0 GOWORK=off GOTOOLCHAIN=local
+WORKDIR /src
+COPY go.mod ./
+COPY internal/lab/ ./internal/lab/
+COPY cmd/verification-lab/ ./cmd/verification-lab/
+RUN --network=none go test ./internal/lab ./cmd/verification-lab && go vet ./internal/lab ./cmd/verification-lab && go build -trimpath -o /out/verification-lab ./cmd/verification-lab
+
+FROM scratch
+COPY --from=backend /out/verification-lab /app/verification-lab
+COPY --from=frontend /src/dist /app/web
+USER 10001:10001
+ENTRYPOINT ["/app/verification-lab"]
+CMD ["-listen", "0.0.0.0:8787"]

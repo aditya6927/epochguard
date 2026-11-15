@@ -7,3 +7,8 @@ __pycache__/
 *.db
 *.db-shm
 *.db-wal
+
+node_modules/
+web/lab/dist/
+web/lab/test-results/
+web/lab/playwright-report/

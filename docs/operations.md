@@ -2,6 +2,10 @@
 
 Run commands from the repository root. These are workflows to execute deliberately, not claims of new test execution. Historical outcomes remain in the linked reports; [architecture](architecture.md) defines the current guarantees.
 
+## Interactive offline Lab
+
+Use the [Verification Lab guide](verification-lab.md) for the actual React/Go browser application and its separate loopback-only Compose stack. From PowerShell, `py -3.12 tests/lab/manage.py up --build` builds/starts it and `py -3.12 tests/lab/manage.py down` removes it. The helper bypasses `.env`; no credential or live evidence is used. The headless qualifications below remain separate from judge interaction.
+
 ## Prerequisites and build selection
 
 Use Git, Docker Desktop in Linux-container mode (or Docker Engine on Linux), Compose v2, Buildx and Python 3.12. Native images target Linux/amd64; other hosts require working emulation. Initial builds download pinned source/dependencies and may take several minutes. Qualification cases use private networks and fixtures unless explicitly marked live.
@@ -166,7 +170,7 @@ The older single-policy [live workflow](task-003b.md#reproduction) uses a differ
 
 ## Bounded-prose live qualification
 
-**004G LIVE QUALIFICATION PENDING.** The isolated G-L harness is prepared and tested offline; no real-source G run has been performed. Its [evidence report](task-004gl.md) records exact results and measurement limits. Existing E profiles and historical live evidence are unchanged.
+**Narrow G live acceptance reviewed and met:** the November 15, 2026 operator run and subsequent sanitized-record assessment are recorded in [the dated review](task-004gl.md#reviewed-live-qualification--november-15-2026). Reproduction remains separately opted in and potentially billable; it is not needed to run the offline Lab. Its [evidence report](task-004gl.md) records exact results and measurement limits. Existing E profiles and historical live evidence are unchanged.
 
 First build and run the new fixture-only qualification. This command has no live opt-in, egress or credential access:
 
@@ -226,7 +230,7 @@ Each invocation creates a fresh directory under `artifacts/004gl/{offline,live}/
 
 Receipt protocol is fixed to `004g.receipt.v2`. Its validation outcome is inferred from ingress's authenticated release/refusal contract; the runner does not export or independently reverify raw receipts. Request hashes describe actual serialized client bytes, and ingress independently binds its forwarded bytes to Bifrost's received bytes. First-byte latency means the first decoded HTTP body chunk observed by the client, not network packet timing or an inferred component duration. Provider counts are separate for all five unique candidates; terminal contradiction must use one provider call despite a configured usable fallback.
 
-A live runner success prints `LIVE RUN COLLECTED: independent review required`, not final qualification approval. The report retains `live_qualification_pending=true` until the separately collected real-source results are reviewed and canonical status is updated. A safe refusal, successful fixture run or prior E live result is not a supported G factual delivery.
+A live runner success prints `LIVE RUN COLLECTED: independent review required`, not final qualification approval. The report retains `live_qualification_pending=true` as its collection-time state. The November 15 records have since been reviewed; the canonical assessment lives in the dated report rather than rewriting preserved runtime artifacts. A safe refusal, successful fixture run or prior E live result is not a supported G factual delivery.
 
 ## Diagnostics and cleanup
 

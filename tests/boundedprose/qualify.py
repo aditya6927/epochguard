@@ -39,7 +39,15 @@ def main():
         selected("recovery","client","recovery")
         with (logs/"restart-window.log").open("w",encoding="utf-8") as stream:
             observer=subprocess.Popen(COMPOSE+["run","--rm","--no-deps","qualification-client","python","/app/prose_runner.py","restart-window"],cwd=ROOT,stdout=stream,stderr=subprocess.STDOUT,creationflags=hidden)
-            time.sleep(4)
+            deadline=time.monotonic()+30
+            while time.monotonic()<deadline:
+                if "restart-window-ready" in (logs/"restart-window.log").read_text(encoding="utf-8"):
+                    break
+                if observer.poll() is not None:
+                    raise RuntimeError("restart observer stopped before readiness")
+                time.sleep(.1)
+            else:
+                raise RuntimeError("restart observer readiness unavailable")
             run("restart-stop",COMPOSE+["stop","-t","1","gateway"])
             time.sleep(2)
             run("restart-start",COMPOSE+["up","-d","--wait","gateway"])

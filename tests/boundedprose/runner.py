@@ -161,6 +161,11 @@ def recovery():
 
 def restart_window():
     counts={200:0,503:0}
+    # Prove a request completed before the host begins the restart. Docker run
+    # startup can otherwise outlast a fixed sleep and miss the outage entirely.
+    first=infer("restart-window-ready",A,200)
+    counts[first["status"]]+=1
+    print("restart-window-ready",flush=True)
     end=time.monotonic()+15
     while time.monotonic()<end:
         row=infer("restart-window",A,(200,503)); counts[row["status"]]+=1

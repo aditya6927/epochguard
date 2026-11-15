@@ -1,6 +1,28 @@
 # Protected bounded-prose live qualification harness
 
-**004G LIVE QUALIFICATION PENDING.** Implemented and exercised offline on November 15, 2026. No real Tavily, PyPI, Gemini or paid request was made; no existing private evidence credential was accessed. This report qualifies the harness against simulated sources and the actual native gateway/ingress, not live G facts or a commercial model.
+**Narrow live-source acceptance reviewed and met**, based on the November 15, 2026 operator-authorized run and subsequent inspection of its sanitized records. The original implementation/offline evidence remains below with its execution-time scope. This qualifies the fixed two-policy bounded-prose path with a controlled provider and v2 protected ingress, not general prose, a commercial model or production readiness.
+
+## Reviewed live qualification — November 15, 2026
+
+The operator supplied `artifacts/004gl/live/20261115T103325Z-964a2976`. Subsequent local inspection of `preflight.json`, `observations.json`, `measurements.json` and `cleanup.json` confirmed the reported summary. The run identifies revision `34ec0756dbf979955d2a351985eac97a39783be8`, schema `004gl.qualification.v1`, `simulated_transports=false`, `004g.receipt.v2` and `expectations_met=true`. The runner status is `LIVE_RUN_COLLECTED_REVIEW_REQUIRED`, not a final approval; its pending flag describes the state before this subsequent assessment.
+
+| Case | HTTP / outcome | Elapsed ms | First body chunk ms | Provider calls |
+| --- | --- | --- | --- | --- |
+| A-support | 200 / ALLOW; exact content match | 1444.173 | 1442.914 | 1 |
+| B-contradiction | 403 / REJECT | 5114.083 | 5110.886 | 1 |
+| C-unsupported | 503 / UNAVAILABLE | 33.529 | 32.383 | 1 |
+| D-no-plugin | 503 / INGRESS_REFUSED | 105.676 | 104.623 | 1 |
+| E-provider-error | 400 / PROVIDER_ERROR | 28.665 | 27.636 | 1 |
+
+All five records are `EXPECTED_OUTCOME`, without a preflight-to-evaluation version change. Both sources record three attempted/three completed application retrievals; `cleanup.completed=true`. The preflight observed Python `3.15.2` at `2026-11-15T10:33:47.509828Z` in `tavily_live` mode and requests `2.34.2` at `2026-11-15T10:33:47.902115Z` in `pypi_live` mode. These are dated observations, not permanent current-version facts.
+
+Inspection recomputed the exact candidate and serialized-request digests for all five cases, validated evidence identity hashes/modes/timestamp bindings and matched each case's verifier records to the separate observations file. The protected ingress performed receipt verification during execution; this assessment does not independently reverify raw HMAC receipts, which are not exported. No source request, model call or paid qualification was repeated for this review.
+
+**Assessment:** the supplied execution and inspected records meet the narrow live acceptance checks. Refusal/provider-error cases demonstrate their expected boundaries, not successful factual verification. Counts do not independently establish billing or origin fetches; first-byte timing means the first decoded body chunk, not packet or internal component timing. Origin freshness, general natural-language coverage, production client authentication/readiness and commercial LLMs remain unqualified.
+
+## Original implementation scope
+
+Implemented and exercised offline on November 15, 2026. No real source/model request or existing private credential access occurred during that implementation phase. Its historical pending statements below precede the operator run and assessment.
 
 Implementation baseline: `ad2b9edca59ae585dc2cfab14e6d3d1761acf07b`. [Architecture](architecture.md) defines the unchanged enforcement/receipt boundary. [Operations](operations.md#bounded-prose-live-qualification) provides complete Windows PowerShell setup, separate opt-ins, invocation, report inspection and cleanup.
 
@@ -115,4 +137,4 @@ No enforcement architecture, cryptography or grammar blocker was found. The harn
 
 The private verifier hop, host, management, pinned binaries, clock, configured plugins and signing key remain trusted. Existing cache, streaming, authentication, global execution-deadline and origin-freshness limitations remain. Process restart resets the qualification budget; it must never be used for automatic paid retries. Source/API changes and unavailable evidence may safely make a future run inconclusive. A failed provider operation is not verification success.
 
-**004G LIVE QUALIFICATION PENDING.** Real-source observations, API compatibility, live latency and reviewed live acceptance remain unmeasured for G. The 004F/Gemini planner remains non-authorizing. Historical E live evidence does not qualify G's v2 path.
+**Original implementation-stage status: 004G LIVE QUALIFICATION PENDING.** At that time, real-source observations, API compatibility, live latency and reviewed live acceptance were unmeasured for G. The dated assessment above records the subsequent narrow qualification. The 004F/Gemini planner remains non-authorizing. Historical E live evidence does not qualify G's v2 path.

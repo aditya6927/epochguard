@@ -6,7 +6,7 @@ This service supplies bounded evidence records to native Go enforcement. It does
 | --- | --- | --- |
 | `POST /v1/verify` | `003a.v1`, one Python Windows template | Legacy narrow live qualification |
 | `POST /v1/verify/multiclaim` | `004b.v1`, two exact templates, up to eight claims | Narrow live qualification with controlled provider and explicitly legacy v1 protected receipts |
-| `POST /v1/verify/prose` | `004g.v1` / `bounded-prose-v1`, nine exact ASCII forms | Real gateway/ingress qualified offline; **004G LIVE QUALIFICATION PENDING** |
+| `POST /v1/verify/prose` | `004g.v1` / `bounded-prose-v1`, nine exact ASCII forms | Narrow November 15, 2026 live acceptance reviewed and met with controlled provider and v2 ingress; [assessment](../../docs/task-004gl.md#reviewed-live-qualification--november-15-2026) |
 
 [Architecture](../../docs/architecture.md) defines the trust/receipt contracts; [operations](../../docs/operations.md) provides fresh-clone builds, isolated regressions and explicitly gated live workflows. The credential-free bounded-prose demonstration uses only a standard-library host runner:
 

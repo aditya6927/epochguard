@@ -6,3 +6,9 @@ artifacts
 **/__pycache__
 **/*.so
 **/*.db*
+
+**/node_modules
+**/dist
+**/test-results
+**/playwright-report
+**/.env*

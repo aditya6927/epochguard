@@ -21,25 +21,31 @@ flowchart LR
 
 Genuine provider errors remain failures with their HTTP status and sanitized error fields; they are not verification verdicts.
 
-## Run the offline demonstration
+## Open the local Verification Lab
 
-Requires Git, Docker Desktop with Linux containers and Buildx/Compose, and Python 3.12. Run from PowerShell:
+The React/TypeScript Lab sends editable candidates through the **actual protected ingress, Bifrost, native Go plugin and Python verifier**. It uses synthetic evidence and a controlled provider that returns the submitted candidate verbatim. It makes no model or live-source calls. The response inspector distinguishes released content from input and preserves policy, ingress and provider-error outcomes.
+
+Requires Git, Docker Desktop with Linux containers and Buildx/Compose, and Python 3.12. From PowerShell:
 
 ```powershell
 git clone https://github.com/aditya6927/epochguard.git
 cd epochguard
-py -3.12 tests/boundedprose/qualify.py --build --builder default
+py -3.12 tests/lab/manage.py up --build
 ```
 
-On Linux, replace `py -3.12` with `python3`. The host runner uses only the Python standard library. Image builds download pinned dependencies; the qualification itself uses **synthetic evidence and a controlled provider**, private networks, no published ports and no live credentials. It runs the real native Bifrost gateway and protected ingress, exercises delivery, refusals, receipt attacks and lifecycle failures, then removes its stack and signing-key volume. Sanitized runner/build outputs are written under ignored `artifacts/004g/qualification/`.
+Open **http://127.0.0.1:8787**. Choose a scenario or edit the candidate, then run verification. Stop and remove the disposable stack/signing volume with:
 
-A successful run ends with `004G offline qualification passed; 004G LIVE QUALIFICATION PENDING`. This is a fixture demonstration, not a live factual observation. See [operations](docs/operations.md) for build prerequisites, troubleshooting, other profiles and regression commands. The default `compose.yaml` is a fixed-decision development fixture, not a factual verifier.
+```powershell
+py -3.12 tests/lab/manage.py down
+```
+
+No virtual environment, host Node installation or API key is needed. First builds download public dependencies; runtime evidence stays simulated. Only the Lab publishes a loopback port. The helper bypasses `.env`, and gateway, verifier, provider and management remain private. See the [Lab guide](docs/verification-lab.md) for scenarios, limits, tests and video recording. The [operations guide](docs/operations.md) retains headless qualification workflows; default `compose.yaml` is a fixed-decision development fixture, not a factual verifier.
 
 ## Capability and qualification
 
 | Capability | Status and limits |
 | --- | --- |
-| Protected bounded prose: `004g.v1` / `bounded-prose-v1` | **Implemented; qualified offline.** Independent Go/Python full-response parsing, two evidence policies, request-bound receipt v2, minimal metadata. **004G LIVE QUALIFICATION PENDING** |
+| Protected bounded prose: `004g.v1` / `bounded-prose-v1` | **Implemented; narrow live acceptance reviewed and met.** November 15, 2026 operator-authorized real Tavily/Python.org and PyPI run, controlled provider, independent Go/Python parsing, request-bound receipt v2 and minimal metadata. [Evidence and review scope](docs/task-004gl.md#reviewed-live-qualification--november-15-2026) |
 | Exact-template multi-claim mode: `004b.v1` | **Qualified live within a narrow scope.** November 14, 2026 maintainer-authorized run used real Tavily/Python.org and PyPI, a controlled provider and explicitly legacy v1 ingress receipts. Subsequent report inspection found all five client expectations met; the runner collected results rather than declaring final live PASS |
 | Legacy single-claim mode: `003a.v1` | **Qualified live within a narrow scope.** November 8, 2026 maintainer-supplied gateway run, one Python policy and controlled provider |
 | Model-assisted claim planning | **Experimental, non-authorizing.** Draft annotations; model quality not independently qualified |
@@ -57,6 +63,7 @@ Streaming, arbitrary prose or sources, production providers/authentication, safe
 
 ## Documentation
 
+- [Verification Lab: local use, limits and demonstration](docs/verification-lab.md)
 - [Architecture, capabilities and security contracts](docs/architecture.md)
 - [Operations: builds, offline suites and explicit live workflows](docs/operations.md)
 - [Verifier APIs, grammar, evidence and limits](services/verifier/README.md)
