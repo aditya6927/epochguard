@@ -1,0 +1,10 @@
+# Separate qualification image. Existing G/E image entry points are unchanged.
+FROM epochguard-verifier:004g
+COPY services/verifier/verifier/bounded_prose/qualification.py /app/verifier/bounded_prose/qualification.py
+COPY services/verifier/tests_live_g/ /app/tests_live_g/
+COPY tests/boundedproselive/ /app/boundedproselive/
+COPY compose.verify.004gl.yaml compose.verify.004gl.offline.yaml /app/security/
+COPY dev/prose-live/gateway.json /app/security/gateway-live.json
+RUN --network=none python -m pytest -p no:cacheprovider tests_live_g -q
+# Image startup remains offline; live selection additionally requires both opt-ins.
+CMD ["python", "-m", "uvicorn", "tests_live_g.simulated:fixture_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--limit-concurrency", "32"]

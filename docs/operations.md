@@ -164,9 +164,69 @@ The driver starts a disposable stack, checks source-free readiness, collects one
 
 The older single-policy [live workflow](task-003b.md#reproduction) uses a different credential/deployment boundary, including an explicitly selected loopback listener. Do not mix it with the protected runtime-secret procedure. Individual [source probes](../services/verifier/README.md#optional-real-source-observations) and [Gemini diagnostics](../services/claim_analysis/README.md#opt-in-real-gemini-analysis) also require their own opt-in and never establish gateway qualification.
 
-## Bounded-prose live status
+## Bounded-prose live qualification
 
-**004G LIVE QUALIFICATION PENDING.** A gated Python live factory exists, reusing E's fixed sources, runtime-secret boundary and budgets plus a separate G opt-in. No tracked G live Compose deployment or qualification driver exists. Do not repoint the E live runner and claim it tested G's grammar, request-bound receipt or metadata projection. A separately reviewed harness and separately authorized real-source run are required.
+**004G LIVE QUALIFICATION PENDING.** The isolated G-L harness is prepared and tested offline; no real-source G run has been performed. Its [evidence report](task-004gl.md) records exact results and measurement limits. Existing E profiles and historical live evidence are unchanged.
+
+First build and run the new fixture-only qualification. This command has no live opt-in, egress or credential access:
+
+```powershell
+py -3.12 tests/boundedproselive/qualify.py --build --builder default
+```
+
+The driver builds the existing native/004C/004E/004G chain plus the separate `epochguard-verifier:004gl` image. It runs the five bounded-prose client cases through actual ingress/gateway/Go/Python, requires unchanged supported content in the minimal envelope, and verifies that the live-configured Go control refuses supported **fixture** evidence. Both G-L verifier commands use Uvicorn concurrency 32; evidence admission remains one active operation. The offline profile retains `fixture` source modes; its Go HTTP ceiling is 30s without the live-only remaining-work profile. It does not simulate a live source identity.
+
+The existing [G security/lifecycle driver](../tests/boundedprose/qualify.py) separately covers v2 receipt faults, exact request substitution, metadata channels, disabled-plugin concurrency, timeout and restart recovery. Both runners clean their own stacks/key volumes. Manual G-L offline cleanup is:
+
+```powershell
+docker compose -f compose.verify.004gl.offline.yaml down --volumes --remove-orphans
+```
+
+**Only after separate operator authorization**, run the following in Windows PowerShell from the repository root, after building/checking the images offline. It starts a separate G live stack; it does not execute the E live runner. The existing E authorization is required along with the additional G opt-in. The key is entered into a fresh restricted temporary file; no existing credential file is read by the host driver.
+
+```powershell
+$secretDirectory = Join-Path $env:TEMP ('epochguard-004gl-' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $secretDirectory -ErrorAction Stop | Out-Null
+$currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent().Name
+icacls $secretDirectory /inheritance:r /grant:r "${currentIdentity}:(OI)(CI)F" | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'Could not restrict the temporary secret directory.' }
+$env:EPOCHGUARD_TAVILY_SECRET_HOST_FILE = Join-Path $secretDirectory 'tavily.key'
+try {
+    $secureKey = Read-Host 'Tavily key for this bounded G qualification' -AsSecureString
+    $keyPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureKey)
+    try {
+        $keyText = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($keyPointer)
+        [IO.File]::WriteAllText($env:EPOCHGUARD_TAVILY_SECRET_HOST_FILE, $keyText, [Text.UTF8Encoding]::new($false))
+    } finally {
+        [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($keyPointer)
+        Remove-Variable keyText, secureKey, keyPointer -ErrorAction SilentlyContinue
+    }
+    $env:EPOCHGUARD_RUN_LIVE_004E = '1'
+    $env:EPOCHGUARD_RUN_LIVE_004G = '1'
+    py -3.12 tests/boundedproselive/qualify.py --live
+    if ($LASTEXITCODE -ne 0) { Write-Host 'Inspect the failed or inconclusive run; do not retry automatically.' }
+} finally {
+    docker compose -f compose.verify.004gl.yaml down --volumes --remove-orphans
+    Remove-Item -LiteralPath $env:EPOCHGUARD_TAVILY_SECRET_HOST_FILE -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $secretDirectory -ErrorAction SilentlyContinue
+    Remove-Item Env:EPOCHGUARD_TAVILY_SECRET_HOST_FILE, Env:EPOCHGUARD_RUN_LIVE_004E, Env:EPOCHGUARD_RUN_LIVE_004G -ErrorAction SilentlyContinue
+}
+```
+
+Docker Desktop must be able to mount the file with authorized account access. Keep the E runtime-secret restrictions above: no secret literals, environment dumps, resolved live Compose output or raw receipts/source/provider bodies. The HMAC key is independently generated in a disposable volume. Do not start live and offline G-L together: they reserve the same private subnet. Only the live verifier joins the egress network; no profile publishes host ports.
+
+The process permits at most three retrieval invocations per source, including one preflight and two factual gateway requests. Unsupported prose, missing plugin, provider errors and readiness do not require source retrieval. There is no model call, source retry, polling or automatic rerun. Changing sources can make the outcome inconclusive; never restart the verifier to reset a paid budget and manufacture success.
+
+Each invocation creates a fresh directory under `artifacts/004gl/{offline,live}/<UTC-time>-<random>/`, preserving older runs and all E evidence. Inspect:
+
+- `preflight.json`: validated observations before candidate generation, source/mode, version, evidence identity/hash and local observation times.
+- `measurements.json`: `004gl.qualification.v1`, Git revision and harness-file digest; per-case status/outcome, exact-content indicator, request/candidate digests, elapsed/first-body-chunk timings, claims/evidence, source changes and unique-candidate provider counts.
+- `observations.json`: sanitized verifier records and per-source attempted/completed invocation timings/counts. A returned page counts as completed even when parsing rejects it; these are not billing or origin-fetch counts.
+- `stages.json`, `failure.json` when present, and `cleanup.json`: fixed stage/exit categories and cleanup status. Raw Docker stdout/stderr and service bodies are not saved. If the stack is available after a failure, one source-free report collection is attempted before cleanup.
+
+Receipt protocol is fixed to `004g.receipt.v2`. Its validation outcome is inferred from ingress's authenticated release/refusal contract; the runner does not export or independently reverify raw receipts. Request hashes describe actual serialized client bytes, and ingress independently binds its forwarded bytes to Bifrost's received bytes. First-byte latency means the first decoded HTTP body chunk observed by the client, not network packet timing or an inferred component duration. Provider counts are separate for all five unique candidates; terminal contradiction must use one provider call despite a configured usable fallback.
+
+A live runner success prints `LIVE RUN COLLECTED: independent review required`, not final qualification approval. The report retains `live_qualification_pending=true` until the separately collected real-source results are reviewed and canonical status is updated. A safe refusal, successful fixture run or prior E live result is not a supported G factual delivery.
 
 ## Diagnostics and cleanup
 
