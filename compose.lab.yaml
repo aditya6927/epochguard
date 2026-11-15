@@ -1,7 +1,7 @@
 # Offline simulated source failures; no live credentials or egress.
 name: epochguard-lab
 x-native: &native
-  image: epochguard-dev:002a
+  image: ${EPOCHGUARD_LAB_IMAGE_PREFIX:-epochguard}-dev:002a
   platform: linux/amd64
 x-gateway: &gateway
   <<: *native
@@ -33,12 +33,14 @@ x-ingress: &ingress
     gateway: {condition: service_healthy}
 services:
   lab:
-    image: epochguard-lab:005a
+    image: ${EPOCHGUARD_LAB_IMAGE_PREFIX:-epochguard}-lab:005a
     build:
       context: .
       dockerfile: dev/Dockerfile.lab
+      args:
+        NATIVE_IMAGE: ${EPOCHGUARD_LAB_IMAGE_PREFIX:-epochguard}-dev:002a
     platform: linux/amd64
-    ports: ["127.0.0.1:8787:8787"]
+    ports: ["127.0.0.1:${EPOCHGUARD_LAB_TEST_PORT:-8787}:8787"]
     networks: [local-entry, edge]
     read_only: true
     cap_drop: [ALL]
@@ -68,7 +70,7 @@ services:
       timeout: 2s
       retries: 30
   verifier:
-    image: epochguard-verifier:004g
+    image: ${EPOCHGUARD_LAB_IMAGE_PREFIX:-epochguard}-verifier:004g
     platform: linux/amd64
     networks: [private]
     command: ["python", "-m", "uvicorn", "tests_bounded_prose.simulated:fixture_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--limit-concurrency", "32"]
@@ -80,8 +82,6 @@ services:
       retries: 30
   gateway:
     <<: *gateway
-    networks:
-      private: {ipv4_address: 10.77.54.10}
     volumes: ["receipt:/run/receipt:ro", "./dev/prose/gateway.json:/app/verify/config.json:ro"]
   gateway-control:
     <<: *gateway
@@ -104,5 +104,3 @@ networks:
     internal: true
   private:
     internal: true
-    ipam:
-      config: [{subnet: 10.77.54.0/24, ip_range: 10.77.54.128/25}]

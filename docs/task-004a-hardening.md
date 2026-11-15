@@ -164,7 +164,7 @@ docker compose -f compose.verify.yaml -f compose.verify.timeouts.yaml up -d --wa
 docker compose -f compose.verify.yaml -f compose.verify.timeouts.yaml run --rm --no-deps verification-tests
 docker compose -f compose.verify.yaml -f compose.verify.timeouts.yaml down --remove-orphans
 
-docker run --rm --network none --mount 'type=bind,source=C:\Users\Aditya Bhardwaj\OneDrive\Desktop\epochguard,target=/project,readonly' --workdir /project -e PYTHONPATH=services/claim_analysis --entrypoint python epochguard-verifier:003a -m claim_analysis.schema_integrity
+docker run --rm --network none --mount "type=bind,source=$($PWD.Path),target=/project,readonly" --workdir /project -e PYTHONPATH=services/claim_analysis --entrypoint python epochguard-verifier:003a -m claim_analysis.schema_integrity
 git diff --check
 ```
 

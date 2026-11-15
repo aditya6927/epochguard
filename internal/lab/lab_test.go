@@ -46,6 +46,37 @@ func handler(t *testing.T, upstream http.HandlerFunc, timeout time.Duration, slo
 	return h
 }
 
+func TestCrossSiteNavigationDoesNotOpenAPIs(t *testing.T) {
+	h := handler(t, func(w http.ResponseWriter, r *http.Request) { t.Fatal("navigation dispatched upstream") }, time.Second, 4)
+	for _, tc := range []struct {
+		method, path, mode, dest, origin, host string
+		status                                 int
+	}{
+		{"GET", "/", "navigate", "document", "", "127.0.0.1:8787", 200},
+		{"GET", "/", "navigate", "iframe", "", "127.0.0.1:8787", 403},
+		{"GET", "/", "cors", "document", "", "127.0.0.1:8787", 403},
+		{"GET", "/", "navigate", "document", "http://attacker.invalid", "127.0.0.1:8787", 403},
+		{"GET", "/", "navigate", "document", "", "attacker.invalid", 403},
+		{"GET", "/api/demo/info", "navigate", "document", "", "127.0.0.1:8787", 403},
+		{"GET", "/assets/test.js", "navigate", "document", "", "127.0.0.1:8787", 403},
+		{"POST", "/api/demo/verify", "navigate", "document", "", "127.0.0.1:8787", 403},
+		{"GET", "/?candidate=x", "navigate", "document", "", "127.0.0.1:8787", 403},
+	} {
+		r := httptest.NewRequest(tc.method, "http://127.0.0.1:8787"+tc.path, nil)
+		r.RequestURI = tc.path
+		r.Host = tc.host
+		r.Header.Set("Sec-Fetch-Site", "cross-site")
+		r.Header.Set("Sec-Fetch-Mode", tc.mode)
+		r.Header.Set("Sec-Fetch-Dest", tc.dest)
+		r.Header.Set("Origin", tc.origin)
+		w := httptest.NewRecorder()
+		h.ServeHTTP(w, r)
+		if w.Code != tc.status || w.Header().Get("Access-Control-Allow-Origin") != "" {
+			t.Fatalf("%s %s: %d", tc.method, tc.path, w.Code)
+		}
+	}
+}
+
 func TestSubmittedBytesFixedRequestAndNoBrowserHeaders(t *testing.T) {
 	text := "\t" + Supported + "\r\n\t"
 	h := handler(t, func(w http.ResponseWriter, r *http.Request) {

@@ -16,7 +16,9 @@ py -3.12 tests/lab/manage.py up --build
 
 Open **http://127.0.0.1:8787**. The host name and port are deliberately fixed; `localhost` and other origins are not accepted. First builds download public pinned Go/Python/Node/npm dependencies. The native host/plugin use the existing pinned Linux/amd64 Go/Bifrost build. Frontend build tools run in the separate Node image; the final Lab image contains only a static Go binary and built static assets, runs without root, and has a read-only filesystem.
 
-If the default Buildx builder cannot resolve GitHub, use the existing [optional project builder](operations.md#prerequisites-and-build-selection):
+When upgrading an already-running 005A Lab, explicitly run `py -3.12 tests/lab/manage.py down` before the first 005B `up --build`. The Lab now lets Docker allocate its private subnet, avoiding collisions between isolated projects. An existing container continues running its old binary until rebuilt/recreated; editing source does not apply the navigation fix to that process.
+
+The launcher uses Docker's selected Buildx builder. An explicit name must belong to the active context; a literal `default` can conflict on Windows. Failure messages identify the stage and a fixed safe diagnosis; see [standalone commands](compatibility.md#builder-and-abi-diagnostics). If public dependency resolution needs it, use the existing [optional project builder](operations.md#prerequisites-and-build-selection):
 
 ```powershell
 py -3.12 tests/lab/manage.py up --build --builder epochguard-002a
@@ -92,7 +94,7 @@ Only `GET /api/demo/info` and `POST /api/demo/verify` are application APIs. A so
 
 The backend constructs one fixed OpenAI-compatible request with model `fixture/epochguard-test`, one message containing the exact submitted candidate and `stream=false`. A fixed scenario selects the normal/no-plugin ingress or the provider's system-role failure. The Lab does not enable the provider's prompt-triggered 004C shape controls. Private metadata fault controls remain available only to the host test operator, not the web API. No browser headers or cookies are forwarded. Upstream redirects, environment proxies, compression and POST replay are disabled. The browser receives a newly serialized minimal presentation record, never a raw upstream body/header.
 
-Local protections require the exact Host/Origin, JSON format and a non-simple same-origin request header; no CORS permission is granted. API/static responses use `no-store`, CSP, `nosniff` and no-referrer headers. These are local browser protections, **not production client authentication**. Trusted host/Docker processes can still issue requests. The existing verifier-hop authentication, host/key/configuration and origin-freshness limits remain in [architecture](architecture.md).
+An ordinary cross-site link may navigate to exact-root `GET /` as a top-level document. This exception does not cover APIs, frames, query variants or verification requests. Local protections require the exact Host/Origin, JSON format and a non-simple same-origin request header; no CORS permission is granted. API/static responses use `no-store`, CSP, `nosniff` and no-referrer headers. These are local browser protections, **not production client authentication**. Trusted host/Docker processes can still issue requests. The existing verifier-hop authentication, host/key/configuration and origin-freshness limits remain in [architecture](architecture.md).
 
 Backend admission is four immediate requests, no waiter queue, with a 64 KiB request bound, 256 KiB response bound, 16 KiB upstream header cap and ten-second total upstream timeout. The HTTP server bounds header/body receipt and writing; the browser waits at most twelve seconds. Existing ingress (16 requests, eight-second offline exchange) and verifier (Uvicorn 32, four active evidence checks, five-second work deadline) retain their separate controls. These are bounded application controls, not host CPU/memory isolation or a global gateway execution deadline.
 
@@ -111,10 +113,18 @@ The Docker Lab build also runs TypeScript/build and component tests with its tes
 Run the actual stack API, repeatability, metadata, overload, missing-service and recovery checks:
 
 ```powershell
-py -3.12 tests/lab/manage.py test --build --builder default
+py -3.12 tests/lab/manage.py test --build
 ```
 
 This runs 21 standard/custom inference checks, a 16-request burst plus private fault/recovery controls, then removes the Lab stack/signing volume even after a failure. With existing images, omit `--build`. Private controls are issued by the host test operator and are never exposed in the web API.
+
+`test` refuses a project that already has containers, so it cannot take over and delete an operator's running Lab. For qualification alongside an existing Lab, use a separate project and test-only loopback port:
+
+```powershell
+py -3.12 tests/lab/manage.py test --project-name epochguard-lab-test --test-port 18787
+```
+
+The test client connects to that port while retaining the application's fixed `127.0.0.1:8787` Host/Origin. This is an HTTP test transport setting, not an alternate browser origin; interactive `up` rejects a non-default test port. The server's Host/Origin and API protections do not change. Coordinate distinct project names between operators; this ownership preflight is not a lock against concurrent privileged Docker operators. Three real HTTP checks also exercise cross-site root navigation and frame/API refusal.
 
 With the Lab running, visible Edge browser checks and screenshots are available on Windows:
 

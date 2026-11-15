@@ -20,7 +20,7 @@ EpochGuard must intercept real AI gateway traffic and eventually enforce respons
 
 For Task 002A, use option 1, pinned to Bifrost HTTP `transports/v2.4.0` (source commit `e869c3f9adc96ea53c38694a21bb04a8e1085487`) and Go 1.27.3 on Linux/amd64. Export only the upstream-compatible Go plugin symbols, configure `pre_builtin` placement and order `0`, and validate the actual loader and request lifecycle through the containerized gateway. Use a deterministic local provider fixture and independent negative control.
 
-Do not enable the built-in semantic cache in this qualified development path. A future EpochGuard-owned verified cache is the leading design, **not** an implemented component or irrevocable decision. Investigate a stock-Bifrost adapter as a separate compatibility mode if the challenge's deployment criteria require it; do not call it a native plugin.
+Do not enable the built-in semantic cache in this qualified development path. A future EpochGuard-owned verified cache is the leading design, **not** an implemented component or irrevocable decision. The official dynamic-binary approach is a supported Bifrost installation. The [compatibility guide](../compatibility.md) records its qualified boundary; a static distribution would require a separate adapter and qualification.
 
 ## Consequences
 

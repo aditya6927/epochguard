@@ -1,11 +1,12 @@
-FROM node:24.13.0-alpine AS frontend
+ARG NATIVE_IMAGE=epochguard-dev:002a
+FROM node:24.13.0-alpine@sha256:cd6fb7efa6490f039f3471a189214d5f548c11df1ff9e5b181aa49e22c14383e AS frontend
 WORKDIR /src
 COPY web/lab/package.json web/lab/package-lock.json ./
 RUN npm ci --ignore-scripts --no-fund
 COPY web/lab/ ./
 RUN --network=none npm run build && npm test
 
-FROM epochguard-dev:002a AS backend
+FROM ${NATIVE_IMAGE} AS backend
 USER root
 ENV CGO_ENABLED=0 GOWORK=off GOTOOLCHAIN=local
 WORKDIR /src

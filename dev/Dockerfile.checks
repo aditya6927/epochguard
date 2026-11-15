@@ -1,0 +1,39 @@
+# Dependency installation has network access; all test execution has none.
+FROM golang:1.27.3-alpine3.24@sha256:f2c872bcee949b7be9c490efd02b48a8a2fbf947cdf533f1c58525ec9d8170fd AS go
+RUN apk add --no-cache gcc musl-dev
+ENV CGO_ENABLED=1 GOWORK=off GOTOOLCHAIN=local GOOS=linux GOARCH=amd64
+WORKDIR /src/plugins/epochguard
+COPY plugins/epochguard/go.mod plugins/epochguard/go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod go mod download && go mod verify
+COPY plugins/epochguard/ ./
+COPY tests/conformance/ /src/tests/conformance/
+RUN --network=none --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
+    test -z "$(gofmt -l .)" && go vet -mod=readonly ./... \
+    && go test -mod=readonly -trimpath ./... && go test -race -p=2 -mod=readonly -trimpath ./... \
+    && go build -mod=readonly -trimpath -buildmode=plugin -o /tmp/epochguard.so .
+WORKDIR /src
+COPY go.mod ./
+COPY cmd/ ./cmd/
+COPY internal/ ./internal/
+COPY tests/ ./tests/
+RUN --network=none --mount=type=cache,target=/root/.cache/go-build \
+    test -z "$(gofmt -l cmd internal tests)" && go vet -mod=readonly ./... \
+    && go test -mod=readonly ./internal/... ./cmd/... \
+    && go test -race -mod=readonly ./internal/... ./cmd/...
+
+FROM python:3.12-slim-bookworm@sha256:935c3c5b12357a7e10caa9c1e6ca5692344d97cf229832ef584be2cec9fc03df AS python
+ENV PYTHONDONTWRITEBYTECODE=1 PIP_DISABLE_PIP_VERSION_CHECK=1 PYTHONPATH=/src/services/verifier:/src/services/claim_analysis
+WORKDIR /src
+COPY services/verifier/requirements.lock /tmp/requirements.lock
+RUN pip install --no-cache-dir -r /tmp/requirements.lock
+COPY services/ ./services/
+COPY tests/ ./tests/
+COPY compose*.yaml ./
+COPY dev/ ./dev/
+COPY scripts/ ./scripts/
+RUN --network=none python -B -m pytest -c services/verifier/pytest.ini -p no:cacheprovider \
+    services/verifier/tests services/verifier/tests_multiclaim services/verifier/tests_gateway \
+    services/verifier/tests_live services/verifier/tests_prose services/verifier/tests_bounded_prose \
+    services/verifier/tests_live_g services/claim_analysis/tests -q
+RUN --network=none python -B -m unittest discover -s tests/lab -p test_manage.py \
+    && python -B -m unittest discover -s scripts -p 'test_*.py'

@@ -1,0 +1,41 @@
+# Security model
+
+EpochGuard protects a configured buffered response route in an isolated deployment. It is experimental and is not a production authentication system, general factual verifier or all-route gateway firewall. [Architecture](architecture.md) is the detailed current contract; [evaluation](evaluation.md) identifies the finite tests and dated source observations.
+
+## Attacker and trust boundary
+
+Candidates, prompts, inference headers, provider responses/metadata and retrieved source bodies are untrusted. Tests include a relay changing a forwarded request while retaining its nonce, replaying/substituting receipts and adding unverified provider text. Clients cannot select evidence URLs, source mode, policy, keys or an authorization verdict. Unsupported prose cannot be partially released.
+
+Trusted components are protected ingress, the pinned gateway/native plugin, Python verifier, operator configuration, receipt secret, local clock and host/container isolation. A compromised signing process, verifier, host or operator can defeat the guarantee. The private gateway-to-verifier HTTP hop has no independent authentication. Network isolation is part of the reference boundary, not cryptographic source authentication.
+
+## Protected release
+
+The protected ingress accepts buffered `POST /openai/v1/chat/completions`, retains the exact forwarded bytes, creates a fresh nonce, buffers the final response and validates its receipt before writing answer bytes. Missing, malformed, stale, replayed, cross-policy or mismatched receipts cause a fixed 503 without the upstream answer. Source-free readiness detects configured activation; each response still needs its own authentication. Readiness alone cannot authorize release or make revocation logically atomic.
+
+`004g.receipt.v2` binds protocol, nonce, `004g.v1`/`bounded-prose-v1` policy, outcome, status, exact response digest, candidate digest, issued time and request-body digest using HMAC-SHA256. The signer derives the request digest from the actual raw body received in the pinned transport pre-hook; it does not trust a supplied digest header. Ingress independently hashes its retained forwarded bytes. Canonical encoding, strict fields/time checks and a fresh per-exchange nonce prevent tested downgrade/replay/substitution paths. See the exact [receipt contract](architecture.md#receipt-authentication-and-protocol-isolation).
+
+Legacy 004D/004E explicitly use `004d.v1`. Those receipts do not provide G's exact request-body binding or metadata projection. G does not accept a legacy fallback. Do not market all receipt profiles as interchangeable security guarantees.
+
+## Content, errors and resources
+
+G independently parses the original response in Go and Python under nine ASCII sentence forms and two fixed source policies. Every admitted claim must be accounted for. Evidence identity, observation mode/times and claim bindings must agree. An authenticated response does not establish general semantic coverage or origin freshness.
+
+After Bifrost's typed-to-HTTP conversion, G replaces provider-owned metadata with a minimal envelope and signs those final bytes. Only the exact approved assistant content can carry factual answer text. IDs, model, usage, fingerprints, tier, extra/routing/nested metadata and arbitrary diagnostics are not admitted through an authenticated ALLOW. Ingress independently checks that representation. Length limits or a valid HMAC alone would not provide this property.
+
+All supported claims allow 200. A validated older contradiction gives terminal 403; invalid coverage, unavailable evidence or failed bindings give 503. Typed policy refusals disable fallback. Genuine provider errors remain failed operations with their status and a fixed safe error category; their original arbitrary text is not verified content. No streaming answer bytes are released while awaiting verification. Application logs and test artifacts must not contain candidate/source bodies, secrets or raw receipts; the reference configs disable inference logging.
+
+Ingress, verifier and Lab have separate bounded admission, body/header limits and deadlines. Uvicorn's server concurrency cap differs from verifier evidence admission. Tests cover overload and recovery, not CPU/memory isolation or a qualified global Bifrost execution deadline. Timeout may stop delivery without stopping all upstream work. Configuration/disable changes can race already-running work; finite restart tests do not prove atomic revocation.
+
+## Deployment and credentials
+
+Reference qualification profiles publish no gateway, verifier, provider or management ports. The Lab alone publishes `127.0.0.1:8787`; its backend has two fixed ingress targets and does not join the private evidence network. An entry bridge is not an egress firewall. The fixture provider has no production authentication and must remain private. Direct gateway access can release unchecked content when the plugin is absent; ingress isolation is mandatory for the described protection.
+
+Lab Host/Origin, non-simple JSON header and Fetch Metadata checks limit local browser abuse; only exact-root top-level GET document navigation may arrive cross-site. State-changing APIs still require the same origin. This is not identity/tenant authentication; trusted local processes can call it. CSP prevents framing. Do not bind the Lab publicly.
+
+Runtime receipt keys are private files/volumes mounted only where needed. Qualification keys are disposable; production key provisioning, rotation, tenancy and client identity remain unqualified. Live-source secrets belong only in the explicitly authorized verifier's runtime file, never Compose output, process environment dumps, images or artifacts. Ordinary development uses simulated transports without source credentials. No CI job or installation command starts live retrieval or model calls.
+
+## Unsupported and residual behavior
+
+Streaming, arbitrary prose/sources, alternate routes, passthrough, Warp background work and production providers are outside this release boundary. API routes can skip transport hooks; some Warp errors are HTTP 200 envelopes. Route-audit findings are narrower than an all-route security claim. Built-in caching remains disabled: asynchronous writes can precede enforcement or follow deletion. An owned verified cache and atomic revocation are proposals only.
+
+Source hashes attest checked content within the trusted verifier, not independent origin freshness, billing, or provider honesty. Live runs qualify fixed policies with a controlled provider, not a commercial model or general correctness. Model planning remains non-authorizing and unqualified for real-model quality. Other Bifrost versions or plugin combinations need fresh conversion/order/ABI/security tests. See [compatibility](compatibility.md) and [disclosure instructions](../SECURITY.md).

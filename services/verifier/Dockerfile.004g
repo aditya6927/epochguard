@@ -1,10 +1,11 @@
 # Build the existing 004C/004E images first. All new build checks are offline.
-FROM epochguard-verifier:004e
+ARG VERIFIER_BASE=epochguard-verifier:004e
+FROM ${VERIFIER_BASE}
 COPY services/verifier/verifier/ /app/verifier/
 COPY services/verifier/tests_bounded_prose/ /app/tests_bounded_prose/
 COPY tests/conformance/ /app/conformance/
 COPY tests/boundedprose/runner.py /app/prose_runner.py
 COPY compose.verify.004g.yaml /app/security/compose.verify.004g.yaml
 COPY services/verifier/Dockerfile.004g /app/security/services/verifier/Dockerfile.004g
-RUN python -m pytest -p no:cacheprovider tests_bounded_prose -q
+RUN --network=none python -m pytest -p no:cacheprovider tests_bounded_prose -q
 CMD ["python", "-m", "uvicorn", "tests_bounded_prose.simulated:fixture_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--limit-concurrency", "32"]

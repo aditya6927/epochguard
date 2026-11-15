@@ -1,5 +1,7 @@
 # Architecture and security contracts
 
+See [compatibility](compatibility.md) for the exact supported build/ABI boundary, [security](security.md) for attacker/trust assumptions and [evaluation](evaluation.md) for offline, live and experimental evidence.
+
 EpochGuard buffers AI gateway answers, checks fixed evidence policies, and refuses responses whose required claims cannot be authorized. Its current protected surface is one non-streaming chat route and a finite claim language. It is not a general factual verifier or a production authentication system.
 
 ## Capabilities and evidence status

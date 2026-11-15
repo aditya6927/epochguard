@@ -1,5 +1,6 @@
 # Build Dockerfile.004c first; its offline entry point remains unchanged.
-FROM epochguard-verifier:004c
+ARG VERIFIER_BASE=epochguard-verifier:004c
+FROM ${VERIFIER_BASE}
 COPY services/verifier/tests_live/ /app/tests_live/
-RUN python -m pytest -p no:cacheprovider tests_live -q
+RUN --network=none python -m pytest -p no:cacheprovider tests_live -q
 CMD ["python", "-m", "uvicorn", "verifier.multiclaim.deployment:live_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--limit-concurrency", "16"]

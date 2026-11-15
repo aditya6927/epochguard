@@ -107,7 +107,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Referrer-Policy", "no-referrer")
 	w.Header().Set("Content-Security-Policy", "default-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
 	w.Header().Set("Content-Type", "application/json")
-	if r.Host != "127.0.0.1:8787" || (r.Header.Get("Origin") != "" && r.Header.Get("Origin") != Origin) || (r.Header.Get("Sec-Fetch-Site") != "" && r.Header.Get("Sec-Fetch-Site") != "same-origin" && r.Header.Get("Sec-Fetch-Site") != "none") {
+	// Cross-site links may navigate to the UI, but cannot read APIs, embed the
+	// page, or dispatch verification. API origin checks below remain mandatory.
+	navigation := r.Method == "GET" && r.RequestURI == "/" && r.Header.Get("Sec-Fetch-Mode") == "navigate" && r.Header.Get("Sec-Fetch-Dest") == "document"
+	if r.Host != "127.0.0.1:8787" || (r.Header.Get("Origin") != "" && r.Header.Get("Origin") != Origin) || (!navigation && r.Header.Get("Sec-Fetch-Site") != "" && r.Header.Get("Sec-Fetch-Site") != "same-origin" && r.Header.Get("Sec-Fetch-Site") != "none") {
 		unavailable(w, 403, "lab", "This local Lab accepts same-origin requests only.", nil)
 		return
 	}

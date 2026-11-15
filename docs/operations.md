@@ -8,17 +8,17 @@ Use the [Verification Lab guide](verification-lab.md) for the actual React/Go br
 
 ## Prerequisites and build selection
 
-Use Git, Docker Desktop in Linux-container mode (or Docker Engine on Linux), Compose v2, Buildx and Python 3.12. Native images target Linux/amd64; other hosts require working emulation. Initial builds download pinned source/dependencies and may take several minutes. Qualification cases use private networks and fixtures unless explicitly marked live.
+Use Git, Docker Desktop in Linux-container mode (or Docker Engine on Linux), Compose v2, Buildx and Python 3.12. Native images target Linux/amd64; the qualified host is Windows x86-64. Other host architectures/emulation and a separate Linux Engine installation are untested. Initial builds download pinned source/dependencies and may take several minutes. Qualification cases use private networks and fixtures unless explicitly marked live.
 
-The three host qualification scripts use only Python's standard library. No virtual environment or local Go installation is needed to run them. In PowerShell use `py -3.12`; on Linux use `python3`.
+The host qualification scripts use only Python's standard library. No virtual environment or local Go installation is needed to run them. In PowerShell use `py -3.12`; on Linux use `python3`.
 
-The scripts default to a previously created `epochguard-002a` builder. On a fresh clone, explicitly select Docker's default builder:
+The Lab launcher uses Docker's selected builder unless `--builder` is supplied. Historical qualification scripts default to a previously created `epochguard-002a` builder. Inspect `docker context show` / `docker buildx ls` and select a builder matching the active context. For Docker Desktop's Linux context:
 
 ```powershell
-py -3.12 tests/boundedprose/qualify.py --build --builder default
+py -3.12 tests/boundedprose/qualify.py --build --builder desktop-linux
 ```
 
-If the default builder cannot resolve GitHub or the Go module proxy, the repository provides an **optional** isolated DNS configuration:
+On Linux the builder may be named `default`; that literal name can conflict with the active Docker Desktop context. See [compatibility diagnostics](compatibility.md#builder-and-abi-diagnostics). If the selected builder cannot resolve GitHub or the Go module proxy, the repository provides an **optional** isolated DNS configuration:
 
 ```powershell
 docker buildx create --name epochguard-002a --driver docker-container --buildkitd-config dev/buildkitd.toml
@@ -46,15 +46,31 @@ All three stacks below publish no ports, need no evidence credentials and use di
 | Qualification | Command after images exist | Outputs | Contract |
 | --- | --- | --- | --- |
 | Bounded prose and security/lifecycle regressions | `py -3.12 tests/boundedprose/qualify.py` | `artifacts/004g/qualification/` | Current request-bound v2 |
+| Bounded-prose live driver, offline transport mode | `py -3.12 tests/boundedproselive/qualify.py` | `artifacts/004gl/offline/` | Current request-bound v2; no live calls |
 | Original protected ingress | `py -3.12 tests/protectedingress/qualify.py` | `artifacts/004d/reproduction/` | Explicitly legacy v1 |
 | Exact-template multi-claim, simulated sources/faults | `py -3.12 tests/livequalification/qualify.py` | `artifacts/004e/offline/` | Explicitly legacy v1 |
 
-Each accepts `--build --builder default` to build its required images. The bounded-prose runner has **no live option** and never reads evidence credentials. A normal E invocation is also offline despite its script directory name. Preserve existing live evidence before reusing the E live output directory; the driver writes fixed filenames.
+Each accepts `--build --builder NAME` to build its required images. The bounded-prose runner has **no live option** and never reads evidence credentials. A normal E invocation is also offline despite its script directory name. Preserve existing live evidence before reusing the E live output directory; the driver writes fixed filenames.
+
+Bypass `.env` when invoking the older host drivers; use a dedicated terminal and do not set live opt-ins. The comment-only environment file contains no assignments:
 
 ```powershell
-docker compose -f compose.verify.004g.yaml down --volumes --remove-orphans
-docker compose -f compose.verify.004d.yaml down --volumes --remove-orphans
-docker compose -f compose.verify.004e.offline.yaml down --volumes --remove-orphans
+$env:COMPOSE_DISABLE_ENV_FILE = '1'
+$env:COMPOSE_ENV_FILES = (Join-Path $PWD.Path 'dev/lab.compose.env')
+py -3.12 tests/boundedprose/qualify.py
+py -3.12 tests/boundedproselive/qualify.py
+py -3.12 tests/protectedingress/qualify.py
+py -3.12 tests/livequalification/qualify.py
+Remove-Item Env:COMPOSE_DISABLE_ENV_FILE -ErrorAction SilentlyContinue
+Remove-Item Env:COMPOSE_ENV_FILES -ErrorAction SilentlyContinue
+```
+
+G-L without `--live` is simulated/offline. Run the stacks sequentially. A nonzero exit requires inspection of the named local stage and completion of cleanup before continuing. No paid rerun is part of regression.
+
+```powershell
+docker compose --env-file dev/lab.compose.env -f compose.verify.004g.yaml down --volumes --remove-orphans
+docker compose --env-file dev/lab.compose.env -f compose.verify.004d.yaml down --volumes --remove-orphans
+docker compose --env-file dev/lab.compose.env -f compose.verify.004e.offline.yaml down --volumes --remove-orphans
 ```
 
 These commands remove only the selected Compose project's resources, including its disposable signing key. See [G security evidence](task-004gs.md), [D lifecycle evidence](task-004d.md) and [E source-fault evidence](task-004e.md) for asserted cases and recorded results. G tests include retained-nonce request substitution, metadata sentinels, receipt faults, source failures, overload/recovery, disabled-plugin concurrency and real restarts. Finite fixture coverage is not a general security proof.
@@ -76,30 +92,30 @@ docker compose --profile test run --rm --no-deps smoke
 docker compose --profile test down --volumes --remove-orphans
 
 # Legacy single-policy verification with an HTTP evidence fixture
-docker compose -f compose.verify.yaml build verifier-supported
-docker compose -f compose.verify.yaml run --rm verification-tests
-docker compose -f compose.verify.yaml down --volumes --remove-orphans
+docker compose --env-file dev/lab.compose.env -f compose.verify.yaml build verifier-supported
+docker compose --env-file dev/lab.compose.env -f compose.verify.yaml run --rm verification-tests
+docker compose --env-file dev/lab.compose.env -f compose.verify.yaml down --volumes --remove-orphans
 
 # Exact-template multi-claim mode, fixture evidence and faulty verifier records
 docker buildx build --builder default --load -t epochguard-verifier:004c -f services/verifier/Dockerfile.004c .
-docker compose -f compose.verify.004c.yaml up -d --force-recreate --wait --no-build gateway gateway-faults gateway-control
-docker compose -f compose.verify.004c.yaml run --rm --no-deps qualification
-docker compose -f compose.verify.004c.yaml down --volumes --remove-orphans
+docker compose --env-file dev/lab.compose.env -f compose.verify.004c.yaml up -d --force-recreate --wait --no-build gateway gateway-faults gateway-control
+docker compose --env-file dev/lab.compose.env -f compose.verify.004c.yaml run --rm --no-deps qualification
+docker compose --env-file dev/lab.compose.env -f compose.verify.004c.yaml down --volumes --remove-orphans
 
 # Route-surface audit, including explicit unprotected controls
-docker compose -f compose.routes.yaml up -d --wait reject control warp-control warp-reject nolog
-docker compose -f compose.routes.yaml run --rm --no-deps route-tests
-docker compose -f compose.routes.yaml down --volumes --remove-orphans
+docker compose --env-file dev/lab.compose.env -f compose.routes.yaml up -d --wait reject control warp-control warp-reject nolog
+docker compose --env-file dev/lab.compose.env -f compose.routes.yaml run --rm --no-deps route-tests
+docker compose --env-file dev/lab.compose.env -f compose.routes.yaml down --volumes --remove-orphans
 
 # Intentionally unsafe cache-ordering/invalidation experiments
-docker compose -f compose.cache.yaml up -d --wait provider store-proxy writer reader reject safe unavailable post-reject post-allow
-docker compose -f compose.cache.yaml run --rm --no-deps cache-tests
-docker compose -f compose.cache.yaml down --volumes --remove-orphans
+docker compose --env-file dev/lab.compose.env -f compose.cache.yaml up -d --wait provider store-proxy writer reader reject safe unavailable post-reject post-allow
+docker compose --env-file dev/lab.compose.env -f compose.cache.yaml run --rm --no-deps cache-tests
+docker compose --env-file dev/lab.compose.env -f compose.cache.yaml down --volumes --remove-orphans
 
 # Separate long post-hook deadline regression; build legacy verifier image above first
-docker compose -f compose.verify.yaml -f compose.verify.timeouts.yaml up -d --force-recreate --wait gateway-supported
-docker compose -f compose.verify.yaml -f compose.verify.timeouts.yaml run --rm --no-deps verification-tests
-docker compose -f compose.verify.yaml -f compose.verify.timeouts.yaml down --volumes --remove-orphans
+docker compose --env-file dev/lab.compose.env -f compose.verify.yaml -f compose.verify.timeouts.yaml up -d --force-recreate --wait gateway-supported
+docker compose --env-file dev/lab.compose.env -f compose.verify.yaml -f compose.verify.timeouts.yaml run --rm --no-deps verification-tests
+docker compose --env-file dev/lab.compose.env -f compose.verify.yaml -f compose.verify.timeouts.yaml down --volumes --remove-orphans
 ```
 
 The cache suite deliberately demonstrates unsafe admission/repopulation behavior. It does not enable or qualify protected caching. [Route](task-003c.md), [cache](task-002c.md) and [timeout](task-003a.md#2026-11-07-follow-up-configurable-live-timeouts) reports retain exact test evidence.
@@ -155,7 +171,7 @@ try {
     py -3.12 tests/livequalification/qualify.py --live
     if ($LASTEXITCODE -ne 0) { Write-Host 'Inspect the collected failure; do not retry automatically.' }
 } finally {
-    docker compose -f compose.verify.004e.yaml down --volumes --remove-orphans
+    docker compose --env-file dev/lab.compose.env -f compose.verify.004e.yaml down --volumes --remove-orphans
     Remove-Item -LiteralPath $env:EPOCHGUARD_TAVILY_SECRET_HOST_FILE -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $secretDirectory -ErrorAction SilentlyContinue
     Remove-Item Env:EPOCHGUARD_TAVILY_SECRET_HOST_FILE, Env:EPOCHGUARD_RUN_LIVE_004E -ErrorAction SilentlyContinue
@@ -183,7 +199,7 @@ The driver builds the existing native/004C/004E/004G chain plus the separate `ep
 The existing [G security/lifecycle driver](../tests/boundedprose/qualify.py) separately covers v2 receipt faults, exact request substitution, metadata channels, disabled-plugin concurrency, timeout and restart recovery. Both runners clean their own stacks/key volumes. Manual G-L offline cleanup is:
 
 ```powershell
-docker compose -f compose.verify.004gl.offline.yaml down --volumes --remove-orphans
+docker compose --env-file dev/lab.compose.env -f compose.verify.004gl.offline.yaml down --volumes --remove-orphans
 ```
 
 **Only after separate operator authorization**, run the following in Windows PowerShell from the repository root, after building/checking the images offline. It starts a separate G live stack; it does not execute the E live runner. The existing E authorization is required along with the additional G opt-in. The key is entered into a fresh restricted temporary file; no existing credential file is read by the host driver.
@@ -210,7 +226,7 @@ try {
     py -3.12 tests/boundedproselive/qualify.py --live
     if ($LASTEXITCODE -ne 0) { Write-Host 'Inspect the failed or inconclusive run; do not retry automatically.' }
 } finally {
-    docker compose -f compose.verify.004gl.yaml down --volumes --remove-orphans
+    docker compose --env-file dev/lab.compose.env -f compose.verify.004gl.yaml down --volumes --remove-orphans
     Remove-Item -LiteralPath $env:EPOCHGUARD_TAVILY_SECRET_HOST_FILE -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $secretDirectory -ErrorAction SilentlyContinue
     Remove-Item Env:EPOCHGUARD_TAVILY_SECRET_HOST_FILE, Env:EPOCHGUARD_RUN_LIVE_004E, Env:EPOCHGUARD_RUN_LIVE_004G -ErrorAction SilentlyContinue

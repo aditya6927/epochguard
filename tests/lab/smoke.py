@@ -6,13 +6,14 @@ import urllib.error
 import urllib.request
 
 ORIGIN = "http://127.0.0.1:8787"
+TRANSPORT_ORIGIN = ORIGIN  # Trusted operator test connection only; never client input.
 HTTP = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
 
 def call(path, value=None, *, headers=None):
     data = json.dumps(value).encode() if value is not None else None
-    req = urllib.request.Request(ORIGIN + path, data=data, headers={
-        "Content-Type": "application/json", "Origin": ORIGIN, "X-EpochGuard-Lab": "1", **(headers or {})})
+    req = urllib.request.Request(TRANSPORT_ORIGIN + path, data=data, headers={
+        "Host":"127.0.0.1:8787", "Content-Type": "application/json", "Origin": ORIGIN, "X-EpochGuard-Lab": "1", **(headers or {})})
     started = time.perf_counter()
     try:
         response = HTTP.open(req, timeout=15)
@@ -40,6 +41,19 @@ def verify(scenario, text, expected, outcome):
 
 
 def main():
+    # Real HTTP origin-form navigation: no Origin on an ordinary external link.
+    # The same Fetch Metadata headers must not open frame/API access.
+    for path, dest, expected in (("/", "document", 200), ("/", "iframe", 403), ("/api/demo/info", "document", 403)):
+        request = urllib.request.Request(TRANSPORT_ORIGIN + path, headers={"Host":"127.0.0.1:8787", "Sec-Fetch-Site":"cross-site", "Sec-Fetch-Mode":"navigate", "Sec-Fetch-Dest":dest})
+        try:
+            response = HTTP.open(request, timeout=5)
+        except urllib.error.HTTPError as error:
+            response = error
+        with response:
+            assert response.status == expected
+            assert not response.headers.get("Access-Control-Allow-Origin")
+            assert "frame-ancestors 'none'" in response.headers["Content-Security-Policy"]
+            response.read(256 * 1024 + 1)
     status, info, _ = call("/api/demo/info")
     assert status == 200 and info["receipt_protocol"] == "004g.receipt.v2"
     expected = ["ALLOW", "REJECT", "UNAVAILABLE", "INGRESS_REFUSED", "PROVIDER_ERROR"]
@@ -64,7 +78,7 @@ def main():
     assert status == 400 and result["content"] is None
     status, _, _ = call("/api/demo/verify", {"scenario":"custom","candidate":"x"}, headers={"Origin":"http://untrusted.invalid"})
     assert status == 403
-    print(json.dumps({"fixture":True,"actual_native_gateway":True,"checks":rows}, sort_keys=True))
+    print(json.dumps({"fixture":True,"actual_native_gateway":True,"navigation_checks":3,"checks":rows}, sort_keys=True))
 
 
 if __name__ == "__main__":

@@ -20,12 +20,14 @@ RUN tail -n +2 go.mod > /tmp/host.mod \
 
 # API-only build: provide an embed input, without compiling or modifying a dashboard.
 COPY dev/bifrost/ui-placeholder.txt /src/bifrost/transports/bifrost-http/ui/task-002a.txt
+# The embed asset is generated build input; no tracked upstream source changes.
+RUN git diff --exit-code && git diff --cached --exit-code
 RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
     go build -p=2 -mod=readonly -trimpath -ldflags='-w -s -X main.Version=v2.4.0' -o /out/bifrost-http ./bifrost-http
 COPY tests/conformance/ /src/epochguard/tests/conformance/
 COPY plugins/epochguard/ /src/epochguard/plugins/epochguard/
 WORKDIR /src/epochguard/plugins/epochguard
-RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
+RUN --network=none --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
     test -z "$(gofmt -l .)" && go vet -mod=readonly ./... && go test -mod=readonly -trimpath -v ./... \
     && go test -race -p=2 -mod=readonly -trimpath ./... \
     && go build -mod=readonly -trimpath -buildmode=plugin -o /out/epochguard.so .
@@ -35,7 +37,7 @@ COPY internal/ /src/epochguard/internal/
 COPY cmd/ /src/epochguard/cmd/
 COPY tests/ /src/epochguard/tests/
 WORKDIR /src/epochguard
-RUN --mount=type=cache,target=/root/.cache/go-build \
+RUN --network=none --mount=type=cache,target=/root/.cache/go-build \
     test -z "$(gofmt -l cmd tests internal)" \
     && go vet -mod=readonly ./internal/ingress ./cmd/provider-fixture ./cmd/receipt-relay \
     && go test -mod=readonly -trimpath -v ./internal/ingress \

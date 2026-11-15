@@ -11,6 +11,6 @@ COPY services/verifier/tests_multiclaim/ ./tests_multiclaim/
 COPY services/verifier/tests_gateway/ ./tests_gateway/
 COPY tests/conformance/ ./conformance/
 COPY services/verifier/pytest.ini ./pytest.ini
-RUN python -m pytest -p no:cacheprovider tests_multiclaim tests_gateway -q
+RUN --network=none python -m pytest -p no:cacheprovider tests_multiclaim tests_gateway -q
 USER 10001:10001
 CMD ["python", "-m", "uvicorn", "verifier.multiclaim.app:fixture_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--limit-concurrency", "32"]

@@ -4,6 +4,8 @@ EpochGuard is an experimental verification gate for AI gateway responses. It hol
 
 Today it checks two propositions: the latest stable Python 3 release label on Python.org's Windows page, and the version reported for `requests` by the PyPI JSON API. The protected bounded-prose mode accepts nine exact sentence forms, not arbitrary natural language. Models can propose claim plans but cannot authorize answers.
 
+EpochGuard uses Bifrost's supported native Go plugin interfaces and official dynamic-binary mechanism, with a separate protected ingress and evidence verifier. The qualified installation is the pinned Linux/amd64 HTTP gateway built together with its `.so`; no tracked upstream source patch is required. [Compatibility and installation](docs/compatibility.md) distinguish this supported extension path from untested versions and static distributions.
+
 ```mermaid
 flowchart LR
     C[Client] --> I[Protected ingress]
@@ -65,6 +67,10 @@ Streaming, arbitrary prose or sources, production providers/authentication, safe
 
 - [Verification Lab: local use, limits and demonstration](docs/verification-lab.md)
 - [Architecture, capabilities and security contracts](docs/architecture.md)
+- [Bifrost compatibility and supported installation](docs/compatibility.md)
+- [Security model](docs/security.md) and [reporting issues](SECURITY.md)
+- [Evaluation and measurement scope](docs/evaluation.md)
+- [Contributing and CI checks](CONTRIBUTING.md)
 - [Operations: builds, offline suites and explicit live workflows](docs/operations.md)
 - [Verifier APIs, grammar, evidence and limits](services/verifier/README.md)
 - [Experimental claim analysis](services/claim_analysis/README.md), [draft prose annotations](services/verifier/data/prose-v1/README.md) and [offline evaluation reports](services/verifier/reports/prose-v1/README.md)
@@ -73,3 +79,5 @@ Streaming, arbitrary prose or sources, production providers/authentication, safe
 - Contributor working agreement: [AGENTS.md](AGENTS.md)
 
 Historical implementation and qualification reports remain under `docs/task-*.md`; start with [bounded prose](docs/task-004g.md), [request/metadata hardening](docs/task-004gs.md), [protected ingress](docs/task-004d.md) and [live multi-claim qualification](docs/task-004e.md). They record results at their stated revisions; architecture describes the current system.
+
+EpochGuard combines evidence-backed release under explicit finite policies, independent parsing and request-bound fail-closed ingress. General prose and production readiness remain unqualified. A repository license has not been selected; see the [license recommendation and third-party audit](docs/third-party.md) before redistribution or upstream submission.

@@ -1,0 +1,50 @@
+name: Offline checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: offline-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  go:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Pinned Go format, vet, unit, race and plugin compilation
+        run: docker build --target go -f dev/Dockerfile.checks .
+  python:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Locked dependencies and network-disabled regressions
+        run: docker build --target python -f dev/Dockerfile.checks .
+  frontend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Locked npm, TypeScript, production build and components
+        run: docker build --target frontend -f dev/Dockerfile.lab .
+  documentation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Links, anchors, structure, repository paths and secret patterns
+        run: |
+          python3 -m unittest discover -s scripts -p 'test_*.py'
+          python3 scripts/check_docs.py
+# Native gateway loading/lifecycle qualifications run locally. A first remote
+# Actions execution is pending; this workflow does not claim gateway coverage.
