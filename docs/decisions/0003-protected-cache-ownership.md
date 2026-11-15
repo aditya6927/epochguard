@@ -1,6 +1,6 @@
 # ADR 0003: own verified cache admission and logical revocation
 
-Status: proposed for maintainer review after Task 002C experiments, 2026-11-06. This records a design direction; the protected cache is not implemented.
+Status: **Proposed**, following Task 002C experiments, 2026-11-06. This records a design direction; the protected cache is not implemented.
 
 ## Context and experimental evidence
 
@@ -37,4 +37,4 @@ For a future protected cache, EpochGuard should own admission and logical revoca
 
 ## Consequences and revisit conditions
 
-The current milestone adds qualification tooling and test-only controls, not cache storage ownership or real freshness verification. A future implementation must choose a backend capable of the required atomic operations and test writer/invalidation/reader races, identity isolation, evidence changes, restarts, outages, and additional response routes. Revisit this ADR if upstream provides an applicable admission/revocation contract or the deployment adds other cache layers.
+The original cache milestone added qualification tooling and test-only controls, not cache storage ownership or freshness verification. Later [evidence enforcement](../architecture.md) does not implement this proposed cache. A future implementation must choose a backend capable of the required atomic operations and test writer/invalidation/reader races, identity isolation, evidence changes, restarts, outages, and additional response routes. Revisit this ADR if upstream provides an applicable admission/revocation contract or the deployment adds other cache layers.

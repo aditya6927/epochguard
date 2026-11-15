@@ -1,5 +1,7 @@
 # Task 004A — Time-sensitive claim identification and evaluation
 
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
 Follow-up: [Task 004A-H](task-004a-hardening.md) records contract-parser, sanitized-diagnostic, baseline lexical and schema-byte hardening. Schema file hashes below now refer to normalized LF bytes stored in Git; earlier CRLF hashes are preserved in that report. Historical evaluation results remain unchanged.
 
 Implemented November 8–9, 2026 as a **stand-alone experiment**, outside the qualified gateway. The offline implementation and regressions are complete for review. **Full acceptance is pending independent human annotation review and real-model performance qualification.** No paid model or Tavily call was made, and no model-quality improvement is claimed. The evaluation reference date remains fixed to November 8 across the local date rollover.
@@ -40,7 +42,7 @@ Text + explicit reference date
 
 [gemini.py](../services/claim_analysis/claim_analysis/gemini.py) implements an actual Gemini REST adapter using existing `httpx`, a fixed HTTPS API host and an operator-selected `gemini-...` model. Candidate text is JSON data in the user message; it cannot choose endpoint, tools, model, prompt or budgets. No tools, browsing, fallback extractor, automatic retry or JSON repair is enabled. The documented [GenerateContent API](https://ai.google.dev/api/generate-content) and [structured-output guidance](https://ai.google.dev/gemini-api/docs/structured-output) informed request construction. The JSON Schema is reduced to the API-supported subset for generation; complete strict validation remains local. Compatibility with a particular paid model is **not qualified without a real run**.
 
-Trusted configuration requires `EPOCHGUARD_ALLOW_MODEL_CALLS=1`, `GEMINI_API_KEY`, explicit model and operator-supplied input/output rates. No credential or opt-in was present in this session. The CLI never logs a key, request headers or raw provider error bodies. Redirects and environment proxies are disabled. Provider failures, blocked/truncated generation, timeout, malformed JSON, duplicate keys, extra fields, invented source text, bad spans/categories and invalid usage become explicit analysis failures. Cancellation propagates rather than producing success. Empty input yields empty analysis without a call; a nonempty model response with no identified units is treated as a failure.
+Trusted configuration requires `EPOCHGUARD_ALLOW_MODEL_CALLS=1`, `GEMINI_API_KEY`, explicit model and operator-supplied input/output rates. No credential or opt-in was present during the reported implementation phase. The CLI never logs a key, request headers or raw provider error bodies. Redirects and environment proxies are disabled. Provider failures, blocked/truncated generation, timeout, malformed JSON, duplicate keys, extra fields, invented source text, bad spans/categories and invalid usage become explicit analysis failures. Cancellation propagates rather than producing success. Empty input yields empty analysis without a call; a nonempty model response with no identified units is treated as a failure.
 
 Bounds are 8,192 input code points, 32,768 UTF-8 bytes, 65,536 result/provider-envelope bytes and 64 units. NUL/disallowed controls/unpaired surrogates fail validation. A total model deadline defaults to 30 seconds and validates 0.1–60; output defaults to 4,096 tokens, bounded 128–8,192; request count is 1–100, default 1. Per-request and entire-run cost admission use finite operator rates, a pessimistic prompt-byte planning estimate and the output token limit. Failed/cancelled attempts retain their reservations. These are **planning guards, not a provider billing guarantee**; use provider-side spending controls. Usage/cost is null when unknown and successful reported totals include thought tokens. Failed outputs may incur costs not available in a successful-analysis usage record; reserved planning cost and attempted requests are reported separately.
 
@@ -173,11 +175,9 @@ Changed files (37 total), grouped by exact directory:
 
 No existing Go/Python verifier implementation, Bifrost config, deployment file or enforcement assertion changed.
 
-Recommended commit, not created: `feat(claims): add isolated temporal claim analysis and draft evaluation`. Stop for maintainer review with human-review/model-quality acceptance items explicitly pending.
-
 ## Gemini schema compatibility follow-up (2026-11-09)
 
-The maintainer supplied the following `gemini-3.5-flash-lite` diagnostics: model listing, basic generation, generation settings without a schema, and minimal `responseJsonSchema` returned HTTP 200; the full EpochGuard generation schema returned HTTP 400 `INVALID_ARGUMENT`. These are maintainer observations, not live results from this session. They isolate the full generation schema as the suspect; they do not prove which individual constraint caused rejection.
+The maintainer supplied the following `gemini-3.5-flash-lite` diagnostics: model listing, basic generation, generation settings without a schema, and minimal `responseJsonSchema` returned HTTP 200; the full EpochGuard generation schema returned HTTP 400 `INVALID_ARGUMENT`. These are maintainer observations, not live results from the reported implementation phase. They isolate the full generation schema as the suspect; they do not prove which individual constraint caused rejection.
 
 Local reproduction confirmed these two bounds in the exact provider conversion:
 
@@ -202,7 +202,7 @@ The new `claim_analysis.schema_diagnostic` command exports both variants entirel
 
 Default live comparison is original versus `no_max_items`, at most two attempts, with the existing environment opt-in/key/model/rates plus explicit `--live`. Failed attempts consume existing reservations. Auth/rate/server errors, timeout or no observed HTTP status stop the experiment. There are no retries or automatic production fallback. Budget-denied attempts do not dispatch. Reports contain no raw provider output, error messages, request headers or credentials. HTTP 200 with invalid/truncated extraction is explicitly not a successful local analysis; it can still show that a schema was accepted by the API.
 
-If array-bound removal is insufficient, explicitly selected diagnostic-only variants isolate one further factor relative to `no_max_items`: remove metadata titles, remove the remaining numeric bounds, replace two nullable string `anyOf` branches with equivalent type unions, or inline the nonrecursive Claim reference. No other production conversion is changed without live evidence and review. These experiments are available offline and credential-gated; remaining constraints have **not** been live-diagnosed in this session. If an alternative passes while `no_max_items` fails, the default remains unqualified and the command exits 1.
+If array-bound removal is insufficient, explicitly selected diagnostic-only variants isolate one further factor relative to `no_max_items`: remove metadata titles, remove the remaining numeric bounds, replace two nullable string `anyOf` branches with equivalent type unions, or inline the nonrecursive Claim reference. No other production conversion is changed without live evidence and review. These experiments are available offline and credential-gated; remaining constraints have **not** been live-diagnosed during the reported implementation phase. If an alternative passes while `no_max_items` fails, the default remains unqualified and the command exits 1.
 
 Executed commands and actual results:
 
@@ -216,18 +216,18 @@ $env:PYTHONPATH = 'services/claim_analysis'
 - Before edits: **64 existing tests passed**, 0.56s.
 - After edits: **81 tests passed**, 0.59s: all original 64 and 17 added regressions. Tests cover exact original reproduction, minimal conversion diff, wire schema selection, strict count limits, 65-claim fail-closed behavior, isolated further variants, dry export, opt-in, shared budgets, no retries, safe status observation and HTTP-200/invalid-analysis distinction.
 - Offline exports exited 0. Comparing pre-change export with the diagnostic's original schema gave exact equality. Removing exactly two entries gave exact equality with the normal adapter's changed schema. Every export reports `live_qualification_pending: true` and an empty live-results list.
-- Final documentation/scope checks passed: 21 local links/anchors, balanced code fences, changed/new whitespace, exact five-file scope, unchanged strict-schema hash and `git diff --check` exit 0.
+- The strict-schema hash remained unchanged.
 - No live diagnostic ran: neither a Gemini key nor the model-call environment opt-in was available. **API incompatibility is not claimed resolved.** MockTransport tests are not real Gemini results. Model quality, annotation review, evaluation metrics/labels, `003a.v1`, Bifrost and caching are unchanged. Historical baseline reports are preserved with their original implementation hashes, not rewritten as new measurements.
 
 Exact credential-safe PowerShell qualification commands, including key/model/rates, the two-request cap and cleanup, are in the [package README](../services/claim_analysis/README.md#gemini-schema-compatibility-diagnostic). Success of the changed variant on the fixed input qualifies only that narrow API/local-parse route, not model extraction quality. Compare original and changed statuses to support or refute the maxItems hypothesis; if both now pass, the earlier cause remains unproven.
 
-Follow-up files: `claim_analysis/gemini.py`, new `claim_analysis/schema_diagnostic.py` and `tests/test_schema_diagnostic.py` under `services/claim_analysis/`, package README and this report. No schema, policy, label, evaluation or deployment change was made. Recommended follow-up commit, not created: `fix(claims): simplify Gemini generation schema and add bounded diagnostics`. Stop for review pending credentialed qualification.
+Follow-up files: `claim_analysis/gemini.py`, new `claim_analysis/schema_diagnostic.py` and `tests/test_schema_diagnostic.py` under `services/claim_analysis/`, package README and this report. No schema, policy, label, evaluation or deployment change was made.
 
 ## Safe model validation diagnostics (2026-11-09)
 
 Subsequent **maintainer-supplied live evidence** established original schema HTTP 400, reduced schema HTTP 200 with `INVALID_MODEL_ANALYSIS`, and a successful separate standalone extraction. Both paths use `ModelExtractor` but analyze different inputs in separate generations. The earlier generic failure does not reveal its exact rejected field. No new live request was made during this follow-up; the new metadata cannot recover details from a discarded previous output.
 
-This change adds bounded diagnostic metadata without changing public failure codes, prompts, provider/model selection, generation schemas, validation acceptance, evaluation semantics or authorization. Existing uncommitted schema-conversion work was preserved. Neither the evaluation dataset nor the qualified gateway, `003a.v1`, caches or deployment defaults changed.
+This change adds bounded diagnostic metadata without changing public failure codes, prompts, provider/model selection, generation schemas, validation acceptance, evaluation semantics or authorization. Neither the evaluation dataset nor the qualified gateway, `003a.v1`, caches or deployment defaults changed.
 
 ### Failure taxonomy
 
@@ -290,7 +290,7 @@ $env:PYTHONPATH = 'services/claim_analysis'
 - With new regressions: **116 tests passed**, 1.08s: all existing 81 plus 35 added cases. Tests cover spans/overlap/IDs, missing required and unsupported fields, invalid temporal/evidence combinations, malformed/duplicate/nonfinite JSON, encoding/size limits, empty analyses, bounded paths/counts, unknown error types, secret/candidate non-disclosure, provider transport/HTTP/envelope stages, legacy codes, valid responses and diagnostic report results.
 - Offline non-disclosure tests inject a private sentinel into candidates, unknown keys, invalid values, provider bodies and arbitrary exception messages, and assert that it appears in neither serialized metadata nor diagnostic object representations. HTTP uses MockTransport; external sockets remain blocked by the existing test guard.
 - Logs are retained under ignored `artifacts/004a-validation-diagnostics/`. No paid/model/Tavily call, gateway deployment or live qualification was performed during this change.
-- Offline reduced-schema export and a MockTransport HTTP-200/binding-failure example exited 0; the latter produced `SOURCE_BINDING` / `BINDING_RANGE` at `$.claims[0].end` with no source text. Final checks verified unchanged dataset hashes, prompt, strict schema, generation schemas and earlier diagnostic tests; 22 local links/anchors, code fences, changed/new whitespace, exact combined nine-file scope (including earlier uncommitted work), and `git diff --check` passed.
+- Offline reduced-schema export and a MockTransport HTTP-200/binding-failure example exited 0; the latter produced `SOURCE_BINDING` / `BINDING_RANGE` at `$.claims[0].end` with no source text. Final checks verified unchanged dataset hashes, prompt, strict schema, generation schemas and earlier diagnostic tests.
 
 After configuring the existing trusted Gemini key/model/rates and explicit model-call opt-in as shown in the [package README](../services/claim_analysis/README.md#gemini-schema-compatibility-diagnostic), repeat only the reduced variant:
 
@@ -301,7 +301,7 @@ $env:PYTHONPATH = 'services/claim_analysis'
 
 This makes at most one model call and writes a fresh `report.json`. Read `failure_details.stage`, then each error's code and sanitized path. The invocation still requires the key, `EPOCHGUARD_ALLOW_MODEL_CALLS=1`, an explicitly selected model and configured rates; existing timeout/output/cost guards apply. It does not retry a failed generation or rerun a dataset. A new generation can differ from the old one, so a new success would not identify the previous failure retrospectively. The live failure's exact category remains unknown until observed safely in a fresh failing run.
 
-Changed in this follow-up: `model.py`, `schema.py`, `gemini.py`, `schema_diagnostic.py`, new `validation_diagnostics.py` and `tests/test_validation_diagnostics.py` under `services/claim_analysis/`, package README and this report. Earlier schema-diagnostic changes and tests remain preserved. Recommended commit, not created: `feat(claims): add sanitized model validation diagnostics`. Stop for maintainer review without committing or pushing.
+Changed in this follow-up: `model.py`, `schema.py`, `gemini.py`, `schema_diagnostic.py`, new `validation_diagnostics.py` and `tests/test_validation_diagnostics.py` under `services/claim_analysis/`, package README and this report. Earlier schema-diagnostic changes and tests remain preserved.
 
 ## Evaluation report diagnostics (2026-11-09)
 
@@ -328,11 +328,11 @@ $env:PYTHONPATH = 'services/claim_analysis'
 - After changes: **124 tests passed**, final rerun 2.28s: all existing 116 and eight new regressions for JSON/schema/binding failures, successful analyses, absent metadata, invalid input, redaction and bounded counts. A three-case fake run also verifies that failure details never leak into a later successful record. Failure metrics still count factual omissions; successful extraction and scoring remain unchanged. Tests use fixed fake replies and block external sockets; there are no model calls.
 - The entire development baseline's pre/post non-latency metrics are exactly equal, including all subgroup results. Every existing per-case field is also equal after excluding timing and the new null field. Source-hash checks confirm no other analysis implementation, prompt, schema, setting, dataset, demo, historical report or existing test changed.
 - The documented PowerShell subset selection was executed offline: it selected exactly `eg004a-0001`, `eg004a-0007`, `eg004a-0019`, preserved their original labels/text, and all three baseline analyses completed with null failure details. This is a command/record check, not Gemini performance evidence.
-- Final checks passed: exact four-file scope, unchanged protected implementation/data/report/test hashes, 23 local documentation links/anchors, balanced code fences, changed/new whitespace and `git diff --check` exit 0.
+- Protected implementation, data, report and existing test hashes remained unchanged.
 
 The [package README](../services/claim_analysis/README.md#evaluation-records-with-validation-diagnostics) contains exact PowerShell commands to select those three original JSONL lines, supply credentials securely, and explicitly run Gemini with `--max-requests 3`. Existing timeout/token/cost controls apply. The final command displays only IDs/status/reasons/sanitized details. Use a fresh output directory; a new generation may differ from the previously failed output, and this field cannot reconstruct a discarded old validation exception.
 
-Changed files: `services/claim_analysis/claim_analysis/cli.py`, new `services/claim_analysis/tests/test_evaluation_diagnostics.py`, `services/claim_analysis/README.md`, and this report. Logs/subset artifacts remain ignored under `artifacts/004a-evaluation-diagnostics/`. Recommended commit, not created: `fix(claims): include sanitized validation details in evaluations`. Stop for review without committing or pushing.
+Changed files: `services/claim_analysis/claim_analysis/cli.py`, new `services/claim_analysis/tests/test_evaluation_diagnostics.py`, `services/claim_analysis/README.md`, and this report. Logs/subset artifacts remain ignored under `artifacts/004a-evaluation-diagnostics/`.
 
 ## Deterministic source-span alignment (2026-11-09)
 
@@ -404,7 +404,7 @@ Baseline non-latency metrics are exactly equal to the saved historical baseline 
 
 Ten **scripted** identification replies constructed from development annotation expectations round-trip through the revised pipeline to exact canonical expectations. That exercises alignment/evaluation plumbing and is labeled `fake-adapter plumbing only`, not a model prediction or model-versus-baseline quality result. It does not prove that the real model will emit the same quotes or labels.
 
-The session has no live model-call opt-in/key available. **No live Gemini or Tavily request was made. The revised baseline-versus-Gemini performance comparison remains pending.** Do not infer that seven failures will disappear: verbatim quote selection, ambiguity, schema compliance, truncation and semantic errors can still fail. The schema diagnostic export reports live qualification pending. Logs, fixed-subset copies and fixture-only outputs remain ignored under `artifacts/004a-alignment/`.
+No live model-call opt-in/key was available during this implementation phase. **No live Gemini or Tavily request was made. The revised baseline-versus-Gemini performance comparison remains pending.** Do not infer that seven failures will disappear: verbatim quote selection, ambiguity, schema compliance, truncation and semantic errors can still fail. The schema diagnostic export reports live qualification pending. Logs, fixed-subset copies and fixture-only outputs remain ignored under `artifacts/004a-alignment/`.
 
 The exact PowerShell subset-construction commands were also executed offline and produced the verified same ten case IDs/labels. All five migrated fake demo commands passed. Final checks passed: 12 protected implementation/data/report/schema hashes, unchanged canonical schema, fake-fixture changes restricted to wire version/removing offsets, unchanged baseline non-latency metrics, 36 relative documentation links/anchors, code fences, changed/new whitespace and JSON syntax, 20-file scope, and `git diff --check` exit 0.
 
@@ -415,5 +415,3 @@ The [package README](../services/claim_analysis/README.md#qualify-alignment-on-t
 Remaining limitations include globally repeated quotes, unique but incomplete/semantically misleading fragments, omitted assertions, incorrect classifications, hallucinated/paraphrased quotes, context-dependent pronouns, discontinuous claims and provider/schema/output failures. Exact alignment is source integrity, not semantic verification or coverage proof. The dataset remains an agent-authored human-review draft. No unrestricted verification, response aggregation, protected cache or Task 004B work was added.
 
 Changed files: new `claim_analysis/alignment.py`, `schema-004a.identification.v1.json`, `tests/test_alignment.py`, `tests/wire_helpers.py`; existing `claim_analysis/model.py`, `validation_diagnostics.py`, `schema_diagnostic.py`, `cli.py`; four existing test modules (`test_analysis.py`, `test_schema_diagnostic.py`, `test_validation_diagnostics.py`, `test_evaluation_diagnostics.py`); five `demos/*.fake.json` fixtures; package README; `docs/architecture.md`; and this report. All package paths are under `services/claim_analysis/`. Canonical `schema.py`, `schema-004a.v1.json`, pricing/configuration code, datasets, original scoring implementation and historical reports are unchanged.
-
-Recommended commit, not created: `feat(claims): align exact source quotes before canonical validation`. Stop for review with revised live-model qualification explicitly pending; no commit or push.

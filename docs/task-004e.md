@@ -1,6 +1,8 @@
 # Task 004E: live multi-claim evidence qualification
 
-The original implementation phase started from clean `main` at `749b5ac` on
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
+The original implementation baseline was `749b5ac` on
 November 14, 2026 (Asia/Calcutta) and completed without live Tavily, PyPI or Gemini
 calls. A subsequent maintainer-authorized live run on **November 14, 2026** met
 the defined narrow acceptance checks, based on the report assessment below.
@@ -26,11 +28,10 @@ credential file and executed:
 
 The runner printed `LIVE RUN COLLECTED: independent result review required`.
 It did **not** print a final live PASS assertion. The maintainer reported that
-all five client cases had `expectation_met=true`. This documentation-only review
-independently inspected the existing local `artifacts/004e/live/preflight.json`,
+all five client cases had `expectation_met=true`. The subsequent documentation assessment
+inspected the existing local `artifacts/004e/live/preflight.json`,
 `measurements.json` and `report.json` and confirmed they match the supplied
-observations below. No qualification or source request was rerun, and no runtime
-artifact or credential is added to the repository by this update.
+observations below. No qualification or source request was rerun during that assessment.
 
 | Preflight source | Retrieval mode | Observed version |
 | --- | --- | --- |
@@ -496,9 +497,8 @@ deadline hierarchy and added stalled-body cancellation/failure-record tests;
 all affected checks and the complete 004D/004E ingress qualifications were rerun.
 
 At the end of the original implementation phase, all task-owned stacks/networks
-and generated signing-key volumes were removed; only the pre-existing BuildKit
-builder remained running. That implementation agent created no real credential
-file and performed no paid execution. The later maintainer-authorized live run
+and generated signing-key volumes were removed. No real credential file was
+created and no paid execution occurred during that phase. The later maintainer-authorized live run
 used its separately supplied temporary runtime credential file.
 
 ## Remaining limitations and review
@@ -514,42 +514,13 @@ routes/background work remain outside scope. A compromised trusted process,
 host, key or verifier can defeat this trust boundary. External source changes
 and transient failures can make a correctly failing live run inconclusive.
 
-## Documentation-only consistency update
+## Live-result assessment provenance
 
-This follow-up started from clean `main` at
-`662bc38639178ea4f39866740626b872d0820efb`. It changes only this report,
-`README.md`, `AGENTS.md`, `docs/architecture.md` and
-`services/verifier/README.md`. It records the supplied live results, scopes the
-original no-live-call statements to their execution phase, distinguishes the
-two-policy protected profile from legacy 003A, and corrects the obsolete claim
-that isolated protected readiness is absent. Production readiness remains
-unqualified.
-
-The 002A/B/C, 003A/B/C, 004A/004A-H/004B/C/D reports and ADRs 0001–0003 were
-reviewed without changing their execution-time results. Local validation passed
-across all 24 tracked Markdown files: balanced fences, link/reference syntax,
-152 local links including 10 anchor links, and the 17 tables in the five changed
-documents. Inline repository/source references resolved; generated
-runtime references were distinguished from tracked source paths. The sole
-remaining pending-status phrase in these five documents is the
-historical offline runner output above, explicitly labeled as such.
-
-SHA-256 comparison with the starting tree confirms all other 210 tracked files
-are unchanged, including implementation, tests, policies, contracts, Compose
-profiles, older reports and ADRs. No new tracked files, credentials or private
-runtime artifacts were added. The three existing live JSON reports matched the
-documented versions, outcomes, timings, claim verdicts and application-level
-counts. `git diff --check` passed; the final diff was reviewed for unrelated
-formatting changes. Only offline documentation/report checks ran during this
-update; no application tests, Tavily/PyPI/Gemini requests or paid qualifications
-were executed.
-
-Original implementation's recommended conventional commit:
-`feat(verifier): add opt-in protected live multi-claim qualification`.
-
-Recommended documentation commit, not created:
-`docs: record 004E live qualification and align project status`.
-
-Stop for maintainer review. This update changes documentation only; no
-implementation, tests, policies, contracts, deployment configuration or runtime
-behavior is changed, and no live requests, commits or pushes are performed.
+The later documentation assessment used implementation baseline
+`662bc38639178ea4f39866740626b872d0820efb`. Inspection of the existing live
+preflight, measurements and verifier JSON reports found the documented versions,
+outcomes, timings, claim verdicts and application-level counts consistent.
+That assessment performed only offline report/documentation checks; it did not
+rerun application tests, Tavily/PyPI/Gemini requests or paid qualification.
+The original offline implementation and subsequent maintainer-authorized live
+execution remain distinct evidence phases.

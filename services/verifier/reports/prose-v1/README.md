@@ -1,7 +1,7 @@
 # 004F offline draft-label measurements
 
 All four JSON reports use the separate frozen 66-case collection (33 per split).
-No Gemini, Tavily or PyPI request was made. Every annotation remains a draft;
+No Gemini, Tavily or PyPI request was made to generate these four offline reports. Every annotation remains a draft;
 **MODEL QUALITY QUALIFICATION PENDING**. These are research diagnostics, not
 production reliability or evidence that general prose completeness is proven.
 
@@ -29,7 +29,7 @@ and wrong-mapping detection instead of allowing an always-zero metric.
 decision (`false_complete_count=null`). `combined_extractor_and_auditor` reports
 the selected engine with the independent audit. `independent_auditor` provides a
 separate closed-form comparison. Real-model and combined model/audit scores are
-not available; scripted fake output is adapter testing only.
+not available in these four offline reports; scripted fake output is adapter testing only.
 
 Default offline reports omit latency, tokens and cost rather than inventing
 measurements. `--measure` enables actual local analysis timing. A separately
@@ -41,3 +41,5 @@ Each report includes selected IDs, source/dataset/manifest and implementation
 hashes, original 004A prompt/schema provenance, all planning records and failure
 metadata. Re-run the documented CLI with the same unmodified sources/data to
 reproduce default reports byte-for-byte. See [Task 004F](../../../../docs/task-004f.md).
+
+A later ten-call Gemini diagnostic is operator-reported against draft labels, separate from these deterministic reports. It is not an independently qualified benchmark; no additional diagnostic metrics or general quality guarantee is asserted here. See the [draft review protocol](../../data/prose-v1/README.md).

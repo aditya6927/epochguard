@@ -1,5 +1,7 @@
 # Task 003A — first evidence-backed verification slice
 
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
 Later status: the maintainer reports a passing credentialed FastAPI + Tavily policy test. [Task 003B](task-003b.md) records that evidence and the separate live gateway qualification. Results below retain their original execution scope and dates.
 
 Implemented and exercised on 2026-11-06; timeout follow-up exercised on 2026-11-07. This is a narrow policy implementation with offline end-to-end qualification, **not general factual verification or completed live Tavily qualification**. The maintainer subsequently reported successful live raw extraction and a failed four-second live test; see the follow-up below. No passing live full-policy verdict is claimed here.
@@ -178,7 +180,7 @@ With a real key already in the shell's `TAVILY_API_KEY` environment, explicitly 
 docker run --rm -e EPOCHGUARD_RUN_LIVE_TAVILY=1 -e TAVILY_API_KEY epochguard-verifier:003a python -m pytest -m live -s -o cache_dir=/tmp/pytest-cache
 ```
 
-The key is passed by environment name, not written into a command value or repository file. Output contains public evidence metadata only. This live test was **not executed with credentials** in this session. Its opt-in guard was executed without network/credentials using `docker run --rm --network none -e PYTEST_ADDOPTS= epochguard-verifier:003a python -m pytest -m live -q -o cache_dir=/tmp/pytest-cache`; result: **1 skipped, 26 deselected, 1 warning in 0.40s**. A skip is not live integration evidence.
+The key is passed by environment name, not written into a command value or repository file. Output contains public evidence metadata only. This live test was **not executed with credentials** during the reported implementation phase. Its opt-in guard was executed without network/credentials using `docker run --rm --network none -e PYTEST_ADDOPTS= epochguard-verifier:003a python -m pytest -m live -q -o cache_dir=/tmp/pytest-cache`; result: **1 skipped, 26 deselected, 1 warning in 0.40s**. A skip is not live integration evidence.
 
 An optional live gateway deployment is supplied for manual follow-up:
 
@@ -199,8 +201,6 @@ It requires `TAVILY_API_KEY`, permits outbound retrieval, uses the live evidence
 - The original `compose.yaml` intentionally remains the 002B **test-only fixed ALLOW** example, not the new verifier deployment. Switching to the narrow source is explicit in the separate 003A config.
 - Missing/failed native plugin loading can still leave Bifrost healthy and serving; integration tests detect it, but no external startup readiness gate exists. Health is not authorization or verifier readiness. Inference/service/management authentication and secret distribution are development-only. The live gateway is loopback-bound; the offline stack exposes no host ports.
 - The race detector covers plugin unit execution, not an instrumented full gateway. Unit cancellation proves the source respects its supplied context; transport disconnect propagation, load saturation, and production performance are not qualified.
-
-Stop after Task 003A for review. Recommended commit, **not created**: `feat(verification): enforce narrow Python release evidence verdicts`.
 
 ## 2026-11-07 follow-up: configurable live timeouts
 
@@ -278,4 +278,4 @@ The observed long path was `http_pre,pre_request,pre_llm,post_llm,http_post`, fo
 
 Local ignored `artifacts/003a-timeouts/` retains build logs, `python-final.log`, `verification.log`, `smoke.log`, `long-verification.log`, runtime traces, opt-in-guard output, and targeted pinned source files. Test deployments were removed after capture.
 
-The live test was **not run with credentials** during this follow-up: both `EPOCHGUARD_RUN_LIVE_TAVILY=1` and an environment credential were absent. The opt-in command in the preceding section now selects the longer profile automatically. A future passing run must report the full typed FastAPI policy outcome and evidence metadata; the reported raw extraction is not a substitute. Recommended follow-up commit, not created: `fix(verification): configure bounded live verification deadlines`. Stop for review.
+The live test was **not run with credentials** during this follow-up: both `EPOCHGUARD_RUN_LIVE_TAVILY=1` and an environment credential were absent. The opt-in command in the preceding section now selects the longer profile automatically. A future passing run must report the full typed FastAPI policy outcome and evidence metadata; the reported raw extraction is not a substitute.

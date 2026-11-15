@@ -4,13 +4,13 @@ The separate [004F prose-planning experiment](../../docs/task-004f.md) now reuse
 this package's unchanged ModelExtractor, Gemini controls, exact alignment and
 canonical classifications. Its independent risk auditor challenges omissions,
 nonfresh classifications and unsupported policy mappings; even PLAN_READY is
-non-authorizing. The gateway remains restricted to the existing 004B templates.
+non-authorizing. The separately qualified [bounded-prose gateway](../../docs/architecture.md) parses a finite language independently and never consumes model planning records.
 004F has its own 66-case draft collection and reports and does not tune against
 or replace the historical 004A data/metrics below. **MODEL QUALITY QUALIFICATION PENDING**; no fake-provider result establishes real-model performance.
 
 Identify assertions and their temporal requirements without verifying them or authorizing response release. This package is independent of FastAPI `/v1/verify`, Bifrost and Tavily. It reuses Pydantic/httpx from the existing lockfile. See [annotation rules](ANNOTATION.md), [JSON schema](schema-004a.v1.json) and [the qualification report](../../docs/task-004a.md).
 
-The dataset has 112 synthetic draft examples and 184 factual assertions. **Independent human review is pending.** A narrow historical ten-case Gemini development run had seven extraction failures. The revised exact-alignment pipeline has not yet been live-qualified. Fake outputs exercise plumbing only. Baseline measurements and error records are in [reports](reports/).
+The dataset has 112 synthetic draft examples and 184 factual assertions. **Independent human review is pending.** A narrow historical ten-case Gemini development run had seven extraction failures. The revised exact-alignment pipeline is not independently quality-qualified. A later ten-call Gemini diagnostic is operator-reported against draft labels; no independently qualified benchmark or new metrics are established here. This is separate from the historical pre-alignment run. Fake outputs exercise plumbing only. Baseline measurements and error records are in [reports](reports/).
 
 Use Python 3.12 and the existing lockfile. From the repository root in PowerShell (reuse `.venv-003a` if it already exists):
 
@@ -36,7 +36,7 @@ Evaluation adds `analysis_outcomes` counts and an `analyzed_only` metric group. 
 
 ## Reproducible demonstrations
 
-Run each name in `mixed`, `version`, `implicit`, `historical`, `adversarial`:
+After the environment setup above, run each name in `mixed`, `version`, `implicit`, `historical`, `adversarial`:
 
 ```powershell
 $name = 'implicit'
@@ -90,7 +90,7 @@ For an explicitly authorized **two-request** live comparison, from repository ro
 ```powershell
 $env:PYTHONPATH = 'services/claim_analysis'
 $env:GEMINI_API_KEY = [System.Net.NetworkCredential]::new('', (Read-Host 'Gemini API key' -AsSecureString)).Password
-$env:EPOCHGUARD_CLAIM_MODEL = 'gemini-3.5-flash-lite'
+$env:EPOCHGUARD_CLAIM_MODEL = Read-Host 'Exact Gemini model ID supporting the structured-output contract'
 $env:EPOCHGUARD_CLAIM_INPUT_USD_PER_MILLION = Read-Host 'Current input USD per million tokens for this model/tier'
 $env:EPOCHGUARD_CLAIM_OUTPUT_USD_PER_MILLION = Read-Host 'Current output USD per million tokens for this model/tier'
 $env:EPOCHGUARD_ALLOW_MODEL_CALLS = '1'
@@ -181,7 +181,7 @@ foreach ($comparisonPath in @($baselinePath, $geminiPath)) {
 (Get-Content -LiteralPath $geminiPath -Raw | ConvertFrom-Json).records | Select-Object case_id, status, reason, failure_details | ConvertTo-Json -Depth 8
 ```
 
-This comparison is pending until a new live run actually executes. Scripted alignment round trips are not model-quality results. The annotated facts are still human-review drafts, and alignment does not establish their truth or complete claim coverage. Do not tune against the held-out set.
+This procedure does not establish that a new comparison ran. The operator-reported ten-call diagnostic does not independently qualify this comparison or its draft labels. Scripted alignment round trips are not model-quality results. The annotated facts are still human-review drafts, and alignment does not establish their truth or complete claim coverage. Do not tune against the held-out set.
 
 ## Evaluation records with validation diagnostics
 
@@ -205,7 +205,7 @@ Then explicitly authorize up to **three** model requests using the same model an
 
 ```powershell
 $env:GEMINI_API_KEY = [System.Net.NetworkCredential]::new('', (Read-Host 'Gemini API key' -AsSecureString)).Password
-$env:EPOCHGUARD_CLAIM_MODEL = 'gemini-3.5-flash-lite'
+$env:EPOCHGUARD_CLAIM_MODEL = Read-Host 'Exact Gemini model ID supporting the structured-output contract'
 $env:EPOCHGUARD_CLAIM_INPUT_USD_PER_MILLION = Read-Host 'Current input USD per million tokens for this model/tier'
 $env:EPOCHGUARD_CLAIM_OUTPUT_USD_PER_MILLION = Read-Host 'Current output USD per million tokens for this model/tier'
 $env:EPOCHGUARD_ALLOW_MODEL_CALLS = '1'

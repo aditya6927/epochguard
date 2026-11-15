@@ -1,57 +1,24 @@
 # Evidence verifier
 
-The separate [004G bounded-prose mode](../../docs/task-004g.md) uses private
-`/v1/verify/prose`, contract `004g.v1` and policy `bounded-prose-v1`. It admits
-exactly the original two sentences plus seven finite 004F paraphrases, with
-independent full-response Go/Python parsing and policy-specific protected
-receipts. It invokes the unchanged two-policy evidence pipeline on reconstructed
-canonical sentences; the original candidate and exact ASCII spans remain bound
-separately. Extra prose and nonfactual exceptions are refused. The 004F planner
-and model cannot authorize this mode. Its separate Compose stack and host driver
-are offline; **004G LIVE QUALIFICATION PENDING**. Existing entry points below
-retain their behavior.
+This service supplies bounded evidence records to native Go enforcement. It does not release gateway responses itself. Trusted deployment configuration selects the contract; client text cannot choose policies or evidence modes.
 
-The qualified FastAPI `/v1/verify` route implements the unchanged `003a.v1`
-Python Windows release-label policy. Its Go client validates that contract before
-gateway delivery. See [the policy specification](../../docs/task-003a.md) and
-[live qualification limits](../../docs/task-003b.md).
+| Private endpoint | Contract / language | Qualification |
+| --- | --- | --- |
+| `POST /v1/verify` | `003a.v1`, one Python Windows template | Legacy narrow live qualification |
+| `POST /v1/verify/multiclaim` | `004b.v1`, two exact templates, up to eight claims | Narrow live qualification with controlled provider and explicitly legacy v1 protected receipts |
+| `POST /v1/verify/prose` | `004g.v1` / `bounded-prose-v1`, nine exact ASCII forms | Real gateway/ingress qualified offline; **004G LIVE QUALIFICATION PENDING** |
 
-`verifier.multiclaim` provides the experimental `004b.v1` API and offline CLI.
-It is **not imported by `/v1/verify`**. A separately configured experimental
-gateway mode validates its records through the isolated 004C profile below;
-the default and existing 003A deployments remain unchanged. It shares this
-service's dependencies, existing Python policy/retrieval and unchanged 004A
-schemas/alignment. No additional production microservice is introduced.
-
-The [004E live composition](../../docs/task-004e.md) uses a separate
-`verifier.multiclaim.deployment:live_app` factory. It requires explicit runtime
-opt-in, the fixed live deadline profile and a bounded Tavily secret file. It
-rejects fixture/endpoint/package/policy/timeout overrides and constructs the
-real fixed-source retrievers with `fixture=False`. Existing entry points retain
-their behavior. The maintainer-authorized **November 14, 2026** run met the narrow
-protected live acceptance checks, based on subsequent inspection of preflight,
-measurements and verifier reports: two supported claims delivered unchanged,
-contradiction/unsupported/missing-plugin refusals and preserved provider error.
-All five client expectations were met; the runner printed collected results,
-not a final live PASS. See the [dated report assessment](../../docs/task-004e.md).
-This covers the receipt-gated ingress and real sources with a controlled provider
-under exact templates. Offline transport faults remain simulations; general
-prose, commercial LLMs, origin freshness and production authentication/readiness
-are not qualified.
-
-From the repository root, the credential-free real-gateway demonstration is:
+[Architecture](../../docs/architecture.md) defines the trust/receipt contracts; [operations](../../docs/operations.md) provides fresh-clone builds, isolated regressions and explicitly gated live workflows. The credential-free bounded-prose demonstration uses only a standard-library host runner:
 
 ```powershell
-& .venv-003a/Scripts/python.exe tests/livequalification/qualify.py --build
+py -3.12 tests/boundedprose/qualify.py --build --builder default
 ```
 
-The report includes masked PowerShell credential setup and the separately gated
-`--live` command. Its one-shot preflight and two factual requests share a maximum
-of three retrieval invocations per source. Private bounded telemetry records
-canonical versions, evidence identifiers/digests, observations and timings without
-raw evidence text. These are observation times, not origin publication times.
-Routine live readiness uses an authenticated negative canary with zero source
-calls; readiness does not attest source health or successful factual support.
+It uses simulated sources and a controlled provider, not live observations. Current G profiles require request-bound receipt v2 and project a minimal HTTP response preserving the exact approved assistant content. Legacy profiles retain v1 behavior and its request/metadata limitations.
+
+The November 14, 2026 maintainer-authorized exact-template run used actual Tavily/Python.org and PyPI through ingress, Go and Python with a controlled provider. Subsequent inspection found all five client expectations met; the runner collected results rather than declaring final live PASS. Its maximum/recorded three application retrievals per source are not billing or origin-fetch counts. See [the dated assessment](../../docs/task-004e.md). This does not qualify G live operation, arbitrary prose, a commercial LLM or production readiness.
+
+`verifier.multiclaim` is not imported by the legacy `/v1/verify` endpoint. The experimental root-context images include the sibling claim-analysis schema package; the original legacy Docker context remains independent. `verifier.bounded_prose` invokes the existing two-policy evidence engine using independently reconstructed canonical sentences, while separately binding original text/spans. Go rederives those mappings and never consumes 004F planning records.
 
 ## Experimental natural-language planning
 
@@ -64,6 +31,8 @@ cannot be used as gateway ALLOW. No gateway mode, app route, 004B contract or
 evidence policy is changed. Optional shadow comparison accepts injected offline
 fixtures only and never overrides unresolved coverage.
 
+Create the [local Python environment](../../docs/operations.md#python-development-and-offline-checks) first, then run from the repository root:
+
 ```powershell
 $env:PYTHONPATH = 'services/verifier;services/claim_analysis'
 & .venv-003a/Scripts/python.exe -m verifier.prose analyze --engine baseline --text-file services/verifier/examples/prose/mapped.txt
@@ -75,12 +44,11 @@ Human output omits candidate text; `--json` and explicit evaluation exports incl
 source-bound records. The separate 66-case [draft collection](data/prose-v1/README.md)
 and [offline reports](reports/prose-v1/README.md) preserve failures, omissions and
 false-complete metrics. **MODEL QUALITY QUALIFICATION PENDING**; fake-provider
-tests are not model-quality evidence. The report gives the separate operator-run
-Gemini diagnostic (explicit credentials/prices, at most ten selected calls).
+tests are not model-quality evidence. The [planning report](../../docs/task-004f.md#optional-operator-run-model-diagnostic) gives a separately opted-in diagnostic procedure (at most ten selected calls). A later ten-call Gemini diagnostic is operator-reported against draft labels, not an independently qualified benchmark; it does not establish semantic completeness or release authority.
 
-## Supported response format
+## Supported response languages
 
-An eligible candidate contains one to eight exact sentences selected from:
+The legacy `003a.v1` endpoint accepts only the first sentence below and retains its 512-byte Go candidate bound. The `004b.v1` multi-claim mode accepts one to eight sentences from these two templates:
 
 ```text
 The latest stable Python 3 release for Windows listed on Python.org is 3.X.Y.
@@ -101,8 +69,21 @@ instructions, Unicode lookalikes and all unrecognized content make coverage
 UNCERTAIN and stop evidence work. Different versions of one policy are separate
 required claims, never deduplicated. Empty/non-factual-only input is insufficient.
 
-This is a whole-response grammar, not general semantic coverage. One supported
-claim cannot authorize unverified neighboring content.
+The `004g.v1` bounded-prose language adds exactly these seven forms (`V` obeys the same policy-specific numeric bounds):
+
+```text
+Python.org currently lists Python V as its latest stable Windows release.
+Python.org lists Python V as its latest stable Windows release.
+Python.org lists V as the latest stable Windows release.
+Python.org lists Python V as its latest stable release for Windows.
+PyPI reports requests version V.
+The PyPI JSON API reports requests version V.
+According to the PyPI JSON API, the version of requests is V.
+```
+
+G accepts only ASCII, one to eight sentences and SP/TAB/CR/LF separators, with exact internal wording/case/punctuation. A duplicate policy/version is refused even if expressed by a different form. Different versions remain separate required claims. There is no greeting, opinion or nonfactual exception. Negations, qualifiers, Unicode punctuation, Markdown and unsupported extra prose cannot pass. Original content is never normalized for client delivery; only a separately bound newline-joined canonical comparison is sent to the two-policy engine.
+
+This is a whole-response grammar, not general semantic coverage. One supported claim cannot authorize unverified neighboring content.
 
 ## Evidence and decisions
 
@@ -139,10 +120,11 @@ Whole-response aggregation is pure and deterministic:
    result per claim, and every result SUPPORTED with satisfied evidence rules.
 5. Every remaining case is INSUFFICIENT. There is no voting or confidence average.
 
+The absent-neighbor contradiction rule describes the 004B contract. G's outer contract additionally requires an explicit evidence result for every original mapping, including insufficient results. Missing results invalidate that record; they cannot become ALLOW or an accepted G aggregate.
+
 ## Run offline from the repository root
 
-Use the existing `.venv-003a` environment, or install the pinned
-`services/verifier/requirements.lock` into a Python 3.12 environment.
+Create the Python 3.12 environment using [operations setup](../../docs/operations.md#python-development-and-offline-checks) before running these CLIs. The environment is gitignored and is not supplied by a clone. For regression execution, use the network-disabled container command there; the commands below are local CLI/focused-test entry points.
 
 ```powershell
 $env:PYTHONPATH = 'services/verifier;services/claim_analysis'
@@ -238,7 +220,7 @@ evidence archive or signed record. Fixture mode cannot satisfy live mode.
 
 ## Optional real-source observations
 
-These commands make **one source request each**, without model or gateway calls,
+These separately opted-in commands make **one source request each**, without model or gateway calls,
 with no retries. They validate and print bounded evidence metadata only. They
 have not been run for Task 004B acceptance. PyPI needs no credential; Python's
 Tavily request requires an operator-provided `TAVILY_API_KEY` and may be billable.
@@ -292,15 +274,7 @@ contradiction can retain 403 with an absent neighboring result; missing results
 can never yield ALLOW. Go validates consistency within a trusted verifier hop;
 metadata and hashes cannot prove a remote source was consulted.
 
-From the repository root, with Docker Desktop running:
-
-```powershell
-docker buildx build --builder epochguard-002a --load -t epochguard-dev:002a -f dev/Dockerfile .
-docker buildx build --builder epochguard-002a --load -t epochguard-verifier:004c -f services/verifier/Dockerfile.004c .
-docker compose -f compose.verify.004c.yaml up -d --force-recreate --wait --no-build gateway gateway-faults gateway-control
-docker compose -f compose.verify.004c.yaml run --rm --no-deps qualification
-docker compose -f compose.verify.004c.yaml down --volumes --remove-orphans
-```
+Build and run this isolated gateway profile using [the operations commands](../../docs/operations.md#other-isolated-gateway-regressions). The same guide covers the protected D/E/G drivers and their cleanup.
 
 The internal-only stack publishes no ports, contains no live API keys and keeps
 semantic caching disabled. Gateway configuration databases live in per-container

@@ -1,5 +1,7 @@
 # Task 002C: real cache lifecycle qualification
 
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
 Executed on 2026-11-06 (Asia/Calcutta), using Docker Desktop Linux/amd64 and the real pinned Bifrost gateway/native plugin loader. This is a qualification milestone, not an implementation of the EpochGuard-owned verified cache. No freshness evidence, Tavily, verification service, dashboard, or safe streaming implementation is included.
 
 ## Results and acceptance boundary
@@ -194,5 +196,3 @@ The `up` command also starts Redis through dependencies. The initial run prestar
 The first cache run failed only the assertion expecting built-in placement/order in the management response. The active cache's fields were omitted. After correcting that assertion, retaining active-status checks and actual trace/order tests, and adding the bounded decision-delay observation, the image was rebuilt and the entire cache suite passed. No tests were disabled or replaced with mocks.
 
 Local ignored evidence under `artifacts/002c/` includes initial/final build and startup logs, `cache-initial.log`, final `cache.log`, per-gateway logs, Redis image/module/TTL evidence, copied build identities, and pinned source. `regression-002b.log` records the full normal smoke suite against the same final plugin image with cache disabled. Both disposable stacks were removed after evidence capture. No required Task 002C checks were left unrun; the unqualified behaviors listed above are outside this experiment's scope.
-
-Stop after Task 002C for review. Recommended commit: `test(cache): qualify Bifrost cache lifecycle and enforcement ordering`. No commit is created automatically.

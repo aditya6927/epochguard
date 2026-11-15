@@ -1,7 +1,9 @@
 # Task 004G-S: request binding and metadata hardening
 
-Baseline: clean `main` at `05ac78939b0efa7dc4f66669b1c1e5bf48e8be23`.
-Implemented November 15, 2026 (Asia/Calcutta). No commit or push.
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
+Implementation baseline: `05ac78939b0efa7dc4f66669b1c1e5bf48e8be23`.
+Implemented November 15, 2026 (Asia/Calcutta).
 **004G LIVE QUALIFICATION PENDING.** All source observations in these checks
 are fixtures/simulated transports; no real Tavily, PyPI, Gemini or paid request.
 
@@ -23,7 +25,7 @@ relay, lifecycle and verifier tests. Actual pinned source was inspected under
 | --- | --- |
 | `transport/handlers/middlewares.go:fasthttpToHTTPRequest` | Copies actual buffered `ctx.Request.Body()` into `HTTPRequest.Body`. Large/streamed paths can omit this copy; absent capture must refuse signing |
 | Same file, `TransportInterceptorMiddleware` | Calls HTTP pre-hooks before inference and applies their request object back to the transport; G hashes its received body in the earliest configured plugin |
-| `transport/integrations/openai.go:openAIResponseConverter` | Converts the typed provider response to the OpenAI HTTP envelope before the transport post-hook |
+| `transport/integrations/openai.go:ChatResponseConverter` | Converts the typed provider response to the OpenAI HTTP envelope before the transport post-hook |
 | `transport/handlers/middlewares.go:runTransportPostHooks` | Copies buffered response entity bytes, calls post-hooks, and applies their modified body. Ordinary hook errors do not reliably enforce refusal |
 | Same file, `applyHTTPResponseToCtx` and response-header hooks | Applies body/status/headers; later headers can change. Ingress independently checks actual received entity bytes and forwards only its own safe headers |
 
@@ -199,7 +201,6 @@ the real native plugin and actual ingress, rather than a mocked loader.
 
 Final tested native image: `sha256:7820344dee00851c7090bdf5f4658596aeeb78229b1e5b9f67af7e246faf0aa4`.
 Final tested G image: `sha256:b69987666e61d1ca4536ce7393ea243c4cef8dc1ba9f1653c619bb02d1e368bf`.
-After cleanup only the pre-existing buildx builder container remained.
 
 The final native build command was:
 `docker buildx build --builder epochguard-002a --load -t epochguard-dev:002a -f dev/Dockerfile .`.
@@ -209,7 +210,6 @@ and `docker build -t epochguard-verifier:004g -f services/verifier/Dockerfile.00
 The updated G driver was executed after these builds. Existing D/E and broader
 regressions ran against the same security implementation; final G additionally
 ran the final fallback/unique-sentinel/isolation test refinements.
-
 
 The combined Python command uses the current source tree read-only and no network:
 
@@ -260,7 +260,6 @@ drivers' offline reproduction directories; 004E live evidence is preserved.
 Legacy Python policies/contracts, grammar/model/planner code, dependency locks,
 old Compose/configuration files and historical D/E reports were not modified.
 
-
 Trusted: host/kernel, pinned binaries, verifier/evidence policies, configured
 plugins, clock, private networking, management and signing key. The private
 verifier hop remains unauthenticated HTTP. This binds requests to received bytes;
@@ -275,12 +274,4 @@ The fixture provider, synthetic evidence and one machine's timings do not qualif
 a commercial model, current live facts, production availability or general prose.
 The 004F planner stays non-authorizing. **004G LIVE QUALIFICATION PENDING.**
 
-**Decision: APPROVE for the scoped offline 004G-S remediation**, supported by
-the request-substitution/metadata negatives and the unit, race and actual gateway
-regressions above. Maintainer review and separately authorized live qualification
-remain outstanding. Static checks also passed: 29 Markdown files, 171 local
-links, 11 anchors, syntax/JSON/whitespace checks and `git diff --check`.
-
-Recommended commit:
-`fix(security): bind protected prose requests and strip provider metadata`.
-No commit or push; stop for maintainer review.
+**Original implementation assessment: APPROVE for the scoped offline 004G-S remediation**, supported by the request-substitution/metadata negatives and the unit, race and actual gateway regressions above. This is the remediation report's assessment, not an independent production security approval. Separately authorized G live qualification remains pending.

@@ -1,402 +1,195 @@
-# EpochGuard architecture
+# Architecture and security contracts
 
-**Status:** the maintainer-authorized November 14, 2026 protected live multi-claim run met its narrow acceptance checks, based on subsequent report inspection: unchanged supported two-claim delivery, contradiction/unsupported/missing-plugin refusals and genuine provider-error preservation. The [004E assessment](task-004e.md) qualifies the 004D ingress boundary and real Tavily/PyPI path together with a controlled provider and exact templates. The runner collected results rather than printing a final live PASS. The legacy single-policy path remains unchanged; its [003B report](task-003b.md) retains the November 8 result and initial blocked attempts. Caching remains disabled; general factual verification, production readiness/authentication and protected caching remain unqualified. A separate [004G bounded-prose mode](task-004g.md) is qualified offline; **004G LIVE QUALIFICATION PENDING**. Updated: 2026-11-15.
+EpochGuard buffers AI gateway answers, checks fixed evidence policies, and refuses responses whose required claims cannot be authorized. Its current protected surface is one non-streaming chat route and a finite claim language. It is not a general factual verifier or a production authentication system.
 
-## Problem and system boundary
+## Capabilities and evidence status
 
-EpochGuard is intended to verify time-sensitive claims in AI-generated responses, track supporting evidence, and prevent known-stale responses from being returned or reused. Its qualified engineering boundary is limited to buffered `POST /openai/v1/chat/completions` and fixed evidence policies with a controlled provider.
-
-The legacy `003a.v1` path uses `/v1/verify` for one exact Python Windows
-release-label sentence. The experimental path uses 004B's deterministic
-whole-response grammar and two-policy comparisons through
-`/v1/verify/multiclaim`; 004C adds independent Go validation/enforcement, 004D
-adds authenticated protected ingress and isolated readiness, and 004E qualifies
-that composition using real Tavily/Python.org and requests PyPI observations.
-The separate 004G path uses `/v1/verify/prose` for nine finite sentence forms
-with independently reconstructed original/canonical bindings and its own receipt
-policy identity; its gateway qualification is offline.
-The two-policy implementation is not a general factual verifier. Production-wide
-readiness and authentication remain outside qualification.
-
-### As implemented in Task 002B
-
-```text
-Client (HTTP, non-streaming)
-    |
-    v
-Bifrost HTTP gateway (v2.4.0, dynamic Linux build)
-    |-- HTTPTransportPreHook     [refuse streaming/async/unsupported routes]
-    |-- PreRequestHook          [EpochGuard: record]
-    |-- PreLLMHook              [typed buffered-chat guard]
-    |       |
-    |       v
-    |   local OpenAI-compatible fixture provider
-    |       |
-    |       v
-    |-- PostLLMHook             [preserve provider error OR wait for decision]
-    |       |-- ALLOW          [same response pointer]
-    |       |-- REJECT         [nil response, terminal typed 403]
-    |       '-- UNAVAILABLE    [nil response, terminal typed 503]
-    |-- HTTPTransportPostHook   [EpochGuard: diagnostic headers]
-    v
-Client sees allowed fixture response OR safe error
-```
-
-`plugins/epochguard/main.go` exports the native hooks and keeps phase names in a request-owned `hookTrace`. A pointer created at the HTTP phase is visible in the child core context. A `sync.Mutex` protects the trace's slice. Request/response wrappers are borrowed and never retained beyond hook execution.
-
-`decision.go` defines `DecisionSource.Decide(context.Context, *schemas.BifrostResponse) (Decision, error)` and the enforcement policy. A fixed, test-only source ignores client input and provider content. Immutable process configuration is published through an atomic pointer; absent configuration defaults to UNAVAILABLE. Fixed ALLOW/REJECT configuration requires `test_only: true`. This switch acknowledges a fixture, not a production verification policy. Task 003A adds an HTTP implementation; the gateway still owns refusal. Source errors never become client-visible refusal text.
-
-On a successful candidate, the post-hook waits synchronously. REJECT, UNAVAILABLE, evaluation errors, unknown decisions, missing candidates, and cancelled evaluation never return the answer. Refusals use `BifrostError` with a fixed message and `AllowFallbacks: &false`, and return nil for the ordinary Go hook error. Genuine provider errors are preserved by pointer and skip evaluation, including their original fallback policy. Every successful fallback candidate is evaluated. No HTTP post-hook error or header is used to enforce this policy.
-
-`guard.go` returns a complete HTTP 400 before dispatch for streaming, async headers, malformed/missing body snapshots, and registered inference routes other than the supported buffered chat route. Health and management use a separate middleware chain without the HTTP transport interceptor; changing the guard's `/api` exemption would not close that boundary. The typed pre-LLM guard also refuses non-chat and streaming request types. This does not qualify direct SDK traffic or alternate transports.
-
-[Task 003C](task-003c.md) qualifies the actual registered passthrough prefixes, selected alternate transports, raw path variants and configured Warp chat with an isolated synthetic provider. Passthrough buffer/stream controls reach core hooks and expose synthetic answers without EpochGuard; with it they stop at HTTP 400 before dispatch. The router matches `PathOriginal()` while the plugin receives normalized `ctx.Path()`. Tested redirects run before hooks; mismatched passthrough paths fail upstream prefix validation. No tested path released a provider answer with EpochGuard active.
-
-Warp's interactive model call uses `ResponsesStreamRequest` even for buffered HTTP output. It skips HTTP hooks but reaches the core guard, which blocks it before the provider; Warp wraps the typed refusal in HTTP 200 JSON/SSE with an empty answer/error event. Logging/configuration prerequisite 503s are not enforcement. Warp indexing/topic jobs can explicitly skip the plugin pipeline, and management/log/history responses, separate A2A gRPC bindings and background execution are outside the qualified answer boundary. Keep these capabilities and configuration trusted; a raw-path ingress allowlist and isolation of management/background execution require separate design review before any broader deployment claim. No core change or ingress was implemented in this audit.
-
-The plugin loads using upstream exported Go symbols and matching shared module versions. `dev/Dockerfile` checks out the fixed Bifrost commit, builds a dynamically linked gateway and plugin on the same Linux/amd64 Go toolchain, and runs unit tests including the race detector. Compose runs the real gateway smoke tests. The built-in cache is **not enabled** in the default deployment; it is enabled only in the isolated Task 002C qualification stack.
-
-### Task 002C cache qualification
-
-`compose.cache.yaml` adds a real Redis Stack vector backend and direct-only `semantic_cache` configuration (`dimension: 1`, no embedding provider). Seven gateway processes use fixed trusted decisions/placement. A transparent test-only TCP proxy can hold a real Redis HSET before forwarding it, making pending-write/invalidation races deterministic. No service in this stack publishes a host port.
-
-Observed order, with unrelated built-ins omitted:
-
-| Placement | Miss | Hit |
-| --- | --- | --- |
-| pre_builtin | E.Pre, C.Pre, provider, C.Post, E.Post | E.Pre, C.Pre, C.Post, E.Post |
-| post_builtin | C.Pre, E.Pre, provider, E.Post, C.Post | C.Pre, C.Post; EpochGuard LLM hooks skipped |
-
-The cache serializes and launches its own writer before early EpochGuard evaluates the candidate. Experiments observed physical storage while a REJECT decision was pending. Moving EpochGuard late prevents writing rejected misses but lets cached answers bypass its LLM hooks. These are isolated unsafe controls, not approved protected configurations.
-
-The optional trusted `cache_no_store` flag sets the exported `semanticcache.CacheNoStoreKey` in EpochGuard's pre-hook, after transport parses headers. It suppresses all built-in writes, including allowed ones, while preserving reads. The tests prove a client false value cannot undo it and that cached candidates still receive safe early refusals. `test_decision_delay_ms` remains a bounded, cancellation-aware test fixture for 002C. Task 003A's HTTP source always sets server no-store as defense in depth and keeps caching disabled. `X-EpochGuard-Cache-At-Post` snapshots cache telemetry for diagnostics only.
-
-Both supported management deletion APIs removed settled entries, with scope and provider-counter controls. Both also allowed a held, older asynchronous writer to repopulate an absent entry after successful invalidation. Physical deletion and TTL do not establish logical revocation or factual freshness. [Task 002C](task-002c.md) records exact source, traces, counters, commands, and limitations; [ADR 0003](decisions/0003-protected-cache-ownership.md) proposes ownership of verified admission and generation-aware revocation for the future cache.
-
-### Task 003A narrow evidence path
-
-```text
-Buffered provider candidate inside Bifrost
-  -> Go exact whole-answer parser / request nonce / SHA-256
-  -> bounded, context-aware HTTP call to trusted FastAPI /v1/verify
-  -> fixed-URL Tavily Extract (candidate is not sent to Tavily)
-  -> unique Python.org Windows latest-stable label comparison
-  -> typed verdict + evidence reference + observation times + reason
-  -> Go validates binding, mode, timestamps and verdict consistency
-  -> original response OR nil response + terminal typed refusal
-```
-
-The only accepted sentence is `The latest stable Python 3 release for Windows listed on Python.org is X.Y.Z.` Equal numeric versions map to SUPPORTED/ALLOW, older candidates to CONTRADICTED/REJECT, and newer candidates to INSUFFICIENT/UNAVAILABLE because the source extraction may lag. Unsupported/additional claims, ambiguous/missing evidence, timeout, malformed records, and network/verifier failures are unavailable. No LLM interprets retrieved instructions. Only one complete plain assistant choice is covered.
-
-`services/verifier/verifier/contract.py` and `plugins/epochguard/http_decision.go` define schema `003a.v1`, policy `python-windows-latest-v1`, request/hash binding, typed claim/verdict/reasons, canonical evidence URL, content hash, retrieval ID/mode, and retrieval/observation/check times. Observation time is receipt of extracted text, not proof of origin publication time or Tavily's fetch age. The verifier and its network/configuration remain trusted; records are not signed attestations. `fixture` evidence requires explicit test configuration and is rejected in live mode.
-
-FastAPI bounds bodies, retrieval and work deadlines; Go independently bounds response size and total HTTP duration and respects the supplied cancellation context. The 2026-11-07 follow-up makes service budgets validated process configuration: offline defaults remain 4/4.5/6 seconds, while the opt-in live profile uses 20/22/25 seconds and a 30-second integration client. Pinned source inspection and a real 12.567-second offline gateway test confirm that the fixture provider's ten-second network timeout does not bound post-hook work on this path. Existing synchronous typed refusals, genuine upstream error preservation, and no-fallback behavior remain unchanged. No answer is released while the decision is pending. Actual transport disconnect propagation and production providers remain unqualified.
-
-`compose.verify.yaml` runs real gateway/plugin/service instances on an internal network, using only an HTTP Tavily fixture. `compose.verify.live.yaml` explicitly enables egress and loopback gateway access with an environment key for manual live follow-up. Default `compose.yaml` remains the fixed test-only 002B example. [Task 003A](task-003a.md) records the contract, trust assumptions, experiments, actual counters, latencies, and live-test instructions. There is no new cache or persistent evidence database.
-
-The live override explicitly selects `TestLiveGatewayQualification` and requires a runner opt-in flag. The runner shares the existing HTTP assertions, receives no API credential, obtains a dynamic version from one direct verifier observation, and then exercises supported/older candidates through Bifrost with usable fallbacks and forged controls. No enforcement or verification architecture changes are introduced. [Task 003B](task-003b.md) distinguishes the earlier blocked attempts, separately reported FastAPI pass, successful maintainer-run gateway qualification, and unavailable live retrieval counts.
-
-### Supported and unsupported surface
-
-| Qualified in 002B | Not qualified in 002B |
+| Mode / component | Implementation and qualification |
 | --- | --- |
-| `/openai/v1/chat/completions` | Other HTTP inference routes, direct SDK calls |
-| Buffered requests; streaming/async pre-dispatch refusal | Safe streamed response delivery, realtime, passthrough, async jobs |
-| Local deterministic OpenAI-compatible fixture | Production providers, private repositories, third-party user data |
-| Plugin load/order, typed refusal, no answer leak, terminal fallback | Enforced startup readiness, live verification, arbitrary plugin combinations |
-| Concurrent smoke requests and plugin unit race detection | Race detection of gateway internals, load testing, production performance |
+| `004g.v1` / `bounded-prose-v1` | Implemented; real gateway/ingress qualified **offline** with simulated sources and controlled provider. Nine sentence forms, independent Go/Python parsing, request-bound receipt v2 and minimal response projection. **004G LIVE QUALIFICATION PENDING** |
+| `004b.v1` / `multi-claim-templates-v1` | Implemented; exact two-template language. Narrow November 14, 2026 **live** source qualification through legacy protected ingress, assessed from maintainer-authorized reports; controlled provider, v1 receipt |
+| `003a.v1` / `python-windows-latest-v1` | Legacy single-template endpoint; narrow November 8, 2026 **live** gateway qualification from maintainer-supplied execution evidence |
+| `004a.v1` identification and `004f.prose-plan.v1` planning | Experimental; non-authorizing, draft datasets, independent model-quality qualification pending |
+| EpochGuard-owned protected cache / atomic revocation | Proposed in [ADR 0003](decisions/0003-protected-cache-ownership.md); not implemented |
 
-The configured development fixture is intentionally unauthenticated on inference and bound to host loopback. It must not be deployed as a production service.
+The live multi-claim runner printed `LIVE RUN COLLECTED: independent result review required`. Subsequent inspection found its five client expectations met; three attempted/completed application-level retrievals per source were recorded, not billing or origin-fetch counts. See [004E evidence](task-004e.md), [legacy live evidence](task-003b.md) and [current security regression evidence](task-004gs.md). These reports qualify their stated revisions and finite test cases, not arbitrary provider/model compatibility or production readiness.
 
-## Experimental claim-identification boundary
+## Components and responsibilities
 
-[Task 004A](task-004a.md) adds a stand-alone Python package/CLI under `services/claim_analysis/`, with schema `004a.v1`. Claims bind exact Unicode code-point spans to the original response and separate factuality, temporal scope, fresh-evidence requirement and uncertainty. A sentence/lexicon baseline and an actual opt-in Gemini HTTP adapter share strict output validation. The model receives original text, not baseline-selected claims. Neither engine produces a truth verdict or authorizes release.
+| Component | Responsibility and owned state |
+| --- | --- |
+| [Protected ingress](../internal/ingress/ingress.go) | Route/body admission, retained forwarded bytes, fresh nonce, complete upstream buffering, independent receipt/body checks and safe client release |
+| Pinned Bifrost HTTP gateway | Provider dispatch, conversion to HTTP response, plugin pipeline and management. Management/background execution is outside the protected answer route |
+| [Go plugin](../plugins/epochguard/) | Typed request guard, synchronous evidence decision, independent grammar/contract validation, terminal refusals, response projection and signing |
+| [Python verifier](../services/verifier/) | Strict request/result schemas, bounded grammar parsing, fixed evidence retrieval, source parsing, comparisons and deterministic aggregation |
+| [Claim analyzer](../services/claim_analysis/) and [prose planner](../services/verifier/verifier/prose/) | Optional proposals, exact quote alignment, independent bounded audit and evaluation; never an authorization authority |
+| Fixture provider, relays and qualification runners | Test-only controlled candidates, faults, observations and assertions; not production components |
 
-The 112-case/184-factual-annotation dataset is an agent-authored review draft with separate development/held-out files. Human review and real-model performance qualification remain pending; fake-adapter tests qualify plumbing only. Baseline held-out fresh-evidence recall is poor. Its identification engines do not authorize the default gateway path; the multi-claim implementation below reuses canonical schemas with trusted grammar coverage. The existing `003a.v1` contract, single Python policy and route/enforcement boundaries remain unchanged. Future use of model extraction still requires complete response coverage: one verified claim cannot authorize unsupported, omitted or uncertain neighbors, and STABLE/HISTORICAL classification is not proof of truth.
+The native build pins Bifrost HTTP `transports/v2.4.0` at `e869c3f9adc96ea53c38694a21bb04a8e1085487`, core `v1.14.1`, framework `v1.11.1`, semantic cache `v1.7.4`, and Go `1.27.3` Linux/amd64. Host/plugin module graphs and build flags match. The gateway is dynamically linked; stock static gateway binaries cannot load this `.so`. [Integration findings](bifrost-integration-spike.md) and [ADR 0001](decisions/0001-native-bifrost-plugin.md) explain this compatibility boundary. No Bifrost core fork is required.
 
-The model-facing `004a.identification.v1` representation now omits offsets. Python accepts only globally unique exact quotes, calculates original Unicode code-point spans, rejects out-of-order/overlapping claims, then validates the unchanged canonical `004a.v1` contract and source binding. There is no normalization, fuzzy repair, quote replacement or partial acceptance; repeated ambiguous text fails closed. This reduces offset-generation responsibility without verifying semantic correctness or coverage. Live performance of this revised pipeline remains pending; [Task 004A](task-004a.md#deterministic-source-span-alignment-2026-11-09) records the fixed development comparison and qualification commands.
+## Request and response flow
 
-## Experimental multi-claim verification boundary
-
-[Task 004B](task-004b.md) adds `verifier.multiclaim` inside the existing Python
-service source tree, initially exposed through a programmatic API and offline
-CLI. [Task 004C](task-004c.md) separately integrates that engine into an explicitly
-configured native gateway mode. The existing `003a.v1` and `004a.v1` contracts
-and default deployments remain unchanged.
-
-```text
-Exact original response + trusted request ID + UTF-8 SHA-256
-  -> trusted complete-response template grammar (maximum eight claims)
-  -> canonical 004A spans / optional 004A extraction schema + binding + agreement
-  -> fixed registry: existing Python Windows policy / requests PyPI JSON policy
-  -> bounded independent evidence observations and deterministic comparisons
-  -> typed per-claim results + coverage + pure aggregation -> 004b.v1 record
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant I as Protected ingress
+    participant G as Bifrost + Go plugin
+    participant P as Provider
+    participant V as Python verifier
+    participant S as Fixed evidence sources
+    C->>I: Buffered chat request
+    I->>G: Retained body bytes + fresh nonce
+    Note over G: Capture digest of received HTTP body
+    G->>P: Qualified provider request
+    P-->>G: Candidate or genuine provider failure
+    G->>V: Candidate, trusted ID and binding
+    V->>S: Fixed-URL bounded retrievals
+    S-->>V: Untrusted source bodies
+    V-->>G: Typed claims, evidence and verdicts
+    Note over G: Independently validate; project final entity; sign
+    G-->>I: Buffered HTTP response + receipt
+    Note over I: Verify protocol, MAC, request, outcome and entity
+    I-->>C: Exact approved content or safe refusal/error
 ```
 
-SUPPORTED requires complete grammar coverage and every required claim supported.
-A validated contradiction takes precedence over insufficient neighboring claims;
-missing results never count as successful checks. Invalid result bindings,
-extraction failures, omitted claims, unsupported prose and uncertain coverage
-cannot produce SUPPORTED. This solves coverage only for the exact template
-language, not arbitrary semantics. Model classifications do not choose policy or
-waive evidence requirements. Fixture evidence remains explicitly separate from
-live observations, and neither timestamps nor hashes prove source authenticity.
+1. Ingress admits only buffered `POST /openai/v1/chat/completions`, with bounded bodies and a fresh 256-bit nonce. It forwards no client headers; client-supplied nonce/digest/bypass/auth/management headers have no authority.
+2. The earliest configured Go HTTP pre-hook captures the digest of Bifrost's actual received body. The pinned transport copies buffered `ctx.Request.Body()` into `HTTPRequest.Body`; absent, empty or oversized capture cannot authorize a bounded-prose receipt.
+3. HTTP and typed core guards refuse unsupported request modes. For a successful eligible provider candidate, `PostLLMHook` waits synchronously for verification. No answer is released during that wait.
+4. Python derives the required claims and performs sequential evidence checks. Go independently reconstructs the complete grammar, validates strict result bindings/evidence and recomputes aggregation.
+5. REJECT/UNAVAILABLE return nil response and a typed terminal `BifrostError` with `AllowFallbacks=false`. Ordinary Go hook errors and diagnostic headers are not enforcement mechanisms.
+6. After Bifrost converts the typed response to its HTTP entity, the transport post-hook verifies correspondence with the executed decision, projects permitted metadata, and signs the final entity bytes. Ingress buffers and validates the actual received entity before release.
 
-One Pipeline instance per event loop bounds admitted requests; each admitted
-request checks claims sequentially under a shared deadline. There is no
-evidence/cache persistence or streaming delivery. The
-[component README](../services/verifier/README.md) specifies the grammar, evidence
-sources, lifetimes, resource limits and offline demos.
+The request-owned trace is shared between transport and core contexts and protected by a mutex. It retains copied bounded strings/digests, not pooled request/response pointers. Immutable policy snapshots are atomically published; an absent policy cannot ALLOW. Signing also requires the same policy still active. Each fallback replaces the prior attempt's attestation state.
 
-### Controlled experimental gateway integration
+## Claim language and evidence validation
 
-```text
-Client -> real buffered Bifrost -> fixture provider -> EpochGuard PostLLMHook
-  -> explicit verifier.mode=004b.v1 / nonce + candidate + UTF-8 hash
-  -> dedicated FastAPI /v1/verify/multiclaim -> unchanged 004B pipeline
-  -> strict bounded result -> independent Go grammar/binding/evidence/aggregation
-  -> original response OR terminal typed 403/503 without fallback
+Three private verifier endpoints have separate contracts:
+
+| Endpoint | Contract | Candidate language |
+| --- | --- | --- |
+| `POST /v1/verify` | `003a.v1` | One exact Python Windows release-label sentence |
+| `POST /v1/verify/multiclaim` | `004b.v1` | One to eight sentences from two exact templates |
+| `POST /v1/verify/prose` | `004g.v1` | One to eight sentences from nine exact ASCII forms |
+
+Trusted process configuration selects the mode, evidence source mode and policy. Inference headers, prompts and model output cannot choose them. The [verifier guide](../services/verifier/README.md#supported-response-languages) specifies exact syntax, separators, version bounds and examples.
+
+Bounded prose binds original text/digest/spans separately from reconstructed canonical comparison sentences. Python derives mappings from original text; Go independently rederives the whole original/canonical relationship, including count, order, offsets, IDs and hashes, before checking the embedded two-policy evidence result. A COMPLETE grammar parse establishes coverage only within that finite syntax. It does not prove general semantic completeness or the correctness of a model's claim selection.
+
+| Policy | Fixed observation and checks |
+| --- | --- |
+| `python-windows-latest-v1` | Tavily Extract of `https://www.python.org/downloads/windows/`; require expected stable Windows context and a unique primary `Latest Python 3 Release - Python V` label |
+| `pypi-requests-reported-v1` | GET `https://pypi.org/pypi/requests/json`; require exact `info.name == "requests"`, canonical numeric `info.version`, and boolean `info.yanked == false` |
+
+Candidates are not sent to Tavily. PyPI descriptions/links are ignored; no source body can select a URL, policy or instruction. Retrieval disables redirects and environment proxies, limits bodies to 1 MiB and uses fixed deadlines. Malformed/duplicate/nonfinite JSON, wrong identity/context, ambiguous labels or unsupported version shapes cannot authorize release.
+
+An equal numeric version is SUPPORTED; an older candidate is CONTRADICTED; an ahead-of-observation candidate is INSUFFICIENT because the source may lag. Observation times must satisfy the local -2..60-second window. They measure receipt of extracted content, not origin publication time, fetch age, installability, compatibility or security.
+
+Evidence binds the configured URL, `fixture` / `tavily_live` / `pypi_live` mode, retrieval ID, raw-content hash, observed version and times. Go validates evidence-identity consistency; trusted Python validates raw bodies and computes the hash. A hash or source-mode label alone cannot prove that a remote source was consulted. Fixture evidence is refused in configured live mode.
+
+## Decisions, failures and provider metadata
+
+| Outcome | Protected behavior |
+| --- | --- |
+| All required claims SUPPORTED | ALLOW / 200, exact approved assistant content |
+| Independently validated CONTRADICTED claim | REJECT / 403, no answer, no policy fallback |
+| Uncertain coverage, invalid binding/result, unavailable evidence, timeout or transport failure | UNAVAILABLE / 503, no answer |
+| Missing/invalid receipt, absent/disabled/reconfigured plugin or changed entity | Ingress 503, no unvalidated upstream body |
+| Genuine provider failure | Preserve failure and core fallback semantics; bounded-prose HTTP error projection retains status and an allowlisted category |
+
+No voting, confidence average or partial answer release is used. In the template mode, a validated contradiction can still refuse with an absent neighbor; missing results never authorize ALLOW. Bounded-prose validation requires an explicit result for every mapping, including insufficient outcomes, before accepting the aggregate.
+
+For bounded prose, the final ALLOW entity is this minimal structure:
+
+```json
+{"choices":[{"finish_reason":"stop","index":0,"message":{"content":"<exact approved text>","role":"assistant"}}],"object":"chat.completion"}
 ```
 
-The new mode is selected only by trusted plugin configuration; omitted mode
-still selects `003a.v1`. Go shares the pinned plain-message eligibility guard
-but uses the 004B 8,192-code-point/32,768-byte candidate limits, a 64 KiB request
-and a 256 KiB response bound. The original 003A parser, 512-byte candidate rule,
-wire validator and endpoint remain unchanged. Go rederives all full-response
-spans/IDs/policies/versions instead of trusting COMPLETE or SUPPORTED. Its new
-JSON parser requires exact nested names, types and required fields, rejects
-duplicates/unknowns/null scalar substitutions and bounds arrays/depth. It checks
-configured evidence modes, source URLs, observation times and numeric verdict
-consistency, then recomputes whole-response aggregation. A missing result cannot
-authorize release; a validated independent contradiction can still refuse.
+The decoded assistant content string is preserved exactly, including admitted ASCII separators. The entire provider envelope is not preserved. Provider-controlled `id`, `model`, `created`, `system_fingerprint`, `service_tier`, usage, extra fields, routing information and nested metadata are discarded. Unknown/raw/annotation/tool/reasoning/multimodal shapes may be refused earlier. Ingress independently requires the minimal representation and does not forward upstream response headers or diagnostics. SDKs requiring full OpenAI envelope metadata need a separate compatibility decision.
 
-The experimental root-context Python image includes both required packages and
-composes the endpoint with the old app, without changing the original image's
-build context. Endpoint input/output are bounded before release, disconnect
-cancels work, and fixed diagnostics exclude raw candidate/evidence/exception
-text. The packaged `Dockerfile.004c` factory is fixture-only with explicit test
-configuration; the separate live factory/profile is described below.
-The isolated `compose.verify.004c.yaml` uses internal networking, no published
-ports/real credentials, disabled caching and tmpfs configuration databases.
-Its test relay corrupts real results; a separate no-plugin gateway is an
-intentional unsafe control. These components are not public deployment examples.
+Genuine provider failures retain their core error pointer/fallback behavior. In bounded-prose HTTP output, their code/message become `epochguard_provider_error` / `Provider request failed.`; the category is allowlisted or `provider_error`. A successful fallback candidate must pass evidence checks. This error channel is not verified factual content. Explicitly legacy profiles retain their original envelope/error reflection limits.
 
-Go establishes consistency within a trusted verifier boundary. It cannot prove
-retrieval occurred or authenticate a forged evidence record. Verifier-hop
-authentication, an external readiness gate and origin freshness remain absent
-from those direct-gateway profiles. The separate protected boundary below adds
-per-response enforcement integrity without changing them.
-The missing-plugin control demonstrates unchecked delivery despite gateway
-health. The original 004C qualification covers the exact grammar with fixtures,
-not live evidence, general prose, background work, arbitrary routes, streaming
-or protected caching.
+## Receipt authentication and protocol isolation
 
-## Experimental protected ingress boundary
+[Signer](../plugins/epochguard/attestation.go) and [ingress validator](../internal/ingress/ingress.go) implement distinct configured protocols:
 
-[Task 004D](task-004d.md) adds an opt-in client entry point rather than changing
-the existing direct gateway deployments:
+| Profiles | Required protocol / policy | Request and metadata guarantee |
+| --- | --- | --- |
+| `004g`, `004g-live` | `004g.receipt.v2` / `004g.v1/bounded-prose-v1` | Exact received/forwarded request-body digest plus minimal response projection |
+| Original D and explicitly legacy E | `004d.v1` / `004b.v1/multi-claim-templates-v1` | Nonce/response binding only; no original request-body digest, original metadata behavior |
 
-```text
-Client network: client -> protected ingress (exact buffered chat route + /ready)
-                                  |
-Private network:               private Bifrost -> EpochGuard -> existing 004B verifier
-                                  |
-                    core decision recorded per request
-                    HTTP post-hook checks candidate/error binding
-                    HMAC receipt over nonce/status/policy/outcome/body digest/time
-                                  |
-                    ingress buffers actual received body and verifies receipt
-                    -> unchanged allowed body / safe refusal
-```
+There is no downgrade or automatic v2 upgrade for legacy profiles. Their historical live qualification does not demonstrate v2 security. Retained-nonce substitution and provider-metadata limitations remain material to legacy deployments.
 
-The ingress generates a fresh 256-bit nonce and forwards no client headers.
-`attestation` configuration is accepted with an explicit 004B or 004G verifier
-mode. A request-owned trace captures the immutable policy identity and final
-core outcome; each fallback replaces the previous attempt. The HTTP post-hook
-can sign only when the same policy remains active and the buffered HTTP content
-still matches the verified candidate or copied genuine error fields. It binds
-the exact HTTP entity body and status, not just a plugin-loaded marker. Later
-response mutation or missing body capture causes ingress refusal rather than
-unchecked delivery. Ordinary post-hook errors remain non-authoritative.
+Canonical payload fields, in serialization order:
 
-Only the ingress bridges client and private Docker networks; Bifrost, verifier,
-provider, management and test controls have no client-network attachment or
-published ports. Receipts use HMAC-SHA256 with a runtime-generated fixture secret
-mounted read-only into the signer and ingress. No secret is stored in Git or
-returned to clients. MAC comparison is constant time, nonces are bound to one
-round trip, timestamp windows are bounded, and internal/debug headers are not
-forwarded to clients. The ingress never retries an unchecked inference response.
+| Field | Binding |
+| --- | --- |
+| `version` | Exact configured receipt protocol |
+| `nonce` | Ingress-generated 32 random bytes, lowercase hex |
+| `policy_id` | Exact mode/policy identity |
+| `outcome` | ALLOW, REJECT, UNAVAILABLE or PROVIDER_ERROR |
+| `status` | Actual HTTP status |
+| `body_sha256` | Final HTTP entity digest |
+| `candidate_sha256` | Exact approved content's UTF-8 digest on ALLOW; empty otherwise |
+| `issued_at` | Trusted Unix seconds at signing |
+| `request_sha256` | **v2 only**, digest of exact HTTP request body received by Bifrost |
 
-`GET /ready` freshly checks gateway reachability, active plugin/order/placement,
-mode and cache absence, then obtains an authenticated ALLOW probe in the offline
-004D profile. Readiness
-does not replace the mandatory per-response receipt check. Runtime removal can
-leave Bifrost serving, but the ingress refuses those unsigned responses. The
-offline lifecycle qualification exercises actual disable and concurrent gateway
-restart; an unsafe direct no-plugin gateway is private test infrastructure.
+Encoding is unpadded base64url(payload), `.`, unpadded base64url(HMAC-SHA256(key, payload)). The key is 32 bytes loaded from a bounded runtime hex secret file. Ingress independently hashes its retained forwarded bytes; the signer hashes actual received bytes, never a caller-supplied digest header. Equivalent JSON reserialization changes the binding and is deliberately refused.
 
-The new boundary caps request bodies at 64 KiB, entity bodies at 256 KiB, body
-receipt at two seconds and the shared ingress request budget at eight seconds.
-It admits at most sixteen active requests with no waiter queue. Valid ALLOW
-returns original bytes, authenticated policy failures return fixed terminal
-403/503 errors, and eligible authenticated genuine provider errors retain their
-original status/body. Missing/invalid proof or unsupported error shapes fail
-closed. This is not safe streaming or general proxy support.
+Validation requires canonical fields/types/order/encoding, constant-time MAC equality, exact protocol/policy/nonce/status/body/candidate/request correspondence, issuance no earlier than request-start minus 2s, no more than 2s in the future and age at most 20s. Unknown/missing/duplicate/aliased fields, malformed encodings, old/cross-policy records, tampering and stale/replayed receipts fail closed. Ingress never exposes a receipt or signing key to clients.
 
-HMAC authenticates the configured enforcement process, not the truth or origin
-freshness of evidence. Hosts, native plugins, keys, clock, deployment configuration
-and the verifier remain trusted; verifier-hop authentication, production client
-authentication, broader routes and protected caching remain outside qualification.
+Fresh nonces prevent substitution across ingress exchanges. This is not request authentication or at-most-once gateway execution: a trusted-network actor can repeat identical upstream requests. No replay database or cache is implemented. A compromised signer/key/host/verifier defeats the boundary.
 
-### Opt-in live multi-claim composition
+## Readiness, deployment and trust
 
-[Task 004E](task-004e.md) adds a separate trusted factory using the same pipeline,
-fixed Tavily Extract/Python.org and PyPI requests retrievers, with `fixture=False`.
-The Go policy requires live evidence modes; fixture records cannot authorize
-live-mode delivery. No grammar, comparison, evidence contract, receipt format or
-legacy `/v1/verify` behavior changes. The November 14 maintainer run and subsequent
-report assessment met the narrow live checks: Python `3.15.2` and requests
-`2.34.2` were supported together; Python `3.15.1` was contradicted against a
-`3.15.2` observation. Unsupported content, missing plugin and genuine provider
-error also met their expected outcomes. These are run-specific observations,
-not fixed current-version assertions or qualification of a commercial LLM.
+`GET /ready` checks active/enabled/loaded plugin state, `pre_builtin` placement/order 0, configured mode/protocol and cache absence, then requires an authenticated refusal for a fixed unsupported-grammar canary. Current bounded-prose and E live readiness consume zero source calls. Original D uses its legacy supported fixture probe. Readiness establishes Go enforcement participation and refusal, not verifier/source health or successful factual verification; each response still needs its own receipt.
 
-Only the verifier joins an egress network; Bifrost/provider/management stay
-private and the client can reach only ingress. A runtime file secret is mounted
-only into the verifier. Fixed HTTPS retrievers disable environment proxies and
-redirect following; this is application restriction, not a packet-level egress
-firewall. The receipt key is separate and remains limited to ingress/signers.
+Protected qualification profiles publish no host ports. Only ingress bridges internal client and private networks; gateway, management, provider and verifier are private. Only the explicit E real-source verifier joins an egress network and mounts the Tavily runtime secret. Egress attachment is not a destination firewall. Receipt keys are generated by a network-disabled init job and mounted read-only only into ingress/signers. Test setup credentials are not production authentication.
 
-The fixed live hierarchy is Tavily API 19s < retrieval 20s, PyPI 4s, shared work 26s,
-Go verifier 30s, remaining decision budget 40s from HTTP pre-hook, ingress 44s,
-server write 48s and runner 52s. Provider network work remains bounded at 10s.
-Pinned Bifrost has no global HTTP execution deadline; the 40s decision cap uses
-the recorded monotonic start without retaining/cancelling pooled contexts.
-Offline defaults remain unchanged. Receipt age stays 20s from issuance at
-completion; longer work does not expand replay or clock tolerances.
+Trusted dependencies include host/kernel, pinned binaries, configured plugins, clock, verifier/source policies, TLS roots, management, secret files and network isolation. The private Go-to-Python HTTP hop has no independent authentication. Diagnostic `X-EpochGuard-*` headers are neither freshness evidence nor authorization. [Operations](operations.md) documents exact profile selection and credential boundaries.
 
-Live `/ready` uses a fixed unsupported-grammar canary and requires an
-authenticated UNAVAILABLE response. It proves enforcement participation rather
-than evidence-source health or factual support. Canaries consume neither source
-budget nor telemetry slots. Private one-shot preflight obtains genuine parsed
-versions; two sequential protected factual requests can then use at most three
-retrieval invocations per source including preflight. Report counters/timings
-describe this process, not Tavily billing, origin fetches or publication times.
-There is no retry, source polling, live fallback to fixtures or Gemini call.
+## Resource limits and cancellation
 
-### Non-authorizing prose analysis
+| Boundary | Offline multi-claim / bounded prose | Fixed live composition |
+| --- | --- | --- |
+| Candidate / verifier request / verifier response | 8,192 code points and 32,768 UTF-8 bytes / 64 KiB / 256 KiB | Same bounds; G additionally ASCII-only |
+| Ingress body receipt / response buffer | 64 KiB within 2s / 256 KiB | Same |
+| Pipeline admission | Four active requests, no waiter queue | One active request |
+| Retrieval / shared work | 4s per retrieval / 5s work | Tavily API 19s, total 20s; PyPI 4s; per-claim ceiling 20.5s / 26s work |
+| Go evidence HTTP call | 6s in protected offline profiles | 30s |
+| Remaining decision work | Context-bound configured timeout | At most 40s from HTTP pre-hook start |
+| Ingress upstream / server write | 8s / 15s | 44s / 48s; external qualification client 52s |
+| Ingress active requests | 16 immediate slots by default, no waiter queue | Same default |
+| G Uvicorn admission | 32 connections/tasks in image and both Compose verifier commands | Required for manual live launch; no tracked G live deployment |
 
-[Task 004F](task-004f.md) adds a standalone `verifier.prose` planner branch whose audit, results and model extraction cannot authorize gateway delivery. It sends the original bounded response to the unchanged
-004A ModelExtractor/Gemini adapter when explicitly selected, while an independent
-scanner derives risk units from the original text. A closed paraphrase grammar
-maps only the two existing policies. Exact alignment does not prove atomicity,
-coverage or semantic equivalence: omissions, compounds, unknown content and
-classification conflicts prevent bounded accounting.
+The legacy single-claim endpoint retains its own bounds/timeouts, including a 512-byte Go candidate limit; do not apply the multi-claim defaults to it. Pipeline instances are shared per event loop; creating one per request would defeat admission bounds. Claims run sequentially under the shared deadline. Retrievers close per-call clients/responses; cancellation releases admission. Server connection/task admission is distinct from evidence-work admission and does not guarantee host CPU/memory isolation.
 
-Its immutable `004f.prose-plan.v1` records always carry `authorization=false`
-and `semantic_completeness=NOT_PROVEN`. PLAN_READY is a plan within the closed
-grammar, not a response release or factual verdict. Optional fixture-only shadow
-comparisons reuse existing 004B policy code and cannot repair a coverage failure.
-The separate 66-case draft evaluation measures omissions and false-complete
-claims; human review and real-model quality qualification remain pending. No
-004A dataset, 004B contract/policy, Go validator, receipt, deployment or gateway
-route changes. The separate 004G integration below uses only the finite mapping registry, not
-these planning records or model-selected subsets.
+The pinned gateway has no qualified global HTTP execution deadline. The provider fixture's 10s network timeout does not bound synchronous post-hook verification. Go context/deadline checks and ingress buffering bound release, but immediate transport disconnect propagation, scheduler cancellation and production provider lifetimes are not fully qualified. No timer may retain/cancel a pooled Bifrost root context after its hook lifetime. There are no automatic retrieval or qualification retries; configured provider fallback remains a separate mechanism.
 
-## Protected bounded-prose enforcement
+A separate G live factory exists behind both `EPOCHGUARD_RUN_LIVE_004G=1` and the reused E opt-in/profile/secret boundary. It is not selected by offline images. There is **no tracked G live Compose profile or qualification runner**; neither existence of a factory nor E's prior live result qualifies G live operation.
 
-[Task 004G](task-004g.md) adds a separate `004g.v1` / `bounded-prose-v1`
-contract and private `/v1/verify/prose` composition. The ASCII-only full response
-must consist of one to eight recognized factual sentences separated only by
-space, tab, CR or LF. Nine exact forms are admitted: the original two 004B
-sentences and seven 004F paraphrases. There are no nonfactual exemptions.
-Repeated policy/version assertions, unknown tails and compound/contextual
-variations are refused before retrieval.
+## Non-authorizing analysis
 
-Python reconstructs original spans, policy/version and canonical comparison
-sentences, then invokes the unchanged bounded 004B pipeline on their newline
-join. The outer record binds the original response/hash and mappings to the
-nested evidence result. Go independently parses the entire original response,
-reconstructs every mapping and canonical candidate, requires every ordered claim
-result, and invokes its unchanged evidence validator. Python COMPLETE or an
-outer mapping list alone cannot authorize release. Model/planner output is not
-an accepted input. Contradiction is terminal; missing evidence is unavailable.
+The claim analyzer aligns globally unique exact source quotes to strict `004a.v1` Unicode code-point spans. Missing/ambiguous/reordered/overlapping quotes fail; there is no fuzzy repair or inferred replacement. Valid spans do not prove that all claims were identified correctly.
 
-The [004G-S security revision](task-004gs.md) requires `004g.receipt.v2` for G.
-It binds exact received HTTP request bytes as well as nonce, policy and the
-projected response. B/D/E legacy configurations explicitly retain `004d.v1`. New ingress profiles `004g` and `004g-live`
-require **only** `004g.v1/bounded-prose-v1`. Older profiles still require only
-`004b.v1/multi-claim-templates-v1`. Nonce, actual entity-body hash, original
-candidate hash, MAC, issue-time and replay checks remain; G also independently
-checks `request_sha256`. Before signing G projects the response to fixed fields
-and the exact approved assistant content, removing provider-owned metadata.
-G provider errors retain status/allowlisted category with a fixed message.
-Legacy B/D/E envelope and error behavior remains explicitly scoped to its old
-protocol; its nonce-only request binding and metadata limits are not repaired. Readiness for
-both new profiles is a source-free authenticated negative canary plus management
-placement/cache checks. Only ingress joins the client and private networks.
+The prose planner emits `004f.prose-plan.v1`, `authorization=false` and `semantic_completeness=NOT_PROVEN`. PLAN_READY means bounded planning, never ALLOW. Original model propositions/classifications cannot choose evidence policies or waive checks. G enforcement independently parses its finite language and never consumes planning records.
 
-The new Compose stack is entirely offline with simulated Tavily/PyPI transports,
-a real fixture provider, native Bifrost and ingress. A separately gated Python
-live factory reuses 004E's runtime credential checks, fixed deadline hierarchy
-and three-attempt-per-source process budget; it additionally requires the 004G
-opt-in. No live 004G qualification was run or automated. No new cache, background
-job, persistent candidate store or production authentication is introduced.
+The 112-case identification collection and 66-case prose collection are synthetic agent-authored drafts, not human-reviewed gold. Baseline/fake-provider diagnostics do not qualify model quality. A later ten-call Gemini diagnostic is operator-reported against draft labels, not an independently qualified benchmark. See the [analyzer guide](../services/claim_analysis/README.md) and [prose evaluation scope](../services/verifier/reports/prose-v1/README.md).
 
-## Proposed product components — not yet delivered
+## Cache findings and proposed design
 
-```text
-Client -> Bifrost + EpochGuard enforcement -> verified response / safe refusal
-                          |
-                          v
-                  Verification service
-                  | claim extraction
-                  | time-sensitivity classification
-                  | Tavily evidence retrieval
-                  | evidence comparison
-                  | decision record
-                          |
-                          v
-                  Evidence DB + verified cache
-                          |
-                          v
-                  Periodic revalidation / invalidation
-```
+Built-in semantic caching remains disabled in default/protected profiles. [Real cache experiments](task-002c.md) found:
 
-Task 002B establishes waiting, typed refusals, and no-leak behavior using deterministic fixtures. Task 003A implements the first narrow service policy above. Task 004A prototypes identification/classification independently; 004B adds experimental template-bounded multi-claim verification. General evidence policies, durable evidence and revalidation remain proposed. The isolated 004C/004D integrations and opt-in 004E composition have the boundaries described above. The trusted gateway policy chooses and enforces actions. Verification may be unavailable; that is an explicit policy outcome, **not** a successful verdict.
+- With `pre_builtin`, the cache serializes/queues writes before EpochGuard evaluates the candidate; physical storage can precede a later rejection.
+- With `post_builtin`, misses can be refused before writing, but cache hits skip EpochGuard's LLM hooks.
+- Trusted server no-store suppresses writes, including allowed responses, while preserving reads. It is not verified cache admission.
+- Both deletion APIs removed settled entries, but a held older asynchronous writer repopulated an absent entry after deletion succeeded. TTL/deletion do not establish logical revocation.
 
-Future caching must bind a response to trusted request scope, policy version, evidence IDs/versions, and expiry. A stale physical cache entry must not become returnable after a concurrent write or invalidation race. Task 002C reproduced both the built-in cache's enforcement-order hazards and late-write repopulation; unrestricted built-in writes remain unsuitable for the protected deployment. A future EpochGuard-owned cache needs explicit admission and read/release validity checks plus atomic generation/version comparison, not deletion alone.
+[ADR 0003](decisions/0003-protected-cache-ownership.md) proposes owned verified admission and generation-aware logical revocation. No protected cache, durable evidence archive or logically atomic revocation is implemented.
 
-## Current acceptance boundary
+## Unsupported surfaces and residual risks
 
-Task 002B exercises **ALLOW**, **REJECT**, and **UNAVAILABLE** decisions on *real* Bifrost provider responses. Its gate requires zero rejected fixture sentinel bytes in the client-visible HTTP response, no undesired fallback, and negative controls. Executed results, request-flow details, and limitations are recorded in [task-002b.md](task-002b.md); 003A reruns that gate unchanged.
+The [route audit](task-003c.md) tested finite raw/encoded targets, registered passthrough prefixes, alternate entry points and configured Warp chat. No provider-answer bypass was reproduced with the plugin active in that matrix. Some router/prerequisite failures occur before enforcement and must not count as policy refusals. Warp interactive chat reaches the core guard but wraps refusal in HTTP 200 JSON/SSE; background jobs can skip plugins entirely.
 
-Task 002C extends that gate with isolated direct-cache lifecycle experiments and explicit unsafe controls. Its results qualify the documented experiments, not production cache safety or semantic similarity mode. The final protected cache remains outside this milestone.
+Management/log/history APIs, background execution, direct SDK calls, A2A/gRPC, realtime, streaming/async delivery and arbitrary routes/providers remain outside the qualified answer boundary. Direct Bifrost without ingress can serve unchecked content if the plugin fails to load. Management/configuration and sibling plugins remain trusted.
 
-Task 003A and its timeout follow-up cover 41 offline service tests and real gateway acceptance with 31 subtests, plus a separate deterministic long-duration path. Task 003B reran that gate and added an offline version-derivation check and opt-in live gateway test. The maintainer subsequently reported a full live gateway pass with five passing subtests, distinct from the earlier FastAPI-only pass. Supported and older requests each used one provider call; live retrieval counts remain unavailable. This qualifies one policy with the controlled provider and explicitly recorded paths, not arbitrary response verification or production provider support.
-
-The current protected boundary has separate evidence: 004B/004C establish bounded
-two-policy coverage and independent Go enforcement, 004D establishes per-response
-receipt gating and missing-plugin/restart safety offline, and the November 14
-004E live report assessment establishes the narrow real-source composition.
-All five live client expectations were met; each source recorded three attempted
-and three completed application-level retrieval invocations. This does not
-independently measure billing or origin fetches, authenticate the private
-gateway-to-verifier HTTP hop, establish origin freshness or qualify a global
-Bifrost execution deadline.
-
-## Primary references
-
-- `docs/bifrost-integration-spike.md` — source investigation and hook/cache contracts.
-- `docs/task-002a.md` — executed build and smoke-test evidence.
-- `docs/task-002b.md` — synchronous enforcement design and executed qualification evidence.
-- `docs/task-002c.md` — real direct-cache lifecycle and race evidence.
-- `docs/task-003a.md` — narrow evidence policy, typed service contract, executed offline integration and live-test boundary.
-- `docs/task-003b.md` — successful maintainer-run live gateway qualification, separately reported FastAPI evidence, preserved blocked attempts, and reproducible opt-in runner.
-- [004A claim-analysis experiment](task-004a.md) and [004A-H hardening](task-004a-hardening.md) — identification only; human review and model quality remain pending.
-- [004B whole-response verification](task-004b.md) and [004C gateway integration](task-004c.md) — two fixed policies, independent Go validation and original offline qualification.
-- [004D protected ingress](task-004d.md) — authenticated release and isolated lifecycle/readiness qualification.
-- [004G bounded-prose enforcement](task-004g.md) ? independent grammar, original/canonical binding, policy-bound receipts and offline qualification.
-- [004E live composition and assessment](task-004e.md) — bounded real-source protected-gateway run and remaining trust limits.
-- `docs/decisions/0003-protected-cache-ownership.md` — proposed verified admission/revocation design.
-- `docs/decisions/0001-native-bifrost-plugin.md` — rationale and alternatives.
+Production TLS/client/tenant authentication, key rotation, stock-gateway compatibility, general prose, arbitrary sources, origin freshness, safe streaming, host resource isolation, atomic network delivery and production performance/availability need separate design and qualification. Current fixture timings are not service guarantees. See [operations](operations.md) for reproducible scoped tests rather than treating these boundaries as deployment approval.

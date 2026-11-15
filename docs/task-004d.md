@@ -1,9 +1,11 @@
 # Task 004D: protected ingress and deployment integrity
 
-Implemented and qualified offline on November 14, 2026 (Asia/Calcutta), starting
-from clean `main` at `257946d`. The protected client entry point now refuses
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
+Implemented and qualified offline on November 14, 2026 (Asia/Calcutta), from implementation
+baseline `257946d`. The protected client entry point now refuses
 unchecked responses when EpochGuard is absent or disabled. This applies to the
-new isolated profile, not every Bifrost route/deployment. No commit, push, live
+new isolated profile, not every Bifrost route/deployment. No live
 Tavily/PyPI/Gemini call or public deployment was performed.
 
 ## Invariant, scope and threat model
@@ -368,14 +370,9 @@ Plugin SHA-256 is
 The reproduction build and regression image had identical gateway, plugin,
 ingress and qualification-runner binary hashes. These identify local tested
 artifacts, not published releases. Task-owned stacks and fixture-secret volumes
-were removed; only the pre-existing BuildKit builder remains running.
+were removed.
 
-The final scope audit passed: five existing files modified and eighteen files
-added. Existing verification contracts, policies, grammar, validators, deployment
-profiles and tests remain unchanged; the typed refusal/enforcement functions are
-byte-identical to the starting revision. Syntax, JSON, whitespace, final newlines,
-Markdown fences, all 54 local documentation links and `git diff --check` passed.
-The final isolated Compose configuration also passed `config --quiet`.
+Existing verification contracts, policies, grammar, validators, deployment profiles and tests remained unchanged; the typed refusal/enforcement functions were byte-identical to the starting revision. The isolated Compose configuration passed `config --quiet`.
 
 ## Remaining boundaries and review
 
@@ -390,8 +387,3 @@ verifier trustworthy. Unsupported error shapes may become generic ingress 503.
 Network failure after a fully validated response starts writing to the client
 does not provide atomic network delivery; upstream partial bodies were held and
 refused before any answer release.
-
-Recommended conventional commit, not created:
-`feat(ingress): require authenticated enforcement receipts`.
-
-Stop at Task 004D for maintainer review. No commit or push.

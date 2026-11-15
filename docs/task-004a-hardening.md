@@ -1,6 +1,8 @@
 # Task 004A-H — correctness and reproducibility hardening
 
-Date: November 10, 2026 (Asia/Calcutta). Starting commit: `29dbfd9b7881bae0911d6c30dc7080a2dded0b43` on `main`, with a clean working tree. Scope is four reproducible defects before Task 004B. No live Tavily or Gemini call, commit or push is part of this work.
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
+Date: November 10, 2026 (Asia/Calcutta). Starting commit: `29dbfd9b7881bae0911d6c30dc7080a2dded0b43`. Scope is four reproducible defects before Task 004B. No live Tavily or Gemini call was made during this hardening phase.
 
 ## Requirement and minimal design
 
@@ -181,7 +183,7 @@ The short verification runner explicitly skips live opt-in and the separate long
 
 Final local image IDs: gateway `sha256:024b058a59089411119e0bb9b7acda69c1fb22ed5ddbd3883a65573658f4af6e`; verifier `sha256:1f905b9d056b4e523cc47c493b8d3d047884d7550eb854990acd865025d879c7`. These identify the locally tested builds, not published releases.
 
-The final local review script checked 57 protected files against the starting Git contents, all 34 relative documentation links/anchors in the two edited reports, balanced code fences, whitespace/JSON syntax in all 22 changed/new content/attribute paths, and evaluation provenance hashes. Both normalized schema working copies match their existing Git blobs. `git diff --check` exited 0. All task-owned smoke, verification, long-profile and route stacks were removed; only the pre-existing BuildKit builder remains running.
+Both normalized schema working copies matched their existing Git blobs, and evaluation provenance hashes were checked. Task-owned smoke, verification, long-profile and route stacks were removed after execution.
 
 ## Remaining limitations and review boundary
 
@@ -192,5 +194,3 @@ Explicitly deferred: missing-plugin startup/ingress enforcement; production remo
 The baseline still has limited temporal lexicons, sentence-level segmentation, incomplete mixed-assertion coverage, ambiguous pronouns and subjective/quoted/negated phrasing it cannot reliably classify. Its new mixed guard can conservatively request evidence for a genuine opinion containing a factual cue. Schema integrity and exact source alignment do not establish semantic coverage or truth. Human annotation review and real Gemini compatibility/quality qualification remain pending.
 
 Changed files: `.gitattributes`; `plugins/epochguard/{decision.go,http_decision.go,main.go,diagnostics.go,diagnostics_test.go,json_contract_test.go}`; `services/verifier/verifier/{app.py,retrieval.py,policy.py,diagnostics.py}` and `tests/test_diagnostics.py`; `services/claim_analysis/claim_analysis/{baseline.py,schema_integrity.py}`, `tests/{test_baseline_hardening.py,test_schema_integrity.py}`, and four new `reports/baseline-hardening-{dev,heldout}.{json,txt}` files; this report and the minimal Task 004A hash/link correction. Both schema working copies are LF with unchanged Git blob contents. No README milestone log is added.
-
-Recommended commit, not created: `fix: harden verifier contracts diagnostics and claim reproducibility`. Stop for maintainer review; do not begin Task 004B.

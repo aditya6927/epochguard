@@ -4,6 +4,8 @@
 - **Date:** 2026-11-06
 - **Decision owners:** EpochGuard project maintainers
 
+**Current application:** the native build remains pinned. Later [protected ingress and receipt contracts](../architecture.md#receipt-authentication-and-protocol-isolation) mitigate missing-plugin release within isolated profiles; direct gateway and stock-binary limitations remain. Cache ownership is still proposed.
+
 ## Context
 
 EpochGuard must intercept real AI gateway traffic and eventually enforce response-freshness policy. Bifrost's open-source Go plugin interface is available but the official published binaries are normally statically linked. Native Go plugins require binary compatibility between host and plugin. Bifrost's built-in semantic cache can short-circuit model requests and its write lifecycle complicates post-response verification.
@@ -29,4 +31,4 @@ Do not enable the built-in semantic cache in this qualified development path. A 
 
 ## Evidence and re-evaluation
 
-The reported Task 002A build, provider request, negative control, and concurrency smoke tests are recorded in `docs/task-002a.md`. Future decisions should be revised if upstream plugin interfaces change, stock deployment becomes mandatory, or a measured cache safety/performance test invalidates the proposed design.
+The reported Task 002A build, provider request, negative control, and concurrency smoke tests are recorded in [Task 002A](../task-002a.md). Future decisions should be revised if upstream plugin interfaces change, stock deployment becomes mandatory, or a measured cache safety/performance test invalidates the proposed design.

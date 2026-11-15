@@ -1,5 +1,7 @@
 # Task 003B — live gateway qualification
 
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
 Date: 2026-11-08 (Asia/Calcutta). Scope: qualify the existing buffered Bifrost → EpochGuard Go plugin → FastAPI → Tavily route, without changing the claim policy, enforcement architecture, timeouts, or cache ownership.
 
 **Result: completed narrow live gateway qualification**, based on the successful rerun supplied by the maintainer on **November 8, 2026**. Full `TestLiveGatewayQualification` passed in **18.16 seconds**, including all five subtests. Supported and older claims traversed the real Bifrost → Go → FastAPI → Tavily route, with the older answer refused without leakage or unintended fallback. The earlier blocked 401 qualification is preserved below. This qualifies the existing single policy with the local provider fixture, not general factual verification, production providers, production readiness, or a protected cache.
@@ -150,12 +152,8 @@ docker run --rm --network none epochguard-dev:002a /app/verification.test '-test
 
 Safe ignored evidence from the original agent-run qualification is retained under `artifacts/003b/`: native build logs, `go-unit-final.log`, offline suites, live preflight, initial flag-parsing transcript, `live-gateway-initial.log`, `live-gateway.log`, sanitized diagnostic status, and runtime traces. These original blocked-run logs are not replaced or presented as the successful rerun transcript. The successful rerun is recorded from the maintainer-supplied results above. No credential is part of source or logs.
 
-## Documentation-only rerun update checks
-
-For this November 8 documentation update, `git diff --check` exited 0. A local Python documentation check validated **45 relative links/anchors** and balanced code fences across README, AGENTS, architecture and the two verification reports; it also checked the supplied timings and preserved failure/limitation statements. A SHA-256 comparison of repository files before/after editing confirmed changes only to `README.md`, `AGENTS.md`, `docs/architecture.md` and this report. Application code, policy, configuration and test assertions are unchanged. No application tests, live requests or credential operations were executed for this update.
-
 ## Limits and review boundary
 
 This qualification uses the controlled local provider and the existing single exact Python.org Windows release-label policy. It does not qualify production model providers, general factual verification, publication freshness, signed evidence, arbitrary plugins/transports, safe streaming delivery, production authentication, or a protected cache. Client disconnect propagation across every transport remains unqualified; supplied-context cancellation and bounded work are covered by existing unit tests. The built-in cache remains disabled.
 
-Narrow live gateway qualification is complete on the maintainer-supplied evidence above; the initial blocked attempts remain visible. No verification architecture or ADR change is needed. This follow-up changes documentation only and does not rerun application/live tests or alter their assertions. Recommended documentation commit, not created: `docs: record successful narrow live gateway qualification`. Stop for maintainer review without committing.
+The successful rerun assessment relies on maintainer-supplied execution evidence; the initial blocked attempts remain preserved.

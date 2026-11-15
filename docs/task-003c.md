@@ -1,5 +1,7 @@
 # Task 003C — HTTP route surface and enforcement boundary audit
 
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
 Executed November 8, 2026, using Docker Desktop's Linux/amd64 gateway and the real native plugin loader. This is an offline boundary qualification, not an expansion of the evidence policy. No Tavily or paid-provider calls were made. Application enforcement code, verification contract, policies and existing regression assertions are unchanged.
 
 ## Outcome and severity
@@ -242,5 +244,3 @@ If broader exposure is required, review these alternatives before implementation
 3. **Pinned upstream contract changes.** Expose authoritative raw target/matched route to plugins and provide a non-skippable policy boundary for internal/provider calls; propagate typed refusals consistently through Warp. This requires upstream/core/transport design review and ABI requalification, not a local `/api` guard edit.
 
 Acceptance for any expanded boundary must include configured positive controls for every exposed model route, background and stored-output paths; no successful answer or paid dispatch outside policy; terminal refusal/no leakage across JSON/SSE/upgrades; raw path agreement across actual proxies; management authorization and health preserved; missing-plugin readiness failure; and regression tests for configured async/agent/gRPC routes. Do not treat an unreachable route, logging disabled, or a prerequisite 503 as the security boundary.
-
-Recommended commit, not created: `test(gateway): qualify HTTP route enforcement boundaries`. Stop after Task 003C for maintainer review; no Task 004A work.

@@ -1,9 +1,11 @@
 # Task 004G: protected bounded-prose gateway enforcement
 
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
 **Security follow-up:** [Task 004G-S](task-004gs.md) supersedes the original receipt and ALLOW-envelope behavior described by this milestone. Current G profiles require `004g.receipt.v2` with exact request-body binding and a minimal response envelope. Original assistant content remains unchanged. The execution results below are historical 004G results; current remediation evidence is in the security report.
 
-Starting tree: clean `main` at `fd0fb7a1ab4a53b13853aacbc958aa0464bff9cb`.
-Implemented and checked November 15, 2026 (Asia/Calcutta). No commit or push.
+Implementation baseline: `fd0fb7a1ab4a53b13853aacbc958aa0464bff9cb`.
+Implemented and checked November 15, 2026 (Asia/Calcutta).
 **004G LIVE QUALIFICATION PENDING.** The gateway demonstrations use synthetic
 observations, simulated source transports and the controlled provider fixture;
 no real Tavily, PyPI or Gemini call was made. Model quality remains pending.
@@ -330,17 +332,12 @@ docker compose -f compose.verify.yaml -f compose.verify.timeouts.yaml run --rm -
 
 Each Compose regression was followed by its matching
 `down --volumes --remove-orphans`; the host drivers clean up in `finally`.
-Final `docker ps` showed only the pre-existing buildx builder container.
-Static scope checks passed: 24 new files and 10 existing edits, Python AST/JSON
-validation, exported-schema equality, all 28 Markdown files / 168 local links /
-11 anchors, and `git diff --check`. Legacy Python/model/planner code, dependency
-locks, old configurations and historical task reports are unchanged.
+Exported-schema equality was checked. Legacy Python/model/planner code, dependency locks, old configurations and historical task reports were unchanged during this implementation.
 
 Tested native image: `sha256:cc1e7ea59cb139c00df7ad89e32e5fd90e0e1cdceb4c5cbbfc515c90303d0329`.
 Tested G image: `sha256:544905ed528fd6b64bee7e2201f5b0067ff3e5f44dff22033be63572fba92dca`.
 Build and existing regression logs are under ignored `artifacts/004g/`;
 004D/E drivers also write their normal offline reproduction paths.
-
 
 The fixture gateway suite includes all nine individual sentence forms; A's two
 supported paraphrases; B's older Python contradiction; ninth-claim overflow;
@@ -392,7 +389,3 @@ solved by the receipt. Semantic cache remains disabled; there is no protected
 cache, atomic revocation, production authentication/readiness, new evidence
 policy, unbounded extraction or durable evidence store. Direct gateway exposure
 still bypasses the ingress deployment-integrity boundary.
-
-Recommended commit:
-`feat(gateway): enforce bounded prose with independent claim validation`.
-Stop for maintainer review; no commit or push was performed.

@@ -1,6 +1,8 @@
 # Task 004F: AI-assisted natural-language claim coverage
 
-Starting tree: clean `main` at `4b259e42d62c8ec80ddaa84c881c36ca5afbb284`.
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
+Implementation baseline: `4b259e42d62c8ec80ddaa84c881c36ca5afbb284`.
 This is an experimental analysis/evidence-planning subsystem, not an extension
 of gateway ALLOW authority. **MODEL QUALITY QUALIFICATION PENDING.** No live
 Gemini, Tavily or PyPI request was made. All annotations are agent-authored drafts;
@@ -244,7 +246,9 @@ cases on 66 draft examples is not a semantic-completeness or reliability guarant
 
 ## Optional operator-run model diagnostic
 
-No model run was authorized/executed here. The following is a separately selected
+A later ten-call Gemini diagnostic is operator-reported against draft labels. It is not an independently qualified benchmark. The commands below describe the opt-in procedure; the offline measurements in this report are not model-quality results.
+
+No model run was authorized/executed during the original implementation phase. The following is a separately selected
 diagnostic, not default startup/testing. Use actual current model/rates supplied
 by the operator; none are guessed. It reuses the unchanged 004A ModelExtractor,
 identification schema and prompt `004a.prompt.v2`, sends the **entire original
@@ -323,13 +327,8 @@ All four exact evaluation commands above were executed, then independently
 rerun into `artifacts/004f/reproduced/`: all four outputs were byte-identical to
 the reports prepared for review. Every exported planning record revalidated,
 all implementation/dataset provenance hashes matched, and all model attempts
-remained zero. The schema snapshot matches the runtime schema. AST/JSON/JSONL,
-format/whitespace/newline, scoped-file and secret-pattern checks passed, as did
-`git diff --check`. Safe local evidence is retained under `artifacts/004f/`.
-Documentation checks passed across 27 Markdown files: 160 local links including
-10 anchors resolved, with balanced fences. The scoped inventory is 29 new files
-and three existing documentation edits; no credentials or private runtime exports
-were added. Evaluation exit 0 means a report was produced, not that extraction,
+remained zero. The schema snapshot matches the runtime schema. Safe local evidence is retained under `artifacts/004f/`.
+Evaluation exit 0 means a report was produced, not that extraction,
 model quality or authorization succeeded.
 
 Only three pre-existing documentation files changed; all other 212 pre-existing
@@ -351,8 +350,3 @@ and mapping policy, full response binding, adversarial cross-language tests and
 real gateway/ingress qualification. It must not reuse PLAN_READY as ALLOW or
 bypass the existing 004B/004D validators. Production source freshness, verifier-hop
 authentication, streaming and protected caching remain separate work.
-
-Recommended conventional commit, not created:
-`feat(prose): add non-authorizing claim coverage and evidence planning`.
-
-Stop for maintainer review. No commit or push. **MODEL QUALITY QUALIFICATION PENDING**.

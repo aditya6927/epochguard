@@ -5,7 +5,13 @@
 - **Review source:** `https://github.com/aditya6927/epochguard`
 - **Validation:** Static inspection of committed Go source, tests, Compose/Docker configuration, and documentation. Docker tests were **not rerun by the reviewer**. Execution evidence comes from `docs/task-002b.md`.
 
-## Verdict
+## Follow-up status
+
+This is a historical source review. [Protected ingress](task-004d.md) and [bounded-prose hardening](task-004gs.md) now address missing/disabled-plugin delivery within their isolated client boundary. Direct gateways without ingress remain exposed to missing-plugin delivery. The [cache study](task-002c.md) completed the proposed investigation and demonstrated unsafe write/hit ordering and pending-write repopulation; protected caching remains unimplemented. The [route audit](task-003c.md) covers a finite matrix, not all routes/background execution. No tracked GitHub CI workflow or production authentication profile is present.
+
+The original findings and verdict below retain their reviewed-revision scope. See [current architecture](architecture.md) and [operations](operations.md).
+
+## Original verdict
 
 Accept Task 002B for its stated, narrow purpose: deterministic synchronous enforcement on the qualified buffered OpenAI chat route. No confirmed failure of the ALLOW / REJECT / UNAVAILABLE paths was found in source inspection. This is **not** approval for production deployment or broad protection claims.
 
@@ -13,11 +19,11 @@ Accept Task 002B for its stated, narrow purpose: deterministic synchronous enfor
 
 1. `plugins/epochguard/decision.go`: the enforcement function returns a nil response and a typed terminal Bifrost error for REJECT and UNAVAILABLE, while passing genuine upstream errors unchanged. The `DecisionSource` interface is small and separable from enforcement. Caller cancellation is checked before and after evaluation.
 2. `plugins/epochguard/guard.go`: unqualified inference paths and explicitly requested streaming/async modes are rejected before the provider dispatch path for the tested HTTP transport. The guard is not a complete schema validator, and it does not protect unrelated transports or direct SDK calls.
-3. `plugins/epochguard/main.go`: immutable policy snapshots are loaded through an atomic pointer; request phase traces remain request-owned. Invalid config deliberately returns success from Init while leaving no ALLOW source installed. A plugin that fails to load entirely is a distinct, unresolved fail-open risk.
+3. `plugins/epochguard/main.go`: immutable policy snapshots are loaded through an atomic pointer; request phase traces remain request-owned. Invalid config deliberately returns success from Init while leaving no ALLOW source installed. At that revision, a plugin that failed to load entirely was a distinct, unresolved fail-open risk. This remains a direct-gateway risk outside the later protected ingress.
 4. `tests/smoke/enforcement_test.go`: checks complete serialized refusal for sentinel markers, traces, provider call counts, fallback stopping, streaming controls, and the unprotected gateway negative control. This is meaningfully stronger than checking status codes alone.
 5. `dev/Dockerfile` / `compose.yaml`: live gateway and native `.so` are built in one pinned Linux toolchain; plugin unit tests include race detection. The race detector does not instrument the running gateway process.
 
-## Open findings and next actions
+## Original findings and proposed actions
 
 | Priority | Finding | Action |
 | --- | --- | --- |
@@ -28,6 +34,6 @@ Accept Task 002B for its stated, narrow purpose: deterministic synchronous enfor
 | Medium before public release | No automated GitHub CI checks are present. | Add focused CI for formatting, unit/race tests, and at least one reproducible integration smoke suite when CI compute capacity allows. |
 | Documentation | `docs/task-002b.md` accurately covers implementation and limitations. | Add ADR-0002 to record the typed-refusal decision; avoid duplicating the extensive test transcript. |
 
-## Suggested next milestone
+## Cache investigation follow-up
 
-Task 002C should be an **integration study and test suite for Bifrost's cache behavior**, not immediate implementation of a large cache service. Use deterministic provider responses and actual cache requests to prove ordering, no-answer-leak enforcement on hits, no-store behavior on rejected misses, write/delete races, and missing-plugin detection. Preserve the existing enforcement tests throughout.
+The proposed next milestone was an **integration study and test suite for Bifrost's cache behavior**, not immediate implementation of a large cache service. [Task 002C](task-002c.md) subsequently executed that study. Use deterministic provider responses and actual cache requests to prove ordering, no-answer-leak enforcement on hits, no-store behavior on rejected misses, write/delete races, and missing-plugin detection. Preserve the existing enforcement tests throughout.

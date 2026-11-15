@@ -1,7 +1,9 @@
 # Task 004B: evidence-backed multi-claim verification
 
-Implemented and checked November 12–13, 2026 (Asia/Calcutta), starting from clean
-`main` at `9747ab6`. No commit or push was made. This is an executable,
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
+Implemented and checked November 12–13, 2026 (Asia/Calcutta), from implementation baseline
+`9747ab6`. This is an executable,
 non-authorizing experiment; the existing qualified gateway remains `003a.v1`.
 No live model, Tavily evidence, or PyPI evidence call was made for this task.
 
@@ -16,7 +18,6 @@ Inspection covered AGENTS, README, the integration spike, architecture,
 003A/B/C and 004A/hardening notes, existing verifier contracts/policy/retrieval/
 settings/tests, 004A schema/model/alignment/baseline/evaluation/Gemini code,
 Go HTTP client/decision validation and the Docker/Compose regression setup.
-The working tree was clean and HEAD matched the requested starting commit.
 
 Reused unchanged:
 
@@ -319,11 +320,7 @@ commands and exact budgets are documented in the
 [component README](../services/verifier/README.md#optional-real-source-observations).
 They require `EPOCHGUARD_RUN_LIVE_004B=1` and were not executed.
 
-Final scope checks confirmed two existing documentation changes and fifteen new
-files. All pre-existing code, configuration, schemas, datasets and reports remain
-unchanged. Python syntax, trailing whitespace, final newlines, balanced Markdown
-fences, 55 local documentation links/anchors and `git diff --check` passed. The
-check command was `& .venv-003a/Scripts/python.exe artifacts/004b/final_check.py`.
+All pre-existing code, configuration, schemas, datasets and reports remained unchanged during the original Python-only implementation.
 
 ## Remaining integration and production limits
 
@@ -340,8 +337,3 @@ tenant isolation and external readiness enforcement remain unresolved. The
 verifier/runtime/clock/configuration/source TLS are trusted, records are unsigned,
 and upstream sources or extracted snapshots can be stale or compromised. Bounded
 local observations are not a claim about continuous or future correctness.
-
-Recommended conventional commit, not created:
-`feat(verifier): add bounded evidence-backed multi-claim verification`.
-
-Stop at Task 004B for maintainer review; no deployment, commit or push.

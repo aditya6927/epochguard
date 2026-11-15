@@ -1,5 +1,7 @@
 # Task 002B: synchronous response enforcement
 
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
 Validated on 2026-11-06 (Asia/Calcutta). Task boundary: extend the native Task 002A plugin to permit or refuse buffered provider responses using deterministic, test-only decisions. No claim extraction, freshness evidence checking, external verification service, Tavily, caching, dashboard, or Task 002C work is included.
 
 ## Result and policy
@@ -148,5 +150,3 @@ Ignored local artifacts in `artifacts/002b/` retain the initial and final build/
 - The race detector ran against plugin unit tests, not an instrumented gateway process. Smoke checks behavioral isolation, not gateway-wide race freedom, performance, or load limits.
 - Decision-source errors and cancellation are unit-tested; actual verifier outages, network timeouts, retries, and evidence policy cannot be integration-tested because no external verifier exists yet.
 - Inference auth remains disabled in the disposable development stack. Keep the host binding on loopback and do not expose the fixture/control network or public development setup token as production security.
-
-Stop after Task 002B for maintainer review. Recommended commit (not created automatically): `feat(gateway): enforce buffered response decisions`.

@@ -4,13 +4,15 @@
 - **Date:** 2026-11-06
 - **Decision scope:** Pinned Bifrost HTTP v2.4.0, native EpochGuard Go plugin, non-streaming `POST /openai/v1/chat/completions`
 
+**Historical decision scope:** the original fixed-decision implementation is described below. Evidence verification and isolated protected ingress were added later; [current architecture](../architecture.md) is authoritative for those contracts. The core typed-refusal/fallback decision remains in use. Current bounded-prose HTTP projection preserves approved assistant content while discarding provider metadata, so the entire original provider envelope is not a current G delivery guarantee.
+
 ## Context
 
 Task 002A established real plugin loading and hook execution, but it did not prevent a successful provider answer from reaching the client. The gateway's ordinary Go hook-error return is not a reliable refusal mechanism. Bifrost also supports provider fallbacks, making it necessary to distinguish genuine upstream failures from EpochGuard policy refusals.
 
 ## Decision
 
-1. Use a synchronous `DecisionSource.Decide(context.Context, *schemas.BifrostResponse) (Decision, error)` interface. Its test fixture supports ALLOW, REJECT, and UNAVAILABLE; no claim-level factual verification is implemented yet.
+1. Use a synchronous `DecisionSource.Decide(context.Context, *schemas.BifrostResponse) (Decision, error)` interface. Its test fixture supports ALLOW, REJECT, and UNAVAILABLE; claim-level factual verification was outside this original decision.
 2. For successful buffered candidate responses, block release until the decision completes. ALLOW returns the unchanged provider response. REJECT returns a safe typed 403; UNAVAILABLE and decision errors return a safe typed 503. The refusal return tuple is `(nil, *schemas.BifrostError, nil)` with `AllowFallbacks` explicitly false.
 3. Preserve genuine upstream `*schemas.BifrostError` by pointer and retain its fallback policy. A successful fallback candidate is subject to the same EpochGuard decision.
 4. For the qualified HTTP route, reject streaming and asynchronous requests in the HTTP pre-hook before provider dispatch. The typed pre-LLM hook also rejects unsupported request kinds.
@@ -29,11 +31,11 @@ The implementation and executed test results are recorded in [`../task-002b.md`]
 
 ## Consequences and open risks
 
-- The current ALLOW mode is **test-only**; it must not be interpreted as verified freshness.
-- No deployment-level readiness gate exists. Bifrost may serve inference if the plugin does not load at all; a runtime policy that defaults to UNAVAILABLE cannot prevent that case.
+- The original fixed ALLOW mode is **test-only**; it must not be interpreted as verified freshness.
+- No deployment-level readiness gate existed at this milestone. Bifrost may serve inference if the plugin does not load at all; a runtime policy that defaults to UNAVAILABLE cannot prevent that case.
 - Authentication is deliberately disabled in the loopback-only development fixture. Management, plugin configuration, and sibling plugins are trusted.
 - Streaming, alternate routes, cache hits, arbitrary providers, and direct SDK calls are not qualified.
-- A future verifier must impose deadlines, respect cancellation, handle partial evidence and ambiguous results, and avoid retaining pooled Bifrost objects.
+- Requirements for the subsequent verifier included deadlines and cancellation: it must impose deadlines, respect cancellation, handle partial evidence and ambiguous results, and avoid retaining pooled Bifrost objects.
 - Future cache integration must avoid writing unverified provider results and must revalidate cached results before release.
 
 ## Revisit when

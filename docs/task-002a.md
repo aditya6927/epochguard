@@ -1,5 +1,7 @@
 # Task 002A: native Bifrost plugin
 
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
 Task boundary: load a minimal external plugin into the real, dynamically linked Bifrost HTTP gateway and observe its hooks during a provider request. No freshness decision, claim extraction, Tavily calls, cache, dashboard, or enforcement implementation belongs to this task.
 
 ## Files and interfaces
@@ -166,5 +168,3 @@ Local evidence is retained under ignored `artifacts/002a/`: `smoke.log`, gateway
 Only the buffered `/openai/v1/chat/completions` path and local provider are tested here. Streaming, cache hits, native `/v1` routes, fallback behavior, other providers/modalities, production authentication, failure enforcement, and deployment readiness policies require later tasks. Bifrost's optional background catalog/network features are not acceptance criteria and can produce warnings in this API-only setup. No freshness or safety guarantee follows from these diagnostics. The negative control demonstrates detection of an absent plugin; it does not implement a production traffic gate.
 
 Inference auth is disabled and the gateway port is published on loopback only. Management probes authenticate with the explicitly public development setup token in Compose. The fixture credential is deliberately fake. No real provider keys are needed. Configuration databases live inside disposable containers, not host bind mounts. Removing/recreating gateway containers loses that development state.
-
-Stop after Task 002A and review the observed integration before Task 002B.

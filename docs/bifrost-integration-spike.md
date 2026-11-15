@@ -1,5 +1,7 @@
 # Bifrost integration spike
 
+**Historical source investigation:** this report preserves the original source findings and proposed experiments. Follow [architecture](architecture.md) for current enforcement/receipt boundaries and [operations](operations.md) for maintained build and qualification commands.
+
 Investigation date: 2026-11-06 (Asia/Calcutta). Scope: official `maximhq/bifrost` source and repository documentation; no EpochGuard integration code implemented.
 
 Runtime follow-up: [Task 002A](task-002a.md) subsequently built and loaded a minimal native plugin on this pin and exercised real provider requests. It also records configuration requirements and corrections discovered at runtime. The investigation and smoke-test design below remain broader than the integration qualified in Task 002A.
@@ -14,7 +16,7 @@ Cache follow-up: [Task 002C](task-002c.md) subsequently qualified direct misses/
 
 Register EpochGuard **before the built-in plugins**, with the earliest configured order. This ensures it participates when the built-in cache short-circuits. Invalidate an unverified result by returning a populated `*schemas.BifrostError`, a nil response, and a nil ordinary Go error from `PostLLMHook`. Set `AllowFallbacks` explicitly to false for a terminal verification refusal. Ordinary LLM hook errors are logged and do not reliably reject requests. [Plugin contract][core-plugin], [pipeline implementation][core-flow].
 
-**Cache reads, response release, cache writes, and physical deletion are separate concerns.** One plugin placement cannot both observe every built-in cache hit and verify a provider response before the built-in cache writes it. For an initial implementation, disable the built-in cache on the protected deployment and let EpochGuard own its verified cache. An optional interoperability mode can verify existing built-in entries on every read and suppress new built-in writes before lookup; it must not claim atomic invalidation or automatic regeneration of rejected hits. Details below.
+**Cache reads, response release, cache writes, and physical deletion are separate concerns.** One plugin placement cannot both observe every built-in cache hit and verify a provider response before the built-in cache writes it. For an initial implementation, disable the built-in cache on the protected deployment; an EpochGuard-owned verified cache is a proposed future design, not an implemented component. An optional interoperability mode can verify existing built-in entries on every read and suppress new built-in writes before lookup; it must not claim atomic invalidation or automatic regeneration of rejected hits. Details below.
 
 ## Evidence status and pins
 
@@ -33,7 +35,7 @@ Register EpochGuard **before the built-in plugins**, with the earliest configure
 
 These are compatibility pins for this spike, not a promise to support every Bifrost release. Bifrost is a multi-module repository: the gateway version is not the core version. Do not use `@latest`, a moving branch, or a floating runtime image as the compatibility identity. [Gateway module manifest][transport-mod].
 
-The default production build uses `GOWORK=off`, so it consumes the tagged dependency modules rather than automatically using sibling directories. I compared Git tree entries at the dependency tags against the gateway tag: core and semanticcache differ only in their changelogs; framework additionally differs in `framework/warp/prompt.go`, `framework/warp/topics.go`, and its test. The loader and streaming files cited here match the framework module tag. **Use the released dependency graph when building the plugin**, not an unqualified local workspace replacement.
+The default production build uses `GOWORK=off`, so it consumes the tagged dependency modules rather than automatically using sibling directories. The investigation compared Git tree entries at the dependency tags against the gateway tag: core and semanticcache differ only in their changelogs; framework additionally differs in `framework/warp/prompt.go`, `framework/warp/topics.go`, and its test. The loader and streaming files cited here match the framework module tag. **Use the released dependency graph when building the plugin**, not an unqualified local workspace replacement.
 
 No Go executable was found on this Windows host. A Docker server query found no running engine; no Linux build, plugin load, provider request, cache test, or stream test was run. This is a source investigation and executable test design, not a runtime qualification result.
 

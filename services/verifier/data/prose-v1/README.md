@@ -55,3 +55,5 @@ assertions. False-complete cases are listed individually, with failure categorie
 Extraction failures count as safe refusals where appropriate, but receive no
 credit as correct semantic abstentions. Missing denominator information is null,
 not zero. The historical 004A fresh recall 0.232 is not comparable to these scores.
+
+See the [non-authorizing planner contract](../../README.md#experimental-natural-language-planning) and [published offline measurement scope](../../reports/prose-v1/README.md). These planning annotations do not define the gateway authorization grammar.

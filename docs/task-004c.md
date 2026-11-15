@@ -1,8 +1,10 @@
 # Task 004C: controlled multi-claim gateway qualification
 
-Executed November 14, 2026 (Asia/Calcutta), starting from clean `main` at
+**Historical report:** results and limitations below apply to the stated revision and execution phase. See [architecture](architecture.md) for current capabilities and [operations](operations.md) for maintained workflows.
+
+Executed November 14, 2026 (Asia/Calcutta), from implementation baseline
 `0551c25`. The isolated experimental native gateway path is implemented and
-qualified offline. No commit, push, live Tavily/PyPI/Gemini call or public
+qualified offline. No live Tavily/PyPI/Gemini call or public
 deployment was made. The existing `003a.v1` deployment remains the default.
 
 ## Design and inspected boundaries
@@ -324,17 +326,9 @@ Runtime image identity matched the final local native image:
 Final experimental Python image:
 `sha256:50c651efb13bace47dea8610cd03cfb9e2d3b3e51a6472da85a7af688abd6408`.
 These are local tested artifacts, not published releases. All task-owned stacks
-were removed after execution; the pre-existing builder remains available.
+were removed after execution.
 
-Final scope checks found seven modified and seventeen new paths. All protected
-pre-existing Python implementation/contracts/tests, schemas/data/reports and
-Compose profiles stayed unchanged. The original Go 003A semantic validator and
-canonical parser, and the typed refusal/enforcement functions, matched their
-starting contents exactly. Python syntax, JSON syntax, trailing whitespace,
-final newlines, Markdown fences, 56 local documentation links/anchors and
-`git diff --check` passed. These checks and exact test-count extraction were run
-with `& .venv-003a/Scripts/python.exe artifacts/004c/final_check.py`. Final Docker
-inspection showed only the pre-existing BuildKit builder still running.
+Protected pre-existing Python implementation/contracts/tests, schemas/data/reports and Compose profiles stayed unchanged. The original Go 003A semantic validator and canonical parser, and the typed refusal/enforcement functions, matched their starting contents exactly.
 
 ## Compatibility and unqualified paths
 
@@ -356,8 +350,3 @@ unqualified. Existing API/background/Warp/alternate-transport limitations from
 untrusted verifier or prove source retrieval from metadata. Browser-to-core
 cancellation propagation is not newly qualified; supplied Go contexts and the
 Python endpoint's disconnect behavior are bounded/tested separately.
-
-Recommended conventional commit, not created:
-`feat(gateway): qualify experimental multi-claim verification`.
-
-Stop at Task 004C for maintainer review. No commit or push.
