@@ -107,6 +107,13 @@ func configure(config any) error {
 			if cfg.Verifier.Mode != multiSchema && cfg.Verifier.Mode != proseSchema {
 				return errors.New("epochguard: attestation requires explicit 004b.v1 mode")
 			}
+			expected := receiptVersion
+			if cfg.Verifier.Mode == proseSchema {
+				expected = boundReceiptVersion
+			}
+			if cfg.Attestation.Protocol != expected {
+				return errors.New("epochguard: receipt protocol does not match verifier mode")
+			}
 			key, err = loadAttestation(*cfg.Attestation)
 			if err != nil {
 				return errors.New("epochguard: attestation configuration unavailable")

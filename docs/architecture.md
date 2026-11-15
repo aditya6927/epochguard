@@ -322,11 +322,17 @@ result, and invokes its unchanged evidence validator. Python COMPLETE or an
 outer mapping list alone cannot authorize release. Model/planner output is not
 an accepted input. Contradiction is terminal; missing evidence is unavailable.
 
-The existing receipt envelope remains `004d.v1`; the immutable configured policy
-now selects the signed identity. New ingress profiles `004g` and `004g-live`
+The [004G-S security revision](task-004gs.md) requires `004g.receipt.v2` for G.
+It binds exact received HTTP request bytes as well as nonce, policy and the
+projected response. B/D/E legacy configurations explicitly retain `004d.v1`. New ingress profiles `004g` and `004g-live`
 require **only** `004g.v1/bounded-prose-v1`. Older profiles still require only
 `004b.v1/multi-claim-templates-v1`. Nonce, actual entity-body hash, original
-candidate hash, MAC, issue-time and replay checks are unchanged. Readiness for
+candidate hash, MAC, issue-time and replay checks remain; G also independently
+checks `request_sha256`. Before signing G projects the response to fixed fields
+and the exact approved assistant content, removing provider-owned metadata.
+G provider errors retain status/allowlisted category with a fixed message.
+Legacy B/D/E envelope and error behavior remains explicitly scoped to its old
+protocol; its nonce-only request binding and metadata limits are not repaired. Readiness for
 both new profiles is a source-free authenticated negative canary plus management
 placement/cache checks. Only ingress joins the client and private networks.
 

@@ -49,7 +49,7 @@ func main() {
 			return
 		}
 		switch config.Fault {
-		case "none", "missing", "mac", "body", "status", "replay", "policy", "version", "duplicate", "partial", "stalled", "oversized", "fake":
+		case "none", "missing", "mac", "body", "status", "replay", "policy", "version", "duplicate", "partial", "stalled", "oversized", "fake", "request-substitute", "request-reserialize", "request-field":
 		default:
 			w.WriteHeader(400)
 			return
@@ -68,6 +68,25 @@ func main() {
 		if err != nil || len(data) > 65536 {
 			w.WriteHeader(413)
 			return
+		}
+		if r.Method == "POST" && r.URL.Path == protectedPath && strings.HasPrefix(selectedFault, "request-") {
+			var value map[string]any
+			if json.Unmarshal(data, &value) != nil {
+				w.WriteHeader(400)
+				return
+			}
+			switch selectedFault {
+			case "request-substitute":
+				value["messages"] = []any{map[string]string{"role": "user", "content": "Python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2."}}
+			case "request-field":
+				value["model"] = "fixture/epochguard-fallback"
+			}
+			data, _ = json.Marshal(value)
+			if selectedFault == "request-reserialize" {
+				data = append(data, ' ')
+			}
+			// Header cloning below retains the original nonce. The relay has no
+			// signing key and never supplies an authoritative request digest.
 		}
 		req, err := http.NewRequestWithContext(r.Context(), r.Method, "http://"+selectedTarget+":8080"+r.URL.RequestURI(), bytes.NewReader(data))
 		if err != nil {

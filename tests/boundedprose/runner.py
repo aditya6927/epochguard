@@ -1,5 +1,6 @@
 """Offline client/operator checks. Never prints raw bodies or receipts."""
 import concurrent.futures
+import asyncio
 import json
 import socket
 import sys
@@ -20,21 +21,25 @@ def call(host, port, method, path, value=None, headers=None):
         return client.request(method, f"http://{host}:{port}{path}", json=value, headers=headers)
 
 
-def infer(name, text=A, status=200, host="ingress", role="user"):
+def infer(name, text=A, status=200, host="ingress", role="user", fallback=None):
     started = time.monotonic()
     value = {"model":"fixture/epochguard-test", "messages":[{"role":role,"content":text}],"stream":False}
-    if role == "user":
+    if fallback is True or (fallback is None and role == "user"):
         value["fallbacks"] = ["fixture/epochguard-fallback"]
     r = call(host,8082,"POST",PATH,value, {"X-EpochGuard-Internal-Receipt":"forged", "X-EpochGuard-Verified":"true"})
     assert r.status_code in (status if isinstance(status,tuple) else (status,)), (name,r.status_code)
     assert not any(k.startswith("x-epochguard-") for k in r.headers)
+    assert "UNVERIFIED_METADATA_004GS" not in r.text
+    assert all("UNVERIFIED_METADATA_004GS" not in value for value in r.headers.values())
     if r.status_code == 200:
         assert r.json()["choices"][0]["message"]["content"].encode() == text.encode(), name
+        if host != "ingress-old":
+            assert r.json() == {"object":"chat.completion","choices":[{"index":0,"finish_reason":"stop","message":{"role":"assistant","content":text}}]}, name
     else:
         assert "choices" not in r.json() and "PRIVATE_PROVIDER_SENTINEL" not in r.text
         assert all(line not in r.text for line in text.splitlines() if len(line)>12), name
         if r.status_code == 400:
-            assert r.json()["error"]["message"] == "fixture upstream failure"
+            assert r.json()["error"] == {"type":"invalid_request_error","code":"epochguard_provider_error","message":"Provider request failed."}
     row = {"case":name,"status":r.status_code,"elapsed_ms":round((time.monotonic()-started)*1000,3),
            "candidate_bytes_match":r.status_code==200,"fixture":True}
     rows.append(row)
@@ -87,9 +92,29 @@ def operator():
     ready()
     after=call("verifier",8000,"GET","/test/report").json()
     assert before["source_invocations"]==after["source_invocations"], "readiness retrieved evidence"
-    for fault in ("tavily-timeout","tavily-401","tavily-429","tavily-500","pypi-timeout","pypi-json","pypi-identity"):
+    count=call("provider",9000,"GET","/stats").json().get(B,0)
+    infer("terminal-refusal-fallback",B,403)
+    assert call("provider",9000,"GET","/stats").json().get(B,0)-count==1
+    count=call("provider",9000,"GET","/stats").json().get(A,0)
+    infer("genuine-provider-fallback",A,200,role="system",fallback=True)
+    assert call("provider",9000,"GET","/stats").json().get(A,0)-count==2
+    for fault in ("tavily-timeout","tavily-401","tavily-429","tavily-500","pypi-timeout","pypi-json","pypi-identity","work-deadline"):
         control(fault); infer("source-"+fault,A,503)
     control("none")
+    for channel in ("id","model","system_fingerprint","service_tier","usage","extra_fields","routing_info","nested","http-header","raw_response","annotations"):
+        assert call("provider",9000,"POST","/test/control",{"channel":channel}).status_code==200
+        infer("metadata-"+channel,A,(200,503))
+    assert call("provider",9000,"POST","/test/control",{"channel":"provider-error"}).status_code==200
+    infer("metadata-provider-error",A,400)
+    assert call("provider",9000,"POST","/test/control",{"channel":"none"}).status_code==200
+    # Prove the would-be replacement is eligible, then retain the nonce and
+    # substitute the original contradicted request at the real relay.
+    assert call("receipt-relay",9003,"POST","/test/control",{"fault":"none"}).status_code==200
+    infer("substitution-positive",A,200,"ingress-faults")
+    for fault,text in (("request-substitute",B),("request-reserialize",A),("request-field",A)):
+        assert call("receipt-relay",9003,"POST","/test/control",{"fault":fault}).status_code==200
+        infer(fault,text,503,"ingress-faults")
+    overload()
     for fault in ("none","mac","body","replay","policy","version","duplicate","missing","fake"):
         assert call("receipt-relay",9003,"POST","/test/control",{"fault":fault}).status_code==200
         infer("receipt-"+fault,A,200 if fault=="none" else 503,"ingress-faults")
@@ -103,6 +128,31 @@ def operator():
     infer("disabled-plugin",A,503)
     ready(expected=503)
     assert call("verifier",8000,"GET","/test/report").json()["active"]==0
+
+
+def overload():
+    async def exercise():
+        connections=[]
+        try:
+            # Partial bodies hold HTTP work before evidence-pipeline admission.
+            for _ in range(40):
+                reader,writer=await asyncio.open_connection("verifier",8000)
+                writer.write(b"POST /v1/verify/prose HTTP/1.1\r\nHost: verifier\r\nContent-Type: application/json\r\nContent-Length: 1000\r\n\r\n{")
+                await writer.drain();connections.append((reader,writer))
+            async def status(reader):
+                try:
+                    return (await asyncio.wait_for(reader.readline(),.3)).startswith(b"HTTP/1.1 503")
+                except TimeoutError: return False
+            assert any(await asyncio.gather(*(status(r) for r,_ in connections))), "server admission did not refuse overload"
+        finally:
+            for _,writer in connections: writer.close()
+            await asyncio.gather(*(w.wait_closed() for _,w in connections),return_exceptions=True)
+        await asyncio.sleep(.2)
+    before=call("verifier",8000,"GET","/test/report").json()
+    asyncio.run(exercise())
+    after=call("verifier",8000,"GET","/test/report").json()
+    assert after["active"]==0 and before["source_invocations"]==after["source_invocations"]
+    infer("overload-recovery")
 
 
 def recovery():

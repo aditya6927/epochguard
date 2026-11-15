@@ -37,7 +37,7 @@ COPY tests/ /src/epochguard/tests/
 WORKDIR /src/epochguard
 RUN --mount=type=cache,target=/root/.cache/go-build \
     test -z "$(gofmt -l cmd tests internal)" \
-    && go vet -mod=readonly ./internal/ingress \
+    && go vet -mod=readonly ./internal/ingress ./cmd/provider-fixture ./cmd/receipt-relay \
     && go test -mod=readonly -trimpath -v ./internal/ingress \
     && go test -race -mod=readonly -trimpath ./internal/ingress \
     && go test -mod=readonly -trimpath -v ./cmd/protected-ingress \

@@ -46,6 +46,16 @@ def main():
             if observer.wait(timeout=40): raise RuntimeError("restart window failed")
             observer=None
         selected("final-recovery","client","recovery")
+        # Inspect runtime output in memory. Never persist raw service logs or
+        # reflect an offending line; a failure reports a fixed category only.
+        result=subprocess.run(COMPOSE+["logs","--no-color","gateway","provider","verifier","ingress"],cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=30,creationflags=hidden)
+        if result.returncode or any(marker in result.stdout for marker in (
+            b"UNVERIFIED_METADATA_004GS",
+            b"Python.org currently lists Python 3.15.",
+            b"PyPI reports requests version 2.34.2.",
+        )):
+            raise RuntimeError("operational log isolation check failed; raw lines withheld")
+        print("runtime logs: no candidate or metadata sentinel observed",flush=True)
         print("004G offline qualification passed; 004G LIVE QUALIFICATION PENDING",flush=True)
     finally:
         if observer is not None and observer.poll() is None:

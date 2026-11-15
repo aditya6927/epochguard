@@ -42,7 +42,7 @@ services:
   provider:
     <<: *native
     networks: [private]
-    command: ["/app/provider-fixture", "-answer-mode", "claim", "-qualification-004c"]
+    command: ["/app/provider-fixture", "-answer-mode", "claim", "-qualification-004c", "-qualification-004gs"]
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9000/health"]
       interval: 2s
@@ -52,7 +52,7 @@ services:
     image: epochguard-verifier:004g
     platform: linux/amd64
     networks: [private]
-    command: ["python", "-m", "uvicorn", "tests_bounded_prose.simulated:fixture_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    command: ["python", "-m", "uvicorn", "tests_bounded_prose.simulated:fixture_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--limit-concurrency", "32"]
     environment: {EPOCHGUARD_TEST_MODE: "1"}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=2)"]
@@ -104,7 +104,7 @@ services:
   verifier-old:
     image: epochguard-verifier:004g
     networks: [private]
-    command: ["python", "-m", "uvicorn", "verifier.multiclaim.app:fixture_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+    command: ["python", "-m", "uvicorn", "verifier.multiclaim.app:fixture_app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--limit-concurrency", "32"]
     environment: {EPOCHGUARD_TEST_MODE: "1", EPOCHGUARD_004C_FIXTURE_CASE: A}
   ingress-old:
     <<: *ingress

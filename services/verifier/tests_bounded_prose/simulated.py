@@ -16,7 +16,7 @@ from verifier.multiclaim.contract import PYPI_URL
 
 class Control(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    fault: Literal["none", "tavily-timeout", "tavily-401", "tavily-429", "tavily-500", "pypi-timeout", "pypi-json", "pypi-identity", "slow"]
+    fault: Literal["none", "tavily-timeout", "tavily-401", "tavily-429", "tavily-500", "pypi-timeout", "pypi-json", "pypi-identity", "slow", "work-deadline"]
 
 
 def fixture_app():
@@ -29,6 +29,7 @@ def fixture_app():
         assert str(req.url) == "https://api.tavily.com/extract"
         assert json.loads(req.content)["urls"] == [SOURCE_URL]
         counts["python"] += 1
+        if state.fault == "work-deadline": await asyncio.sleep(3)
         if state.fault == "slow": await asyncio.sleep(.3)
         if state.fault == "tavily-timeout": raise httpx.ReadTimeout("simulated")
         if state.fault.startswith("tavily-"): return httpx.Response(int(state.fault.split("-")[1]))
@@ -37,6 +38,7 @@ def fixture_app():
     async def pypi(req):
         assert str(req.url) == PYPI_URL
         counts["pypi"] += 1
+        if state.fault == "work-deadline": await asyncio.sleep(3)
         if state.fault == "pypi-timeout": raise httpx.ReadTimeout("simulated")
         if state.fault == "pypi-json": return httpx.Response(200, content="invalid")
         return httpx.Response(200,json={"info":{"name":"other" if state.fault=="pypi-identity" else "requests","version":"2.34.2","yanked":False}})

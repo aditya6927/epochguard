@@ -24,6 +24,7 @@ const Path = "/openai/v1/chat/completions"
 const NonceHeader = "X-EpochGuard-Internal-Nonce"
 const ReceiptHeader = "X-EpochGuard-Internal-Receipt"
 const Protocol = "004d.v1"
+const BoundProtocol = "004g.receipt.v2"
 const Policy = "004b.v1/multi-claim-templates-v1"
 const ProsePolicy = "004g.v1/bounded-prose-v1"
 const ResponseLimit = 256 * 1024
@@ -40,6 +41,10 @@ type Receipt struct {
 	BodySHA256      string `json:"body_sha256"`
 	CandidateSHA256 string `json:"candidate_sha256"`
 	IssuedAt        int64  `json:"issued_at"`
+}
+type BoundReceipt struct {
+	Receipt
+	RequestSHA256 string `json:"request_sha256"`
 }
 type Config struct {
 	Gateway         string
@@ -127,7 +132,11 @@ func (h *Handler) exchange(ctx context.Context, data []byte) (int, []byte, Recei
 	if media != "application/json" || (response.Header.Get("Content-Encoding") != "" && response.Header.Get("Content-Encoding") != "identity") || len(response.Header.Values(ReceiptHeader)) != 1 {
 		return 0, nil, receipt, errors.New("receipt unavailable")
 	}
-	receipt, err = verifyPolicy(response.Header.Get(ReceiptHeader), h.cfg.Secret, nonce, response.StatusCode, body, started, time.Now(), h.policy())
+	if h.policy() == ProsePolicy {
+		receipt, err = verifyBound(response.Header.Get(ReceiptHeader), h.cfg.Secret, nonce, Hash(data), response.StatusCode, body, started, time.Now(), h.policy())
+	} else {
+		receipt, err = verifyPolicy(response.Header.Get(ReceiptHeader), h.cfg.Secret, nonce, response.StatusCode, body, started, time.Now(), h.policy())
+	}
 	if err != nil {
 		return 0, nil, receipt, errors.New("invalid receipt")
 	}
@@ -146,6 +155,14 @@ func (h *Handler) policy() string {
 }
 
 func verifyPolicy(header string, secret []byte, nonce string, status int, body []byte, started, now time.Time, policy string) (Receipt, error) {
+	return verifyReceipt(header, secret, nonce, status, body, started, now, policy, Protocol, "")
+}
+
+func verifyBound(header string, secret []byte, nonce, requestHash string, status int, body []byte, started, now time.Time, policy string) (Receipt, error) {
+	return verifyReceipt(header, secret, nonce, status, body, started, now, policy, BoundProtocol, requestHash)
+}
+
+func verifyReceipt(header string, secret []byte, nonce string, status int, body []byte, started, now time.Time, policy, protocol, requestHash string) (Receipt, error) {
 	var r Receipt
 	bad := errors.New("invalid enforcement receipt")
 	if len(secret) != 32 || len(header) > 2048 || !digestRE.MatchString(nonce) {
@@ -173,13 +190,23 @@ func verifyPolicy(header string, secret []byte, nonce string, status int, body [
 	}
 	d := json.NewDecoder(bytes.NewReader(payload))
 	d.DisallowUnknownFields()
-	if d.Decode(&r) != nil {
-		return r, bad
+	var canonical []byte
+	if protocol == BoundProtocol {
+		var bound BoundReceipt
+		if d.Decode(&bound) != nil || !digestRE.MatchString(requestHash) || bound.RequestSHA256 != requestHash {
+			return r, bad
+		}
+		r = bound.Receipt
+		canonical, err = json.Marshal(bound)
+	} else {
+		if d.Decode(&r) != nil {
+			return r, bad
+		}
+		canonical, err = json.Marshal(r)
 	}
 	// Requiring the exact canonical payload also rejects aliases, omitted zero
 	// fields and alternate encodings. The signer emits this one representation.
-	canonical, err := json.Marshal(r)
-	if err != nil || !bytes.Equal(payload, canonical) || r.Version != Protocol || r.PolicyID != policy || r.Nonce != nonce || r.Status != status || r.BodySHA256 != Hash(body) || !digestRE.MatchString(r.BodySHA256) || r.IssuedAt < started.Unix()-2 || r.IssuedAt > now.Unix()+2 || now.Unix()-r.IssuedAt > 20 {
+	if err != nil || !bytes.Equal(payload, canonical) || r.Version != protocol || r.PolicyID != policy || r.Nonce != nonce || r.Status != status || r.BodySHA256 != Hash(body) || !digestRE.MatchString(r.BodySHA256) || r.IssuedAt < started.Unix()-2 || r.IssuedAt > now.Unix()+2 || now.Unix()-r.IssuedAt > 20 {
 		return r, bad
 	}
 	switch r.Outcome {
@@ -193,6 +220,14 @@ func verifyPolicy(header string, secret []byte, nonce string, status int, body [
 		if json.Unmarshal(body, &parsed) != nil || len(parsed.Choices) != 1 || Hash([]byte(parsed.Choices[0].Message.Content)) != r.CandidateSHA256 {
 			return r, bad
 		}
+		if protocol == BoundProtocol {
+			projected, _ := json.Marshal(map[string]any{"object": "chat.completion", "choices": []any{
+				map[string]any{"index": 0, "finish_reason": "stop", "message": map[string]string{"role": "assistant", "content": parsed.Choices[0].Message.Content}},
+			}})
+			if !bytes.Equal(body, projected) {
+				return r, bad
+			}
+		}
 	case "REJECT":
 		if status != 403 || r.CandidateSHA256 != "" {
 			return r, bad
@@ -205,10 +240,27 @@ func verifyPolicy(header string, secret []byte, nonce string, status int, body [
 		if status < 400 || status > 599 || r.CandidateSHA256 != "" {
 			return r, bad
 		}
+		if protocol == BoundProtocol && !safeProviderError(body) {
+			return r, bad
+		}
 	default:
 		return r, bad
 	}
 	return r, nil
+}
+
+func safeProviderError(body []byte) bool {
+	var parsed struct{ Error struct{ Type string } }
+	if json.Unmarshal(body, &parsed) != nil {
+		return false
+	}
+	switch parsed.Error.Type {
+	case "invalid_request_error", "authentication_error", "permission_error", "rate_limit_error", "server_error", "provider_error":
+	default:
+		return false
+	}
+	projected, _ := json.Marshal(map[string]any{"error": map[string]string{"type": parsed.Error.Type, "code": "epochguard_provider_error", "message": "Provider request failed."}})
+	return bytes.Equal(body, projected)
 }
 
 type request struct {
@@ -389,12 +441,14 @@ func (h *Handler) ready(ctx context.Context) bool {
 			}
 			found := false
 			expectedMode := "004b.v1"
+			expectedProtocol := Protocol
 			if h.cfg.Profile == "004g" || h.cfg.Profile == "004g-live" {
 				expectedMode = "004g.v1"
+				expectedProtocol = BoundProtocol
 			}
 			for _, plugin := range plugins.Plugins {
 				if plugin.Name == "epochguard" {
-					found = plugin.Enabled && plugin.Placement == "pre_builtin" && plugin.Order != nil && *plugin.Order == 0 && plugin.Status.Status == "active" && plugin.Config.Verifier.Mode == expectedMode && plugin.Config.Attestation.Protocol == Protocol
+					found = plugin.Enabled && plugin.Placement == "pre_builtin" && plugin.Order != nil && *plugin.Order == 0 && plugin.Status.Status == "active" && plugin.Config.Verifier.Mode == expectedMode && plugin.Config.Attestation.Protocol == expectedProtocol
 				}
 			}
 			if !found {

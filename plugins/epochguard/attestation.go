@@ -11,6 +11,7 @@ import (
 	"io"
 	"mime"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -19,6 +20,7 @@ import (
 )
 
 const receiptVersion = "004d.v1"
+const boundReceiptVersion = "004g.receipt.v2"
 const receiptPolicy = "004b.v1/multi-claim-templates-v1"
 const nonceHeader = "X-EpochGuard-Internal-Nonce"
 const receiptHeader = "X-EpochGuard-Internal-Receipt"
@@ -32,6 +34,14 @@ type attestationState struct {
 	policy                                         *policy
 	nonce, outcome, candidate, code, kind, message string
 	status                                         int
+	requestSHA256                                  string
+}
+
+// Legacy wire fields remain unchanged. G requires this explicit revision and
+// the digest of the bytes received by the transport, never a digest header.
+type boundEnforcementReceipt struct {
+	enforcementReceipt
+	RequestSHA256 string `json:"request_sha256"`
 }
 type enforcementReceipt struct {
 	Version         string `json:"version"`
@@ -45,7 +55,7 @@ type enforcementReceipt struct {
 }
 
 func loadAttestation(cfg attestationConfig) (*attestationKey, error) {
-	if cfg.Protocol != receiptVersion || cfg.SecretFile == "" {
+	if (cfg.Protocol != receiptVersion && cfg.Protocol != boundReceiptVersion) || cfg.SecretFile == "" {
 		return nil, errors.New("invalid attestation configuration")
 	}
 	f, err := os.Open(cfg.SecretFile)
@@ -79,7 +89,16 @@ func beginAttestation(ctx *schemas.BifrostContext, req *schemas.HTTPRequest) {
 		return
 	}
 	trace.mu.Lock()
-	trace.attested = &attestationState{policy: p, nonce: nonce}
+	state := &attestationState{policy: p, nonce: nonce}
+	if p.receiptPolicy == proseSchema+"/"+prosePolicy {
+		// Absent body capture (large/streamed paths included) cannot authorize G.
+		if len(req.Body) == 0 || len(req.Body) > 65536 {
+			trace.mu.Unlock()
+			return
+		}
+		state.requestSHA256 = shaText(string(req.Body))
+	}
+	trace.attested = state
 	trace.mu.Unlock()
 }
 
@@ -176,6 +195,20 @@ func finishAttestation(ctx *schemas.BifrostContext, resp *schemas.HTTPResponse) 
 	if media != "application/json" || !attestedBody(resp.Body, s) {
 		return
 	}
+	bound := s.policy.receiptPolicy == proseSchema+"/"+prosePolicy
+	if bound {
+		if !digestRE.MatchString(s.requestSHA256) {
+			return
+		}
+		// Core conversion is complete. Never release provider-owned metadata,
+		// even when its JSON type/length is valid. Sign the projected entity.
+		var err error
+		resp.Body, err = protectedEntity(s)
+		if err != nil {
+			return
+		}
+		resp.Headers = map[string]string{"Content-Type": "application/json", "Content-Length": strconv.Itoa(len(resp.Body))}
+	}
 	candidateHash := ""
 	if s.outcome == "ALLOW" {
 		candidateHash = shaText(s.candidate)
@@ -185,7 +218,14 @@ func finishAttestation(ctx *schemas.BifrostContext, resp *schemas.HTTPResponse) 
 		identity = receiptPolicy
 	}
 	r := enforcementReceipt{receiptVersion, s.nonce, identity, s.outcome, s.status, shaText(string(resp.Body)), candidateHash, time.Now().Unix()}
-	payload, err := json.Marshal(r)
+	var payload []byte
+	var err error
+	if bound {
+		r.Version = boundReceiptVersion
+		payload, err = json.Marshal(boundEnforcementReceipt{r, s.requestSHA256})
+	} else {
+		payload, err = json.Marshal(r)
+	}
 	if err != nil {
 		return
 	}
@@ -194,9 +234,31 @@ func finishAttestation(ctx *schemas.BifrostContext, resp *schemas.HTTPResponse) 
 	resp.Headers[receiptHeader] = base64.RawURLEncoding.EncodeToString(payload) + "." + base64.RawURLEncoding.EncodeToString(mac.Sum(nil))
 }
 
+func protectedEntity(s *attestationState) ([]byte, error) {
+	if s.outcome == "ALLOW" {
+		return json.Marshal(map[string]any{"object": "chat.completion", "choices": []any{
+			map[string]any{"index": 0, "finish_reason": "stop", "message": map[string]string{"role": "assistant", "content": s.candidate}},
+		}})
+	}
+	code, kind, message := s.code, s.kind, s.message
+	if s.outcome == "PROVIDER_ERROR" {
+		// Preserve status and an allowlisted error category, not arbitrary provider
+		// text, codes or metadata. This outcome is never factual verification.
+		code, message = "epochguard_provider_error", "Provider request failed."
+		switch kind {
+		case "invalid_request_error", "authentication_error", "permission_error", "rate_limit_error", "server_error":
+		default:
+			kind = "provider_error"
+		}
+	}
+	return json.Marshal(map[string]any{"error": map[string]string{"code": code, "type": kind, "message": message}})
+}
+
 // Validate the post-conversion protected content before binding final bytes.
 // Unknown body fields, raw payloads, aliases, duplicates and extra answer forms
-// are refused. Transport-owned bounded metadata is not an additional claim.
+// are refused. Legacy compatibility admits bounded metadata without establishing
+// semantic coverage. G uses this only for correspondence, then discards all
+// provider metadata before signing the minimal protected entity.
 func attestedBody(data []byte, s *attestationState) bool {
 	if !utf8.Valid(data) || !uniqueWireJSON(data) {
 		return false

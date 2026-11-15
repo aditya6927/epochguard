@@ -15,6 +15,11 @@ func TestProsePolicyReceiptIsolation(t *testing.T) {
 				r := fixtureReceipt(nonce)
 				r.PolicyID = source
 				body := []byte(testBody)
+				if source == ProsePolicy {
+					r.Version = BoundProtocol
+					body = boundBody()
+					r.BodySHA256 = Hash(body)
+				}
 				if mutation == "nonce" {
 					r.Nonce = strings.Repeat("b", 64)
 				}
@@ -25,10 +30,18 @@ func TestProsePolicyReceiptIsolation(t *testing.T) {
 					body = append(body, ' ')
 				}
 				signed := sign(r, testKey)
+				if source == ProsePolicy {
+					signed = signedBound(BoundReceipt{r, Hash([]byte(testRequest))})
+				}
 				if mutation == "mac" {
 					signed = "invalid"
 				}
-				_, err := verifyPolicy(signed, testKey, nonce, 200, body, now, now, target)
+				var err error
+				if target == ProsePolicy {
+					_, err = verifyBound(signed, testKey, nonce, Hash([]byte(testRequest)), 200, body, now, now, target)
+				} else {
+					_, err = verifyPolicy(signed, testKey, nonce, 200, body, now, now, target)
+				}
 				if (err == nil) != (source == target && mutation == "valid") {
 					t.Fatal("policy isolation/receipt attack")
 				}

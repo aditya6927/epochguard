@@ -52,7 +52,7 @@
           "evidence_mode": "fixture"
         },
         "attestation": {
-          "protocol": "004d.v1",
+          "protocol": "004g.receipt.v2",
           "secret_file": "/run/receipt/receipt.hex"
         },
         "test_only": true

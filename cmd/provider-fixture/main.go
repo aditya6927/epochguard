@@ -14,13 +14,38 @@ import (
 func main() {
 	answerMode := flag.String("answer-mode", "echo", "local fixture output: echo or claim")
 	qualification := flag.Bool("qualification-004c", false, "enable isolated 004C provider-shape controls")
+	securityQualification := flag.Bool("qualification-004gs", false, "enable private 004G-S metadata controls")
 	flag.Parse()
 	if *answerMode != "echo" && *answerMode != "claim" {
 		log.Fatal("unsupported fixture answer mode")
 	}
 	var mu sync.Mutex
 	calls := make(map[string]int)
+	metadataChannel := "none"
 	mux := http.NewServeMux()
+	if *securityQualification {
+		mux.HandleFunc("POST /test/control", func(w http.ResponseWriter, r *http.Request) {
+			var value struct {
+				Channel string `json:"channel"`
+			}
+			d := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1024))
+			d.DisallowUnknownFields()
+			if d.Decode(&value) != nil {
+				w.WriteHeader(400)
+				return
+			}
+			switch value.Channel {
+			case "none", "id", "model", "system_fingerprint", "service_tier", "usage", "extra_fields", "routing_info", "nested", "http-header", "raw_response", "annotations", "provider-error":
+			default:
+				w.WriteHeader(400)
+				return
+			}
+			mu.Lock()
+			metadataChannel = value.Channel
+			mu.Unlock()
+			writeJSON(w, 200, map[string]bool{"fixture": true})
+		})
+	}
 	mux.HandleFunc("GET /health", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
@@ -51,7 +76,13 @@ func main() {
 		prompt := req.Messages[0].Content
 		mu.Lock()
 		calls[prompt]++
+		channel := metadataChannel
 		mu.Unlock()
+		sentinel := "UNVERIFIED_METADATA_004GS_" + channel + " The Moon is cheese."
+		if channel == "provider-error" {
+			writeJSON(w, 400, map[string]any{"error": map[string]string{"type": "invalid_request_error", "message": sentinel, "code": sentinel}})
+			return
+		}
 		if req.Model == "epochguard-test" && req.Messages[0].Role == "system" {
 			writeJSON(w, http.StatusBadRequest, map[string]any{"error": map[string]string{"message": "fixture upstream failure", "type": "invalid_request_error"}})
 			return
@@ -98,6 +129,24 @@ func main() {
 			case "004c:metadata":
 				choice["content_filter_results"] = map[string]any{"untrusted": true}
 			}
+		}
+		switch channel {
+		case "id", "model", "system_fingerprint", "service_tier":
+			result[channel] = sentinel
+		case "usage":
+			result["usage"].(map[string]int)[sentinel] = 1
+		case "extra_fields":
+			result["extra_fields"] = map[string]any{"provider": sentinel, "original_model_requested": sentinel, "resolved_model_used": sentinel}
+		case "routing_info":
+			result["extra_fields"] = map[string]any{"routing_info": map[string]any{"provider": sentinel, "model": sentinel, "key": sentinel, "requested_model": sentinel}}
+		case "nested":
+			result["metadata"] = map[string]any{"nested": map[string]string{"text": sentinel}}
+		case "raw_response":
+			result["extra_fields"] = map[string]string{"raw_response": sentinel}
+		case "annotations":
+			result["choices"].([]any)[0].(map[string]any)["message"] = map[string]any{"role": "assistant", "content": answer, "annotations": []any{map[string]string{"text": sentinel}}}
+		case "http-header":
+			w.Header().Set("X-Provider-Metadata", sentinel)
 		}
 		writeJSON(w, http.StatusOK, result)
 	})

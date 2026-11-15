@@ -1,5 +1,7 @@
 # Task 004G: protected bounded-prose gateway enforcement
 
+**Security follow-up:** [Task 004G-S](task-004gs.md) supersedes the original receipt and ALLOW-envelope behavior described by this milestone. Current G profiles require `004g.receipt.v2` with exact request-body binding and a minimal response envelope. Original assistant content remains unchanged. The execution results below are historical 004G results; current remediation evidence is in the security report.
+
 Starting tree: clean `main` at `fd0fb7a1ab4a53b13853aacbc958aa0464bff9cb`.
 Implemented and checked November 15, 2026 (Asia/Calcutta). No commit or push.
 **004G LIVE QUALIFICATION PENDING.** The gateway demonstrations use synthetic
@@ -160,13 +162,15 @@ or unrecognized original content -> UNAVAILABLE (503). No partial answer release
 
 ## Receipt and readiness isolation
 
-The receipt envelope remains `004d.v1`. Configured immutable enforcement policy
-selects the signed `policy_id`:
+Following 004G-S, G uses `004g.receipt.v2` and additionally signs
+`request_sha256`, derived from the exact HTTP body received by Bifrost. Ingress
+compares it with its retained forwarded bytes. G never accepts a legacy receipt.
+Configured immutable enforcement policy selects the signed `policy_id`:
 
 | Profile | Accepted receipt identity |
 | --- | --- |
 | Existing 004D / 004E | `004b.v1/multi-claim-templates-v1` only |
-| New `004g` / `004g-live` | `004g.v1/bounded-prose-v1` only |
+| New `004g` / `004g-live` | `004g.v1/bounded-prose-v1`, protocol `004g.receipt.v2` only |
 
 No client policy selector is introduced. MAC, unpredictable per-request nonce,
 body/status/candidate hash, canonical receipt encoding, request-start minus two
@@ -174,7 +178,13 @@ seconds, future tolerance two seconds and maximum issuance age 20s are unchanged
 Signing requires the same configured policy still active at the HTTP post-hook.
 Every fallback attempt replaces request-local state. Missing/disabled plugin,
 later response mutation, mixed candidate or absent body capture cannot produce
-an accepted ALLOW. Internal receipt/diagnostic headers are stripped on release.
+an accepted ALLOW. Internal receipt/diagnostic headers are stripped on release. G projects successful
+entities to fixed `object`/choice/role/finish fields and the exact approved content.
+Provider IDs, model labels, fingerprints, service tier, usage, extra fields and
+routing metadata are removed. G provider errors retain HTTP status and an
+allowlisted category with a fixed safe message; they are not factual verdicts.
+Explicit legacy B/D/E configurations retain their original wire behavior and
+do not acquire these new guarantees.
 
 Both G profiles use the existing fixed negative canary and require an authenticated
 UNAVAILABLE 503, plus actual loaded/active/enabled plugin placement/order/mode,
