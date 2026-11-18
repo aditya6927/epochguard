@@ -57,6 +57,7 @@ type policy struct {
 	cacheNoStore  bool
 	attestation   *attestationKey
 	receiptPolicy string
+	qualification *qualificationSink
 }
 
 // Publication is atomic for concurrent hooks/reconfiguration. A policy and its
@@ -67,12 +68,13 @@ func configure(config any) error {
 	// Even a failed reconfiguration must not leave an earlier ALLOW installed.
 	activePolicy.Store(nil)
 	var cfg struct {
-		TestOnly            bool                    `json:"test_only"`
-		Decision            Decision                `json:"decision"`
-		CacheNoStore        bool                    `json:"cache_no_store"`
-		TestDecisionDelayMS int                     `json:"test_decision_delay_ms"`
-		Verifier            *HTTPVerificationConfig `json:"verifier"`
-		Attestation         *attestationConfig      `json:"attestation"`
+		TestOnly                 bool                    `json:"test_only"`
+		Decision                 Decision                `json:"decision"`
+		CacheNoStore             bool                    `json:"cache_no_store"`
+		TestDecisionDelayMS      int                     `json:"test_decision_delay_ms"`
+		Verifier                 *HTTPVerificationConfig `json:"verifier"`
+		Attestation              *attestationConfig      `json:"attestation"`
+		QualificationDiagnostics bool                    `json:"qualification_diagnostics"`
 	}
 	data, err := json.Marshal(config)
 	if err != nil {
@@ -82,6 +84,9 @@ func configure(config any) error {
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(&cfg); err != nil {
 		return errors.New("epochguard: invalid decision configuration")
+	}
+	if cfg.QualificationDiagnostics && (!cfg.TestOnly || cfg.Verifier == nil || cfg.Verifier.Mode != proseSchema || cfg.Attestation == nil || cfg.Attestation.Protocol != boundReceiptVersion) {
+		return errors.New("epochguard: qualification diagnostics require fixture prose with bound receipt")
 	}
 	if cfg.Verifier != nil {
 		if cfg.Decision != "" || cfg.TestDecisionDelayMS != 0 || cfg.CacheNoStore {
@@ -125,7 +130,11 @@ func configure(config any) error {
 		if cfg.Verifier.Mode == proseSchema {
 			identity = proseSchema + "/" + prosePolicy
 		}
-		activePolicy.Store(&policy{source: source, cacheNoStore: true, attestation: key, receiptPolicy: identity})
+		p := &policy{source: source, cacheNoStore: true, attestation: key, receiptPolicy: identity}
+		if cfg.QualificationDiagnostics {
+			p.qualification = &qualificationSink{path: qualificationFile}
+		}
+		activePolicy.Store(p)
 		if cfg.Verifier.Mode == proseSchema {
 			safeLogf("epochguard event=init task=004g source=http policy=bounded-prose-v1")
 		} else if cfg.Verifier.Mode == multiSchema {
@@ -177,10 +186,20 @@ func enforce(ctx context.Context, resp *schemas.BifrostResponse, upstreamErr *sc
 	// Preserve the genuine failure, including identity and provider fallback policy.
 	// Discard any simultaneous response instead of treating it as a candidate.
 	if upstreamErr != nil {
+		if upstreamErr.IsBifrostError {
+			qualificationEvent(ctx, "provider_bifrost_failure")
+		} else {
+			qualificationEvent(ctx, "provider_failure")
+		}
 		return nil, upstreamErr, nil
 	}
 	decision := Unavailable
 	var decisionErr error
+	if resp == nil || resp.ChatResponse == nil {
+		qualificationEvent(ctx, "invalid_chat_response")
+	} else if source == nil {
+		qualificationEvent(ctx, "source_unavailable")
+	}
 	if resp != nil && resp.ChatResponse != nil && source != nil && ctx.Err() == nil {
 		result, err := source.Decide(ctx, resp)
 		decisionErr = err
@@ -189,6 +208,7 @@ func enforce(ctx context.Context, resp *schemas.BifrostResponse, upstreamErr *sc
 		}
 	}
 	if ctx.Err() != nil {
+		qualificationEvent(ctx, "request_cancelled")
 		decisionErr = ctx.Err()
 	}
 	switch decision {

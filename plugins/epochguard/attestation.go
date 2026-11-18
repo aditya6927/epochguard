@@ -99,6 +99,9 @@ func beginAttestation(ctx *schemas.BifrostContext, req *schemas.HTTPRequest) {
 		state.requestSHA256 = shaText(string(req.Body))
 	}
 	trace.attested = state
+	if p.qualification != nil && state.requestSHA256 != "" {
+		trace.qualification = &qualificationTrace{sink: p.qualification, RequestSHA256: state.requestSHA256}
+	}
 	trace.mu.Unlock()
 }
 

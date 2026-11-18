@@ -402,8 +402,13 @@ func (s *multiDecisionSource) Decide(ctx context.Context, resp *schemas.BifrostR
 		defer cancel()
 	}
 	started := time.Now()
-	text, err := bufferedCandidate(resp)
-	if err != nil || !multiTextBound(text) {
+	text, shape, err := inspectBufferedCandidate(resp)
+	if err != nil {
+		qualificationEvent(ctx, shape)
+		return Unavailable, verificationFailure{category: "unsupported_candidate"}
+	}
+	if !multiTextBound(text) {
+		qualificationEvent(ctx, "buffered_candidate_shape")
 		return Unavailable, verificationFailure{category: "unsupported_candidate"}
 	}
 	// The pinned BifrostResponse is a pointer union. A mixed response cannot
@@ -411,14 +416,17 @@ func (s *multiDecisionSource) Decide(ctx context.Context, resp *schemas.BifrostR
 	value := reflect.ValueOf(resp).Elem()
 	for i := 0; i < value.NumField(); i++ {
 		if value.Type().Field(i).Name != "ChatResponse" && (value.Field(i).Kind() != reflect.Pointer || !value.Field(i).IsNil()) {
+			qualificationEvent(ctx, "buffered_candidate_shape")
 			return Unavailable, verificationFailure{category: "unsupported_candidate"}
 		}
 	}
 	// Additional provider annotations on 004B require a separate trust policy.
 	chat := resp.ChatResponse
 	if len(chat.PromptFilterResults) != 0 || len(chat.Choices[0].ContentFilterResults) != 0 || chat.Diagnostics != nil || len(chat.ExtraParams) != 0 || chat.Choices[0].StopString != nil {
+		qualificationEvent(ctx, "unsupported_provider_annotations")
 		return Unavailable, verificationFailure{category: "unsupported_candidate"}
 	}
+	qualificationEvent(ctx, "candidate_eligible")
 	nonce := make([]byte, 16)
 	if _, err := rand.Read(nonce); err != nil {
 		return Unavailable, verificationFailure{category: "verification_unavailable"}
@@ -437,28 +445,40 @@ func (s *multiDecisionSource) Decide(ctx context.Context, resp *schemas.BifrostR
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.GetBody = nil // no automatic replay of verification POSTs
+	qualificationEvent(ctx, "verifier_request_attempted")
 	response, err := s.client.Do(req)
 	if err != nil {
+		qualificationEvent(ctx, "verifier_transport_failure")
 		return Unavailable, transportFailure(err)
 	}
 	defer response.Body.Close()
+	qualificationEvent(ctx, "verifier_request_completed")
 	if response.StatusCode != 200 {
+		qualificationEvent(ctx, "evidence_policy_validation_refused")
 		return Unavailable, verificationFailure{category: "verifier_http_failure", status: response.StatusCode}
 	}
 	media, _, _ := mime.ParseMediaType(response.Header.Get("Content-Type"))
 	data, err := io.ReadAll(io.LimitReader(response.Body, multiBodyLimit+1))
 	if err != nil {
+		qualificationEvent(ctx, "verifier_body_failure")
 		return Unavailable, transportFailure(err)
 	}
 	var result multiResult
 	if s.prose {
 		var result proseResult
 		if media != "application/json" || strictRecordJSON(data, &result, 10) != nil {
+			qualificationEvent(ctx, "evidence_policy_validation_refused")
 			return Unavailable, verificationFailure{category: "invalid_contract", status: 200}
 		}
 		decision, err := validateProse(payload, result, s.evidenceMode, started, time.Now())
 		if err != nil {
+			qualificationEvent(ctx, "evidence_policy_validation_refused")
 			return Unavailable, verificationFailure{category: "invalid_contract", status: 200}
+		}
+		if decision == Allow {
+			qualificationEvent(ctx, "evidence_policy_validated")
+		} else {
+			qualificationEvent(ctx, "evidence_policy_validation_refused")
 		}
 		return decision, nil
 	}

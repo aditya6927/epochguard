@@ -6,7 +6,8 @@ import httpx
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, Response
 from claim_analysis.schema import strict_json
-from verifier.bounded_prose.grammar import parse
+from .response_observations import observe_envelope
+from .response_shapes import SHAPE_PROMPTS, response as shape_response
 from .common import OUTPUTS, PROMPTS, read_settings, sha
 
 DEADLINE, RUN_SECONDS, REQUEST_LIMIT, RESPONSE_LIMIT = 15, 300, 8192, 65536
@@ -39,7 +40,7 @@ class Relay:
                 raise ValueError()
             prompt = content["parts"][0]["text"]
             phase = "prompt"
-            scenario = next(name for name, text in PROMPTS.items() if prompt == text)
+            scenario = next(name for name, text in (PROMPTS | SHAPE_PROMPTS).items() if prompt == text)
             if self.live and scenario not in OUTPUTS:
                 raise ValueError()
             config = value["generationConfig"]
@@ -103,21 +104,21 @@ class Relay:
         # Telemetry never influences enforcement or changes forwarded bytes.
         try:
             value = strict_json(body)
-            candidates = value["candidates"]
-            if len(candidates) == 1 and candidates[0].get("finishReason") == "STOP":
-                parts = candidates[0]["content"]["parts"]
-                if parts and all(set(p) <= {"text", "thought"} and isinstance(p.get("text"), str) for p in parts):
-                    text = "".join(p["text"] for p in parts if not p.get("thought", False))
-                    row.update(candidate_sha256=sha(text), matches_intended_text=text == OUTPUTS.get(scenario))
-                    mappings, reason = parse(text)
-                    row["finite_grammar_observation"] = {"mapped_claims": len(mappings), "reason": reason}
+        except Exception:
+            row["response_structure"] = {"schema_version": "005cr.response-shape.v1", "parse_outcome": "INVALID_JSON"}
+            return
+        try:
             usage = value.get("usageMetadata", {})
             incoming, total = usage.get("promptTokenCount"), usage.get("totalTokenCount")
             if type(incoming) is int and type(total) is int and 0 <= incoming <= total:
                 row.update(input_tokens=incoming, output_tokens_including_thoughts=total-incoming,
                            estimated_cost_usd=(incoming*self.settings.input_usd_per_million + (total-incoming)*self.settings.output_usd_per_million)/1_000_000)
         except Exception:
-            pass  # Unknown telemetry remains null; native provider still parses.
+            pass  # Unknown usage is independent of malformed candidate structure.
+        try:
+            observe_envelope(value, scenario, row)
+        except Exception:
+            row["response_structure"] = {"schema_version": "005cr.response-shape.v1", "parse_outcome": "OBSERVATION_UNAVAILABLE"}
 
     @staticmethod
     def error(status):
@@ -125,7 +126,9 @@ class Relay:
 
     async def simulated(self, request):
         prompt = strict_json(request.content)["contents"][0]["parts"][0]["text"]
-        name = next(name for name, text in PROMPTS.items() if prompt == text)
+        name = next(name for name, text in (PROMPTS | SHAPE_PROMPTS).items() if prompt == text)
+        if name in SHAPE_PROMPTS:
+            return httpx.Response(200, content=shape_response(name), headers={"Content-Type": "application/json"})
         if name == "timeout":
             raise httpx.ReadTimeout("simulated")
         if name == "provider_error":

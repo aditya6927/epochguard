@@ -137,23 +137,44 @@ func plainCandidate(resp *schemas.BifrostResponse) (string, string, error) {
 // Shared eligibility checks against the pinned core v1.14.1 schema. Each mode
 // applies its own text policy afterward; 003A retains its exact old parser.
 func bufferedCandidate(resp *schemas.BifrostResponse) (string, error) {
+	text, _, err := inspectBufferedCandidate(resp)
+	return text, err
+}
+
+// Same eligibility predicates; the fixed reason is diagnostic only.
+func inspectBufferedCandidate(resp *schemas.BifrostResponse) (string, string, error) {
 	bad := errors.New("epochguard: unsupported provider candidate")
 	if resp == nil || resp.ChatResponse == nil {
-		return "", bad
+		return "", "invalid_chat_response", bad
 	}
 	chat := resp.ChatResponse
-	if chat.Object != "chat.completion" || len(chat.Choices) != 1 || len(chat.SearchResults) > 0 || len(chat.Videos) > 0 || len(chat.Citations) > 0 {
-		return "", bad
+	if chat.Object != "chat.completion" || len(chat.Choices) != 1 {
+		return "", "invalid_chat_response", bad
+	}
+	if len(chat.SearchResults) > 0 || len(chat.Videos) > 0 || len(chat.Citations) > 0 {
+		return "", "unsupported_provider_annotations", bad
 	}
 	choice := chat.Choices[0]
-	if choice.ChatNonStreamResponseChoice == nil || choice.TextCompletionResponseChoice != nil || choice.ChatStreamResponseChoice != nil || choice.FinishReason == nil || *choice.FinishReason != "stop" || choice.LogProbs != nil {
-		return "", bad
+	if choice.ChatNonStreamResponseChoice == nil || choice.TextCompletionResponseChoice != nil || choice.ChatStreamResponseChoice != nil {
+		return "", "buffered_candidate_shape", bad
+	}
+	if choice.FinishReason == nil || *choice.FinishReason != "stop" {
+		return "", "unsupported_finish_reason", bad
+	}
+	if choice.LogProbs != nil {
+		return "", "unsupported_provider_annotations", bad
 	}
 	msg := choice.Message
-	if msg == nil || msg.Role != schemas.ChatMessageRoleAssistant || msg.ChatAssistantMessage != nil || msg.ChatToolMessage != nil || msg.Name != nil || msg.Content == nil || msg.Content.ContentStr == nil || msg.Content.ContentBlocks != nil {
-		return "", bad
+	if msg == nil || msg.Role != schemas.ChatMessageRoleAssistant {
+		return "", "buffered_candidate_shape", bad
 	}
-	return *msg.Content.ContentStr, nil
+	if msg.ChatAssistantMessage != nil || msg.ChatToolMessage != nil || msg.Name != nil {
+		return "", "unsupported_provider_annotations", bad
+	}
+	if msg.Content == nil || msg.Content.ContentStr == nil || msg.Content.ContentBlocks != nil {
+		return "", "buffered_candidate_shape", bad
+	}
+	return *msg.Content.ContentStr, "candidate_eligible", nil
 }
 
 func (s *httpDecisionSource) Decide(ctx context.Context, resp *schemas.BifrostResponse) (Decision, error) {

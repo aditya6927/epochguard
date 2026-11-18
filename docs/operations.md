@@ -10,7 +10,7 @@ Use the [Verification Lab guide](verification-lab.md) for the actual React/Go br
 
 Use Git, Docker Desktop in Linux-container mode (or Docker Engine on Linux), Compose v2, Buildx and Python 3.12. Native images target Linux/amd64; the qualified host is Windows x86-64. Other host architectures/emulation and a separate Linux Engine installation are untested. Initial builds download pinned source/dependencies and may take several minutes. Qualification cases use private networks and fixtures unless explicitly marked live.
 
-The host qualification scripts use only Python's standard library. No virtual environment or local Go installation is needed to run them. In PowerShell use `py -3.12`; on Linux use `python3`.
+The historical host qualification scripts use only Python's standard library. The separate 005C/005C-R tools reuse locked Pydantic dependencies and need the documented virtual environment. No local Go installation is required. In PowerShell use `py -3.12` for standard-library drivers; on Linux use `python3`.
 
 The Lab launcher uses Docker's selected builder unless `--builder` is supplied. Historical qualification scripts default to a previously created `epochguard-002a` builder. Inspect `docker context show` / `docker buildx ls` and select a builder matching the active context. For Docker Desktop's Linux context:
 
@@ -261,6 +261,15 @@ Create the environment from the existing lockfile as shown in the guide if absen
 
 ```powershell
 docker compose --env-file dev/lab.compose.env -f compose.verify.005c.cleanup.yaml down --volumes --remove-orphans
+```
+
+To reproduce response-shape refusals, first rebuild native and model images as shown in the [diagnostic workflow](real-model-qualification.md#response-refusal-diagnostics-005c-r), then run the three offline batches. These commands use synthetic Gemini envelopes, retain private networks and unchanged budgets, and reject `--live`:
+
+```powershell
+foreach ($batch in 1..3) {
+    & .venv-003a/Scripts/python.exe tests/modelqualification/qualify.py --shape-batch $batch
+    if ($LASTEXITCODE -ne 0) { throw 'Inspect sanitized response-shape artifacts before continuing.' }
+}
 ```
 
 Use the driver's sanitized case/build outputs to diagnose failures; ignored artifacts are local evidence, not published releases. The G runtime-log scan reads logs in memory and emits a fixed failure category rather than persisting an offending line. Do not expand diagnostic logging to candidate/provider/source bodies, receipt headers or secrets. Full CLI `--json` and evaluation exports intentionally contain supplied source text; use nonprivate fixtures or protect those exports separately.

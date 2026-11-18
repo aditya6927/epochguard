@@ -12,6 +12,7 @@ import uuid
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / "tests"), str(ROOT / "services/claim_analysis")]
 from modelqualification.common import OUTPUTS, Settings, SafeParser, read_settings, sha, write_new
+from modelqualification.response_shapes import FIXTURES, batch
 
 
 def environment(live, directory, secret=None):
@@ -41,28 +42,38 @@ def gateway(settings):
         "network_config": {"base_url": "http://relay:9001/v1beta", "allow_private_network": True,
                            "max_retries": 0, "default_request_timeout_in_seconds": 20},
         "keys": [{"name": "005c-runtime", "value": "env.EPOCHGUARD_005C_KEY", "models": [settings.model], "weight": 1}]}
+    config["plugins"][0]["config"]["qualification_diagnostics"] = True
     return config
 
 
-def validate(client, observation, live):
+def validate(client, observation, live, shape_batch=None):
     transport = observation["transport"]
     verifier = observation["verifier"]
     if verifier["fixture"] is not True or verifier["simulated_transports"] is not True:
         raise ValueError("evidence mode changed")
     records, cases = transport["records"], client["cases"]
-    required = list(OUTPUTS) + ([] if live else ["provider_error", "timeout"])
+    required = batch(shape_batch) if shape_batch is not None else list(OUTPUTS) + ([] if live else ["provider_error", "timeout"])
     if [r["scenario"] for r in records] != required or transport["real_provider"] is not live:
         raise ValueError("provider invocation accounting")
     if any(r["real_provider_invocation_attempted"] is not live for r in records) or transport["attempted"] != len(records) or sum(transport[k] for k in ("completed", "failed", "cancelled")) != len(records):
         raise ValueError("inconsistent invocation totals")
-    if [c["scenario"] for c in cases] != required + ["missing_plugin", "controlled_provider_error"]:
+    if [c["scenario"] for c in cases] != required + ([] if shape_batch is not None else ["missing_plugin", "controlled_provider_error"]):
         raise ValueError("case denominator")
     for case in cases:
         name = case["scenario"]
         observed = next((r for r in records if r["scenario"] == name), None)
         case["real_provider_invocation_attempted"] = bool(observed and observed["real_provider_invocation_attempted"])
         case["observed_model_matches_intention"] = observed["matches_intended_text"] if observed else None
-        if name in OUTPUTS:
+        stages = [r["stages"] for r in observation["native_stages"] if r["request_sha256"] == case["request_sha256"]]
+        case["native_stages"] = stages[0] if len(stages) == 1 else None
+        if name != "missing_plugin" and case["native_stages"] is None:
+            raise ValueError("qualification stage observation missing")
+        if shape_batch is not None:
+            _, expected, stage, verifier_attempted = FIXTURES[name.removeprefix("shape_")]
+            if case["outcome"] != expected or stage not in case["native_stages"] or ("verifier_request_attempted" in case["native_stages"]) is not verifier_attempted:
+                raise ValueError("response shape boundary mismatch")
+            case["expectation_met"] = True
+        elif name in OUTPUTS:
             # Noncompliance remains visible. A live safe refusal is collected,
             # never relabeled as the intended successful scenario.
             expected = {"supported": "ALLOW", "older": "REJECT", "unsupported": "UNAVAILABLE", "paraphrase": "UNAVAILABLE"}[name]
@@ -91,12 +102,16 @@ def source_hash():
     paths = [*sorted((ROOT / "tests/modelqualification").glob("*.py")), ROOT / "internal/ingress/ingress.go",
              ROOT / "cmd/protected-ingress/main.go", ROOT / "dev/model/start-gateway.sh", ROOT / "dev/prose/gateway.json",
              ROOT / "internal/ingress/model_test.go", ROOT / "compose.verify.005c.yaml", ROOT / "compose.verify.005c.live.yaml",
-             ROOT / "compose.verify.005c.cleanup.yaml", ROOT / "dev/Dockerfile.model"]
+             ROOT / "compose.verify.005c.cleanup.yaml", ROOT / "dev/Dockerfile.model", ROOT / "dev/Dockerfile",
+             *sorted((ROOT / "plugins/epochguard").glob("*.go")), ROOT / "plugins/epochguard/go.mod", ROOT / "plugins/epochguard/go.sum"]
     return sha(b"".join(p.relative_to(ROOT).as_posix().encode()+b"\0"+p.read_bytes().replace(b"\r\n", b"\n") for p in paths))
 
 
 def execute(args):
     live = args.live
+    shape_batch = args.shape_batch
+    if live and shape_batch is not None:
+        raise ValueError("response shape fixtures cannot run live")
     settings = read_settings(args.settings) if live else Settings(model="gemini-offline-fixture", max_requests=6,
         input_usd_per_million=0.0, output_usd_per_million=0.0, max_request_usd=0.25, max_run_usd=1.0)
     settings.preflight(live)
@@ -149,14 +164,18 @@ def execute(args):
         before = role("before", "operator", "report")
         if before["transport"]["attempted"] or before["verifier"]["records"] or any(s["attempted"] for s in before["verifier"]["sources"].values()):
             raise ValueError("readiness used model or evidence")
-        client = role("client", "client", "client")
+        client = role("client", "client", "client" if shape_batch is None else "shapes-" + str(shape_batch))
         write_new(directory / "client.json", client)
         observed = role("observations", "operator", "report")
+        raw_stages = run("native-stages", compose + ["exec", "-T", "gateway", "cat", "/tmp/epochguard-005cr.jsonl"])
+        if len(raw_stages) > 64*1024:
+            raise ValueError("qualification observation bound")
+        observed["native_stages"] = [json.loads(line) for line in raw_stages.splitlines()]
         write_new(directory / "observations.json", observed)
         stage = "validate"
-        report = validate(client, observed, live)
+        report = validate(client, observed, live, shape_batch)
         report.update(source_revision=run("revision", ["git", "rev-parse", "HEAD"]), source_sha256=source_hash(),
-                      model_configuration=settings.model_dump(), offline_passed=not live)
+                      model_configuration=settings.model_dump(), offline_passed=not live and shape_batch is None, shape_batch=shape_batch)
     except Exception:
         failed_stage = stage
         if started_stack and not (directory / "observations.json").exists():
@@ -188,6 +207,7 @@ def main():
     parser.add_argument("--settings", type=Path)
     parser.add_argument("--secret-file", type=Path)
     parser.add_argument("--offline-preflight", type=Path)
+    parser.add_argument("--shape-batch", type=int, choices=(1, 2, 3))
     args = parser.parse_args()
     try:
         execute(args)

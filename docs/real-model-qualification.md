@@ -29,7 +29,7 @@ The four generation intentions are exact supported fixture labels, an older Pyth
 
 ## Authorized model-to-gateway run
 
-**PENDING OPERATOR RUN.** Implementation and offline execution do not authorize paid inference. Obtain separate operator approval before the following procedure. Use an exact Gemini model supporting native `generateContent` text output and independently verify its current availability, tier and input/output/thought-token rates. The [example settings](../dev/model/settings.example.json) intentionally contain invalid null rates; no historical model or guessed price is selected automatically. Review provider-side spending limits as well.
+**Successful factual release remains unqualified.** The preserved first operator run made four real HTTP 200 round trips but all four answers were safely refused, with no recorded verifier pipeline work; see [005C-R](task-005c-r.md). No further paid run is authorized by this investigation. Obtain separate operator approval before any later use of the following procedure. Use an exact Gemini model supporting native `generateContent` text output and independently verify its current availability, tier and input/output/thought-token rates. The [example settings](../dev/model/settings.example.json) intentionally contain invalid null rates; no historical model or guessed price is selected automatically. Review provider-side spending limits as well.
 
 The qualification admits at most **four** real HTTPS submission attempts, no retries, fallback, tools, source calls, streaming or schema repair. Each native prompt is fixed and below 4,096 bytes; the relay limits the converted request to 8,192 bytes and the raw response to 65,536 bytes. Output limits are 128–1,024 tokens (default 256); provider total deadline is 15 seconds, native network deadline 20 seconds, ingress 44 seconds and each client exchange 48 seconds. The relay admits work only within a 300-second process lifetime and uses the remaining lifetime as a total request deadline. The client role has a 250-second process ceiling. The full gateway is still not claimed to have a qualified global execution deadline.
 
@@ -91,9 +91,35 @@ The cleanup manifest identifies only this project's resources and has no startab
 
 Each run creates a new `artifacts/005c/{offline,live}/<UTC-time>-<random>/` directory. Inspect `report.json`, `observations.json`, `stages.json` and `failure.json` when present. No existing run is overwritten. Report source revision plus source digest identify the executed working implementation; HEAD alone does not describe uncommitted changes.
 
+New runs also collect qualification-only native stages. Diagnostics change the source digest, so an older offline preflight cannot admit a later live run. Rebuild native/model images and collect a matching ordinary offline qualification first. Shape-only batches are not successful ordinary live preflight records.
+
 `report.json` distinguishes intended scenario, whether observed provider text matched that intention, actual client outcome, answer release, exact content digest, timing and relay attempts. `observations.json` includes sanitized verifier candidate hashes, coverage, verdicts and fixture source records. The relay observes grammar/usage without authorizing anything. A submission attempt with a transport error does not prove remote inference; an HTTP response confirms a provider round trip but does not independently establish billing. Counts are application observations. The simulated timeout is a mock transport exception; existing ingress tests separately cover a response that stalls while buffered.
 
 Model compliance is uncertain. Unsupported wording in the intended supported case must remain UNAVAILABLE. A different supported response can be safely released if the actual checks pass, but does not satisfy that intended case. No output is repaired, reconstructed or replayed into a fixture. Model reasoning parts, tool calls or other unsupported envelopes may safely fail the existing plugin contract. A live collection never declares final qualification: inspect actual provider round trips, matching exact response hashes, independent verifier records, intended/observed differences and client outcomes before assessing **NARROW REAL-MODEL QUALIFICATION MET**. No real-model qualification is currently claimed.
+
+## Response-refusal diagnostics (005C-R)
+
+The first real-provider report is preserved unchanged at `artifacts/005c/live/20261118T193532Z-771f9f45/`. Its null text hashes do not prove no text, truncation, or thinking-only generation. The old observer ignored text when parts had extra fields, and the exact finish/part structure was not saved. A signature-bearing text part is one source-demonstrated mechanism: native Bifrost converts the signature to reasoning metadata and EpochGuard refuses its assistant union before evidence checks. This hypothesis is not a retroactive diagnosis of the original run.
+
+The relay now reports `response_structure` with capped candidate/part counts and allowlisted structural fields, categorized finish reasons, visible/thinking-only/empty-text flags and grammar applicability. Visible text can be recognized alongside metadata, but original parts are never normalized or concatenated. `reported_output_tokens_without_usable_candidate` means reported output consumption without a single nonempty stopped visible text part; it is not a billing claim or Go eligibility decision. Signature contents, thinking text and arbitrary field/reason values are never exported.
+
+The Go stage trace uses trusted `qualification_diagnostics: true` only with fixture prose and bound v2 attestation. It writes fixed enums and request digests to a 0600 gateway tmpfs file, capped at 64 KiB/16 stages per exchange, and the host collects it with private Docker exec. No protected response/header or public endpoint exposes it. `native_stages` joins the actual ingress request digest to candidate/finish/annotation refusal, verifier attempt/response and policy-validation stages. A completed HTTP hop still needs body/contract validation. Missing diagnostics fail collection, never authorize release. Ordinary profiles default off, and gateway general logs remain suppressed.
+
+Rebuild both artifacts before using the new diagnostic profile; a stale native plugin cannot provide these observations:
+
+```powershell
+docker buildx build --builder epochguard-002a --load -t epochguard-dev:002a -f dev/Dockerfile .
+docker build --load -t epochguard-model:005c -f dev/Dockerfile.model .
+& .venv-003a/Scripts/python.exe tests/modelqualification/qualify.py
+foreach ($batch in 1..3) {
+    & .venv-003a/Scripts/python.exe tests/modelqualification/qualify.py --shape-batch $batch
+    if ($LASTEXITCODE -ne 0) { throw 'Inspect sanitized artifacts; do not continue after a failed batch.' }
+}
+```
+
+Use the builder belonging to the intended Docker context; the name above is the inspected local builder. The 16 synthetic envelopes include missing/empty output, truncation, thinking/signatures, extra metadata/grounding annotations, malformed JSON, unsupported prose, exact support and contradiction. Three disposable batches keep the existing per-process budgets. They have no egress, credentials, real model calls or origin-source fetches, and cannot be combined with `--live`. Their successful results do not establish what the historical model actually returned.
+
+Inspect `client.json`, `observations.json`, `report.json` and process `stages.json`; the last is orchestration, while `native_stages` contains the Go boundaries. Root-cause uncertainty and exact offline outcomes belong in the [diagnostic report](task-005c-r.md). Successful new real-model verification still requires a separately authorized future run and independent review, with no automatic model, thinking or output-limit change.
 
 ## Claim-analysis evaluation
 

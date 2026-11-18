@@ -17,6 +17,7 @@ This is the canonical index of implemented and measured scope. [Architecture](ar
 | [002C cache experiments](task-002c.md) | Isolated controlled Redis/gateway experiment | Unsafe ordering and pending-write controls; no qualified protected cache |
 | [004A claim analysis](task-004a.md), [004F planning](task-004f.md) | Agent-authored draft annotations, fake/baseline adapters | Real-model quality pending. Planning never authorizes responses |
 | [005C native model path and draft evaluation](task-005c.md) | Baseline `5bf1a0b81b1abf9afb7e4519990342c496aadc7b` plus 005C implementation; simulated provider/evidence | Native Gemini conversion and protected release controls; separate frozen 18-case draft comparison. Real-model gateway and analysis calls **PENDING OPERATOR RUN** |
+| [005C-R refusal investigation](task-005c-r.md) | Baseline `4a45673d16946b466e77e975a95954efdd1d4d14`; preserved operator run with real Gemini and simulated evidence | Four provider HTTP 200 responses, four UNAVAILABLE refusals, zero recorded verifier pipeline requests. Connectivity and safe non-release only; exact response shape was not recorded. New diagnostics/fixtures remain non-authorizing |
 
 The four qualification combinations are distinct:
 
@@ -24,7 +25,7 @@ The four qualification combinations are distinct:
 | --- | --- | --- |
 | Controlled | Simulated | Existing G/G-L/Lab; 005C adds native Gemini transport simulation |
 | Controlled | Real | Narrow reviewed November 15 G-L source qualification; historical observations |
-| Real model | Simulated | 005C operator tooling; **PENDING OPERATOR RUN** |
+| Real model | Simulated | Connectivity observed in four genuine provider round trips; all safely refused. Successful factual release unqualified; exact cause unresolved in preserved telemetry |
 | Real model | Real | Not executed or qualified; no automatic combined mode |
 
 005C uses the unchanged 004A/004F analysis pipeline. Its [review packet](../tests/modelqualification/data/README.md) was newly authored from required categories and frozen before model execution, without held-out tuning. All labels remain agent drafts. Metrics count failed analyses as misses and show denominator, failures, all omissions, dynamic recall, exact-span and classification scores; independent-audit metrics also show unaccounted risk, unsupported mappings, false completeness and abstentions. Gemini cells remain null until actual execution. Real inference alone would not establish general factual correctness, PS06 compliance or per-claim freshness scoring; 005D is separate.

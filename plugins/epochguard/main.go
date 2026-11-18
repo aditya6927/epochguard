@@ -17,11 +17,12 @@ const hookSequenceKey schemas.BifrostContextKey = "epochguard.002a.hooks"
 // HTTP hooks and core hooks can receive parent/child contexts. Sharing a
 // request-owned pointer makes phases recorded in the child visible to HTTP post.
 type hookTrace struct {
-	mu          sync.Mutex
-	phases      []string
-	cacheAtPost string
-	attested    *attestationState
-	started     time.Time
+	mu            sync.Mutex
+	phases        []string
+	cacheAtPost   string
+	attested      *attestationState
+	started       time.Time
+	qualification *qualificationTrace
 }
 
 func GetName() string { return "epochguard" }
@@ -128,5 +129,6 @@ func HTTPTransportPostHook(ctx *schemas.BifrostContext, _ *schemas.HTTPRequest, 
 	trace.mu.Unlock()
 	resp.Headers["X-EpochGuard-Plugin"] = GetName()
 	finishAttestation(ctx, resp)
+	finishQualification(ctx, resp.StatusCode)
 	return nil
 }

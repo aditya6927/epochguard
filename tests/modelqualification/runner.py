@@ -6,6 +6,7 @@ import sys
 import socket
 import httpx
 from .common import OUTPUTS, PROMPTS, SUPPORTED, read_settings, sha
+from .response_shapes import SHAPE_PROMPTS, batch
 
 PATH = "/openai/v1/chat/completions"
 
@@ -73,10 +74,14 @@ async def execute(action):
         connection.close()
         raise ValueError("private service exposed to qualification client")
     live = os.getenv("EPOCHGUARD_005C_MODE") == "live"
+    shape_batch = int(action[-1]) if action in {"shapes-1", "shapes-2", "shapes-3"} else None
+    if shape_batch is not None and live:
+        raise ValueError("response shapes are offline only")
     cases = []
     import time
-    for name in list(OUTPUTS) + ([] if live else ["provider_error", "timeout"]) + ["missing_plugin", "controlled_provider_error"]:
-        value = {"model": "gemini/" + settings.model, "messages": [{"role": "user", "content": PROMPTS.get(name, SUPPORTED)}],
+    names = batch(shape_batch) if shape_batch is not None else list(OUTPUTS) + ([] if live else ["provider_error", "timeout"]) + ["missing_plugin", "controlled_provider_error"]
+    for name in names:
+        value = {"model": "gemini/" + settings.model, "messages": [{"role": "user", "content": (PROMPTS | SHAPE_PROMPTS).get(name, SUPPORTED)}],
                  "stream": False, "max_completion_tokens": settings.output_tokens}
         if name in {"missing_plugin", "controlled_provider_error"}:
             value.pop("max_completion_tokens")
