@@ -12,6 +12,7 @@ EpochGuard buffers AI gateway answers, checks fixed evidence policies, and refus
 | `004b.v1` / `multi-claim-templates-v1` | Implemented; exact two-template language. Narrow November 14, 2026 **live** source qualification through legacy protected ingress, assessed from maintainer-authorized reports; controlled provider, v1 receipt |
 | `003a.v1` / `python-windows-latest-v1` | Legacy single-template endpoint; narrow November 8, 2026 **live** gateway qualification from maintainer-supplied execution evidence |
 | `004a.v1` identification and `004f.prose-plan.v1` planning | Experimental; non-authorizing, draft datasets, independent model-quality qualification pending |
+| 005C native Gemini qualification | Isolated opt-in native provider execution with simulated evidence and bounded relay; real model execution **PENDING OPERATOR RUN**. Separate 18-case draft analysis evaluation; no new release authority |
 | EpochGuard-owned protected cache / atomic revocation | Proposed in [ADR 0003](decisions/0003-protected-cache-ownership.md); not implemented |
 
 The live multi-claim runner printed `LIVE RUN COLLECTED: independent result review required`. Subsequent inspection found its five client expectations met; three attempted/completed application-level retrievals per source were recorded, not billing or origin-fetch counts. See [004E evidence](task-004e.md), [legacy live evidence](task-003b.md) and [current security regression evidence](task-004gs.md). These reports qualify their stated revisions and finite test cases, not arbitrary provider/model compatibility or production readiness.
@@ -175,11 +176,17 @@ The isolated G-L qualification profile adds private one-shot preflight and bound
 
 ## Non-authorizing analysis
 
+005C adds an [isolated real-model qualification workflow](real-model-qualification.md). The native Gemini provider in pinned core `v1.14.1` sends its actual request through a fixed-host resource relay; admitted provider bytes pass unchanged. The relay owns attempt reservations, deadlines, size limits and sanitized usage/response-hash observations. It cannot authorize release or select sources. Only the live relay has egress; evidence stays simulated. A runtime-file launcher supplies Bifrost's supported process-local `env.*` credential reference, without embedding a key in tracked JSON or Compose environment configuration. Gateway diagnostics are suppressed in this profile; the relay is trusted with the private credential header and provider bodies in memory.
+
+The optional ingress `ModelQualification` setting is valid only with `004g-live`. It admits an explicit `max_completion_tokens` integer from 128 to 1,024 on native Gemini requests, refuses fallback and requires the bound on Gemini requests. Existing profiles retain their prior request fields. The relay independently requires the trusted exact model, fixed prompts and configured output bound; no caller can increase spending by selecting another model or native parameter. Forwarded request bytes still receive the unchanged v2 binding. Controlled readiness/provider-failure/missing-plugin requests remain distinct, credential-free controls. Default Lab and CI never select live inference.
+
 The claim analyzer aligns globally unique exact source quotes to strict `004a.v1` Unicode code-point spans. Missing/ambiguous/reordered/overlapping quotes fail; there is no fuzzy repair or inferred replacement. Valid spans do not prove that all claims were identified correctly.
 
 The prose planner emits `004f.prose-plan.v1`, `authorization=false` and `semantic_completeness=NOT_PROVEN`. PLAN_READY means bounded planning, never ALLOW. Original model propositions/classifications cannot choose evidence policies or waive checks. G enforcement independently parses its finite language and never consumes planning records.
 
 The 112-case identification collection and 66-case prose collection are synthetic agent-authored drafts, not human-reviewed gold. Baseline/fake-provider diagnostics do not qualify model quality. A later ten-call Gemini diagnostic is operator-reported against draft labels, not an independently qualified benchmark. See the [analyzer guide](../services/claim_analysis/README.md) and [prose evaluation scope](../services/verifier/reports/prose-v1/README.md).
+
+The separate [005C packet](../tests/modelqualification/data/README.md) contains 18 newly authored synthetic drafts, frozen before model execution. Its diagnostic reuses 004A prompt/schema/alignment, the existing Gemini adapter, 004F Analyzer/auditor and metrics. All failures stay in the denominator. Real Gemini comparisons remain missing until separately authorized execution; draft metrics never establish independent model accuracy or release authorization.
 
 ## Cache findings and proposed design
 

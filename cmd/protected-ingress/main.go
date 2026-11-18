@@ -50,7 +50,7 @@ func main() {
 			log.Fatal("ingress probe unavailable")
 		}
 	}
-	h, err := ingress.New(ingress.Config{Gateway: os.Getenv("EPOCHGUARD_GATEWAY_URL"), Secret: key, ManagementToken: os.Getenv("EPOCHGUARD_SETUP_TOKEN"), ProbeCandidate: strings.TrimSuffix(string(probe), "\n"), Profile: profile})
+	h, err := ingress.New(ingress.Config{Gateway: os.Getenv("EPOCHGUARD_GATEWAY_URL"), Secret: key, ManagementToken: os.Getenv("EPOCHGUARD_SETUP_TOKEN"), ProbeCandidate: strings.TrimSuffix(string(probe), "\n"), Profile: profile, ModelQualification: os.Getenv("EPOCHGUARD_MODEL_QUALIFICATION") == "1"})
 	if err != nil {
 		log.Fatal("ingress configuration unavailable")
 	}

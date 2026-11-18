@@ -1,0 +1,9 @@
+# Cleanup only: contains no startable service, interpolation or credential.
+name: epochguard-005c
+services: {}
+volumes:
+  receipt:
+networks:
+  client:
+  private:
+  egress:

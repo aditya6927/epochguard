@@ -41,7 +41,9 @@ py -3.12 -m unittest discover -s scripts -p 'test_*.py'
 py -3.12 scripts/check_docs.py
 ```
 
-For actual native loading and protected lifecycle checks, run the [operations suites](docs/operations.md#protected-offline-qualifications), including G and G-L offline. CI compiles a `.so`; it does not replace these gateway qualifications. The [evaluation index](docs/evaluation.md) separates locally executed commands from the first pending hosted CI run.
+For actual native loading and protected lifecycle checks, run the [operations suites](docs/operations.md#protected-offline-qualifications), including G and G-L offline. CI compiles a `.so`; it does not replace these gateway qualifications. The [evaluation index](docs/evaluation.md) separates local execution, inspected successful baseline hosted checks and unexecuted checks on later changes.
+
+The 005C tests in `tests/modelqualification/` are included in the network-disabled Python CI stage. Its host diagnostics reuse the same locked Python dependencies and require the documented virtual environment. [Native model qualification](docs/real-model-qualification.md) has a separate private profile and explicit operator authorization; never enable paid models in CI or Lab. Preserve frozen analysis packets and historical held-out labels; agent-authored annotations remain drafts until actual independent review.
 
 ## Pull requests
 

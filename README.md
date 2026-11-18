@@ -51,6 +51,7 @@ No virtual environment, host Node installation or API key is needed. First build
 | Exact-template multi-claim mode: `004b.v1` | **Qualified live within a narrow scope.** November 14, 2026 maintainer-authorized run used real Tavily/Python.org and PyPI, a controlled provider and explicitly legacy v1 ingress receipts. Subsequent report inspection found all five client expectations met; the runner collected results rather than declaring final live PASS |
 | Legacy single-claim mode: `003a.v1` | **Qualified live within a narrow scope.** November 8, 2026 maintainer-supplied gateway run, one Python policy and controlled provider |
 | Model-assisted claim planning | **Experimental, non-authorizing.** Draft annotations; model quality not independently qualified |
+| Native Gemini model qualification | **Implemented opt-in tooling; PENDING OPERATOR RUN.** Isolated native provider path with simulated evidence, bounded requests and separate draft-label claim-analysis evaluation. [Workflow and limits](docs/real-model-qualification.md) |
 | Protected cache and atomic revocation | **Proposed, not implemented.** Built-in caching stays disabled in protected profiles |
 
 The live multi-claim run recorded three attempted/completed application-level retrievals per source, not independent billing or origin-fetch counts. Its historical observations are not claims about today's versions. [Live evidence and measurement scope](docs/task-004e.md) and [security remediation evidence](docs/task-004gs.md) retain the exact results and limitations.
@@ -70,6 +71,7 @@ Streaming, arbitrary prose or sources, production providers/authentication, safe
 - [Bifrost compatibility and supported installation](docs/compatibility.md)
 - [Security model](docs/security.md) and [reporting issues](SECURITY.md)
 - [Evaluation and measurement scope](docs/evaluation.md)
+- [Real-model qualification and separate claim-analysis evaluation](docs/real-model-qualification.md)
 - [Contributing and CI checks](CONTRIBUTING.md)
 - [Operations: builds, offline suites and explicit live workflows](docs/operations.md)
 - [Verifier APIs, grammar, evidence and limits](services/verifier/README.md)

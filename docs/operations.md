@@ -250,6 +250,19 @@ A live runner success prints `LIVE RUN COLLECTED: independent review required`, 
 
 ## Diagnostics and cleanup
 
+005C native Gemini qualification and the separate draft claim-analysis diagnostic have their own [operator procedure](real-model-qualification.md), runtime-secret boundary, cost review and sanitized artifacts. Default real calls are zero; generation and extraction need separate explicit authorization. The implementation phase never enables paid execution. Offline generation uses the actual gateway/native loader with simulated Gemini HTTP and simulated evidence:
+
+```powershell
+& .venv-003a/Scripts/python.exe tests/modelqualification/qualify.py --build
+& .venv-003a/Scripts/python.exe tests/modelqualification/analysis.py --output artifacts/005c/analysis-offline.json
+```
+
+Create the environment from the existing lockfile as shown in the guide if absent. Existing G/G-L source and receipt regressions remain separate required checks. 005C cleanup includes its disposable signing volume; the emergency cleanup manifest needs no credential or variable interpolation:
+
+```powershell
+docker compose --env-file dev/lab.compose.env -f compose.verify.005c.cleanup.yaml down --volumes --remove-orphans
+```
+
 Use the driver's sanitized case/build outputs to diagnose failures; ignored artifacts are local evidence, not published releases. The G runtime-log scan reads logs in memory and emits a fixed failure category rather than persisting an offending line. Do not expand diagnostic logging to candidate/provider/source bodies, receipt headers or secrets. Full CLI `--json` and evaluation exports intentionally contain supplied source text; use nonprivate fixtures or protect those exports separately.
 
 A failed build can reflect registry/network/toolchain availability rather than an enforcement regression. Keep that failure distinct from a passing unit or gateway result. Run only the relevant matching cleanup commands, inspect their exit status and preserve meaningful failure evidence. Cleanup does not remove the shared Buildx builder or previously saved live reports.

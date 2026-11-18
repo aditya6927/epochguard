@@ -1,0 +1,9 @@
+{
+  "model": "gemini-operator-must-select",
+  "max_requests": 4,
+  "output_tokens": 256,
+  "input_usd_per_million": null,
+  "output_usd_per_million": null,
+  "max_request_usd": 0.25,
+  "max_run_usd": 1.0
+}

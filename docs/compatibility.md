@@ -20,6 +20,7 @@ EpochGuard is a native Go extension of Bifrost, using its supported dynamic-plug
 | Other Bifrost versions, current `dev` | NOT TESTED | Rebuild both artifacts and rerun contracts, security and gateway tests before claiming compatibility |
 | Existing upstream plugins added to protected stack | REQUIRES INVESTIGATION | Ordering, request mutation, response conversion, logging and cache behavior can alter this boundary |
 | Streaming, arbitrary routes, background tasks, protected caching | UNSUPPORTED | Outside the qualified protected release contract |
+| Native Gemini generation / 005C | IMPLEMENTED; LIVE PENDING | Source-inspected core `v1.14.1` native chat conversion, `env.*` key loading and zero retries; isolated simulated-provider HTTP qualification is separate from an actual authorized Gemini round trip. [Operator workflow](real-model-qualification.md) |
 
 ## Upstream sources and build equivalence
 

@@ -31,6 +31,7 @@ const ResponseLimit = 256 * 1024
 const LiveCanary = "EpochGuard readiness canary: intentionally outside the trusted claim grammar."
 
 var digestRE = regexp.MustCompile(`^[0-9a-f]{64}$`)
+var qualificationModelRE = regexp.MustCompile(`^gemini/gemini-[a-z0-9][a-z0-9.-]{0,95}$`)
 
 type Receipt struct {
 	Version         string `json:"version"`
@@ -47,13 +48,14 @@ type BoundReceipt struct {
 	RequestSHA256 string `json:"request_sha256"`
 }
 type Config struct {
-	Gateway         string
-	Secret          []byte
-	ManagementToken string
-	ProbeCandidate  string
-	Timeout         time.Duration
-	MaxActive       int
-	Profile         string
+	Gateway            string
+	Secret             []byte
+	ManagementToken    string
+	ProbeCandidate     string
+	Timeout            time.Duration
+	MaxActive          int
+	Profile            string
+	ModelQualification bool
 }
 type Handler struct {
 	cfg    Config
@@ -62,6 +64,9 @@ type Handler struct {
 }
 
 func New(cfg Config) (*Handler, error) {
+	if cfg.ModelQualification && cfg.Profile != "004g-live" {
+		return nil, errors.New("model qualification requires bounded prose")
+	}
 	if cfg.Profile != "" && cfg.Profile != "004e-live" && cfg.Profile != "004g" && cfg.Profile != "004g-live" {
 		return nil, errors.New("invalid ingress profile")
 	}
@@ -269,11 +274,16 @@ type request struct {
 		Role    string `json:"role"`
 		Content string `json:"content"`
 	} `json:"messages"`
-	Stream    bool     `json:"stream"`
-	Fallbacks []string `json:"fallbacks,omitempty"`
+	Stream              bool     `json:"stream"`
+	Fallbacks           []string `json:"fallbacks,omitempty"`
+	MaxCompletionTokens *int     `json:"max_completion_tokens,omitempty"`
 }
 
 func validRequest(data []byte) bool {
+	return validQualifiedRequest(data, false)
+}
+
+func validQualifiedRequest(data []byte, modelQualification bool) bool {
 	if !uniqueJSON(data) {
 		return false
 	}
@@ -288,14 +298,24 @@ func validRequest(data []byte) bool {
 			return false
 		}
 	}
+	if r.MaxCompletionTokens != nil {
+		if !modelQualification || *r.MaxCompletionTokens < 128 || *r.MaxCompletionTokens > 1024 || !qualificationModelRE.MatchString(r.Model) || len(r.Fallbacks) != 0 || len(r.Messages[0].Content) > 4096 {
+			return false
+		}
+	} else if modelQualification && strings.HasPrefix(r.Model, "gemini/") {
+		return false
+	}
 	// Struct matching in encoding/json is case insensitive; independently require
 	// canonical request names and message fields to avoid ambiguous stream flags.
 	var fields map[string]json.RawMessage
 	if json.Unmarshal(data, &fields) != nil {
 		return false
 	}
+	if _, present := fields["max_completion_tokens"]; present && r.MaxCompletionTokens == nil {
+		return false
+	}
 	for key := range fields {
-		if key != "model" && key != "messages" && key != "stream" && key != "fallbacks" {
+		if key != "model" && key != "messages" && key != "stream" && key != "fallbacks" && !(modelQualification && key == "max_completion_tokens") {
 			return false
 		}
 	}
@@ -356,7 +376,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_ = http.NewResponseController(w).SetReadDeadline(time.Time{})
-	if !validRequest(data) {
+	if !validQualifiedRequest(data, h.cfg.ModelQualification) {
 		refuse(w, 400)
 		return
 	}

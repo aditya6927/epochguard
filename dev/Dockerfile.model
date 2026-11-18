@@ -1,0 +1,4 @@
+FROM epochguard-verifier:004gl
+COPY services/claim_analysis/claim_analysis/ /app/claim_analysis/
+COPY tests/modelqualification/ /app/modelqualification/
+CMD ["python", "-m", "uvicorn", "modelqualification.relay:app", "--factory", "--host", "0.0.0.0", "--port", "9001", "--no-access-log", "--log-level", "critical", "--limit-concurrency", "4"]

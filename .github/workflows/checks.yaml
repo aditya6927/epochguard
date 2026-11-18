@@ -46,5 +46,5 @@ jobs:
         run: |
           python3 -m unittest discover -s scripts -p 'test_*.py'
           python3 scripts/check_docs.py
-# Native gateway loading/lifecycle qualifications run locally. A first remote
-# Actions execution is pending; this workflow does not claim gateway coverage.
+# Native gateway loading/lifecycle qualifications run locally. Hosted checks
+# do not claim native gateway execution or live model/source coverage.

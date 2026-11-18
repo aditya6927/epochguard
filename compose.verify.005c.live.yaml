@@ -1,0 +1,19 @@
+# Only the resource relay has egress. Evidence remains simulated.
+services:
+  gateway:
+    environment:
+      EPOCHGUARD_005C_MODE: live
+      EPOCHGUARD_RUN_MODEL_005C: ${EPOCHGUARD_RUN_MODEL_005C:?separate model opt-in required}
+    secrets: [provider]
+  relay:
+    environment:
+      EPOCHGUARD_005C_MODE: live
+      EPOCHGUARD_RUN_MODEL_005C: ${EPOCHGUARD_RUN_MODEL_005C:?separate model opt-in required}
+    networks: [private, egress]
+  qualification-client:
+    environment: {EPOCHGUARD_005C_MODE: live}
+secrets:
+  provider:
+    file: ${EPOCHGUARD_005C_SECRET_FILE:?private runtime credential required}
+networks:
+  egress: {}

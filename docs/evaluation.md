@@ -6,7 +6,8 @@ This is the canonical index of implemented and measured scope. [Architecture](ar
 
 | Category | Revision and source mode | Observation and limits |
 | --- | --- | --- |
-| [005B compatibility and packaging](task-005b.md) | Baseline `f7a7cd6f7a386b9079e34e666920ca1296f0a36f` plus uncommitted 005B changes; simulated/offline | Current local commands and cold-input installation evidence; hosted Actions execution separately pending |
+| [005B compatibility and packaging](task-005b.md) | Baseline `f7a7cd6f7a386b9079e34e666920ca1296f0a36f` plus uncommitted 005B changes; simulated/offline | Dated local commands and cold-input installation evidence; hosted execution was pending at report time, with subsequent baseline checks recorded below |
+| [Hosted baseline Actions](https://github.com/aditya6927/epochguard/actions/runs/43752637258) | Commit `5bf1a0b81b1abf9afb7e4519990342c496aadc7b`; check-run metadata inspected during 005C | Python, Go, documentation and frontend checks completed successfully. This is subsequent baseline evidence, not hosted execution of uncommitted 005C changes or native gateway qualification |
 | [005A Lab](task-005a.md) | Implementation baseline `34ec0756dbf979955d2a351985eac97a39783be8`, subsequently committed in the 005B baseline; fixture provider and simulated transports | Actual gateway behind ingress, editable candidates, fault/overload/recovery and desktop/mobile presentation; no live/model calls |
 | [004G-L reviewed live run](task-004gl.md#reviewed-live-qualification--november-15-2026) | `34ec0756dbf979955d2a351985eac97a39783be8`, November 15, 2026; `tavily_live` / `pypi_live`, `004g.receipt.v2` | Operator-authorized run, subsequent sanitized-record inspection; five client expectations met. Original runner collected records requiring review; it did not declare final live approval |
 | [004G-S security](task-004gs.md) and [004G](task-004g.md) | Security implementation baseline `05ac78939b0efa7dc4f66669b1c1e5bf48e8be23`; fixtures/simulated transports | Request substitution, metadata projection, receipt faults, policy outcomes, plugin disable/restart and overload; current reruns in 005B report |
@@ -15,6 +16,18 @@ This is the canonical index of implemented and measured scope. [Architecture](ar
 | [003C route audit](task-003c.md) | Pinned gateway, offline providers | Finite route/passthrough/Warp checks; background work unqualified; prerequisite/router failures are not policy enforcement |
 | [002C cache experiments](task-002c.md) | Isolated controlled Redis/gateway experiment | Unsafe ordering and pending-write controls; no qualified protected cache |
 | [004A claim analysis](task-004a.md), [004F planning](task-004f.md) | Agent-authored draft annotations, fake/baseline adapters | Real-model quality pending. Planning never authorizes responses |
+| [005C native model path and draft evaluation](task-005c.md) | Baseline `5bf1a0b81b1abf9afb7e4519990342c496aadc7b` plus 005C implementation; simulated provider/evidence | Native Gemini conversion and protected release controls; separate frozen 18-case draft comparison. Real-model gateway and analysis calls **PENDING OPERATOR RUN** |
+
+The four qualification combinations are distinct:
+
+| Provider | Evidence | Status |
+| --- | --- | --- |
+| Controlled | Simulated | Existing G/G-L/Lab; 005C adds native Gemini transport simulation |
+| Controlled | Real | Narrow reviewed November 15 G-L source qualification; historical observations |
+| Real model | Simulated | 005C operator tooling; **PENDING OPERATOR RUN** |
+| Real model | Real | Not executed or qualified; no automatic combined mode |
+
+005C uses the unchanged 004A/004F analysis pipeline. Its [review packet](../tests/modelqualification/data/README.md) was newly authored from required categories and frozen before model execution, without held-out tuning. All labels remain agent drafts. Metrics count failed analyses as misses and show denominator, failures, all omissions, dynamic recall, exact-span and classification scores; independent-audit metrics also show unaccounted risk, unsupported mappings, false completeness and abstentions. Gemini cells remain null until actual execution. Real inference alone would not establish general factual correctness, PS06 compliance or per-claim freshness scoring; 005D is separate.
 
 Live observations are historical source labels, not statements of today's versions. Existing ignored local artifacts may not be available in a fresh clone; the reports explain provenance and actual commands. This task does not rerun or overwrite paid evidence. A summary record or hash is not independent reproduction of a remote call or independent HMAC revalidation when raw receipts were intentionally not retained.
 
