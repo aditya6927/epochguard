@@ -1,5 +1,67 @@
 # Task 005C-T — safe pre-conversion Gemini response adapter
 
+## Reviewed real-model qualification — November 19, 2026
+
+**NARROW REAL-MODEL ENFORCEMENT QUALIFICATION MET.** The separately authorized November 19 run demonstrated policy-bounded enforcement of genuine Gemini-generated candidates through strict pre-conversion structural validation, pinned Bifrost conversion, native Go plugin enforcement, independent Python verification, request-bound receipt signing and protected ingress. The supported answer was released unchanged; contradicted and unsupported answers were withheld. Evidence retrieval was **simulated** throughout. This assessment applies only to the tested configuration and evidence mode.
+
+This subsequent review inspected existing sanitized operator-collected records, without repeating provider calls. The original live report still says `PENDING INDEPENDENT REVIEW` and `COLLECTED; NOT APPROVED`: those collection-time fields remain unchanged. The implementation-time pending status and original testing details in the remaining sections are preserved as chronological evidence. The two November 18 failed real-model attempts remain unchanged; this adapter was not present in those runs.
+
+### Qualification identity and evidence
+
+| Field | Reviewed value |
+| --- | --- |
+| Qualification schema / run | `005c.gateway.v1` / `20261119T092712Z-6d95a336` |
+| Date | November 19, 2026 |
+| Implementation / source revision | `87d877c43f3ab46d9d62d279e457f16b8df9c0c3` |
+| Source SHA-256 | `816a776a6eaad8533dbc0cb84b1c9cf32e84168a8beb4ce6f745416c96a0a793` |
+| Live configuration SHA-256 | `4b96205612c9ee5bdb38150224e0f8ef7cadcd2d01be6820b4ac195ae1d3f124` |
+| Model / provider | `gemini-3.5-flash-lite` / native Gemini through pinned Bifrost |
+| Response mode | `strict-005ct` |
+| Evidence / policy / receipt | Simulated / `004g.v1/bounded-prose-v1` / `004g.receipt.v2` |
+| Real Gemini submissions / completed responses | 4 / 4 HTTP 200 |
+| Expected protected client outcomes | 6/6 |
+| Cleanup | Completed; recorded cleanup stage exit 0 |
+
+The strict offline preflight is `artifacts/005c/offline/20261119T092144Z-eb3be78f/`; the reviewed real-model run is `artifacts/005c/live/20261119T092712Z-6d95a336/`. Both contain `report.json`, `observations.json`, `client.json`, `stages.json` and public qualification configuration. Both reports identify the same source revision/digest and strict response mode; the offline report has `offline_passed: true` and eight expected policy/provider/ingress outcomes. The live report's `offline_passed: false` identifies a live collection, not a failed preflight. Both record completed cleanup, and every recorded orchestration stage exited 0. No separate cleanup file exists in these directories; cleanup evidence is in the reports and stages.
+
+### Reviewed protected outcomes and verifier decisions
+
+| Scenario | HTTP | Outcome | Answer released | Protected client elapsed |
+| --- | --- | --- | --- | --- |
+| Supported | 200 | ALLOW | Yes | 9003.188 ms |
+| Older version | 403 | REJECT | No | 8785.892 ms |
+| Unsupported factual prose | 503 | UNAVAILABLE | No | 6095.623 ms |
+| Unrecognized paraphrase | 503 | UNAVAILABLE | No | 9676.588 ms |
+| Missing plugin | 503 | INGRESS_REFUSED | No | 122.017 ms |
+| Controlled provider error | 400 | PROVIDER_ERROR | No | 31.017 ms |
+
+All six outcomes matched expectations. The first four used real Gemini; missing-plugin and provider-error cases used the separately labeled controlled provider and consumed no Gemini submissions. The ingress refusal and provider failure are distinct from evidence-policy decisions.
+
+Four completed independent verifier records in the live `observations.json` match the corresponding observed provider-candidate hashes:
+
+| Scenario | Exact candidate SHA-256 | Coverage | Verdict |
+| --- | --- | --- | --- |
+| Supported | `fb6f13725b5d5f7e80e5058893307f7198ad91dfa76e10e1290f109850abc3bc` | COMPLETE | SUPPORTED |
+| Older version | `28a4162cc06069f265bbb8edb3241a837ec19c10f44fb4a2c58c7c36a894574f` | COMPLETE | CONTRADICTED |
+| Unsupported factual prose | `fbf8d461222bc1f3b166f41b770151e004acaf53e81e2e035b93eec9702375e2` | UNCERTAIN | INSUFFICIENT |
+| Unrecognized paraphrase | `c7df77c165ac66164ec53bbeeb8f660c5061f1c7c228073f87b3a8b3c0631166` | UNCERTAIN | INSUFFICIENT |
+
+All four candidate hashes above were compared directly across the saved transport and verifier records. Verifier `reason_code` values are not populated in the exported records; no more specific verifier reason code is inferred. Relay grammar observations and the adapter's `validated_projection` category are separate diagnostics.
+
+For all four Gemini responses, the saved structural observation reports one STOP candidate, one non-thinking visible text part with `thoughtSignature`, and exact intended generated text. The adapter records `original_received: true`, `validation: ACCEPTED`, `signature_present: true`, `projection_performed: true` and `text_equal: true`. Each observed candidate digest equals both the original-text and projected-text digest. The released supported answer's approved-content digest also equals that same candidate digest. Original-response and projected-response digests are separately recorded; they identify different envelopes, not a claim of unchanged response bytes.
+
+Each model case's request digest matches a native stage record with `candidate_eligible`, `verifier_request_attempted` and `verifier_request_completed`. Supported ends at `evidence_policy_validated`; the other three end at `evidence_policy_validation_refused`. Their completed Python records establish SUPPORTED/COMPLETE, CONTRADICTED/COMPLETE and two INSUFFICIENT/UNCERTAIN results respectively. Only the supported case has `answer_released: true`; all withheld cases have no approved-content digest.
+
+The successful client stage used the existing strict minimal-envelope and internal-header checks in `tests/modelqualification/runner.py`. Those execution-time checks excluded signatures, reasoning and original provider-only metadata from the approved client response. The existing protected ingress enforced request-bound v2 receipts during execution. This review compares sanitized correspondence and boundary records; raw client bodies, original Gemini responses and HMAC receipts were intentionally not exported. It does not independently revalidate raw receipts or cryptographically authenticate Google from exported hashes. Original-envelope completeness and signature removal remain assertions of the trusted adapter.
+
+### Single-run usage observations and limits
+
+The recorded 203 input tokens and 135 output tokens including reported thoughts recompute to an estimated combined inference cost of **$0.0003984**, using operator-supplied rates of $0.30 and $2.50 per million tokens respectively. The four transport records report completed HTTPS submissions with no failures/cancellations and no relay admission rejections. These application observations and the client times above are neither service-level guarantees nor independently verified billing amounts. Reported output usage reveals no internal thinking contents. Four generations are not a statistical reliability benchmark.
+
+Qualification remains restricted to two fixed evidence policies and the nine-form bounded language, using tightly controlled prompts. This run does not establish arbitrary natural-language understanding, source freshness, general factual verification or model-assisted analysis quality. The qualification-only adapter is trusted for structural completeness and exact text preservation; an opaque thought signature is neither factual evidence nor source authentication. Observation timestamps do not prove origin freshness. The private unauthenticated verifier HTTP hop and existing trusted host, configuration, gateway, signing and ingress assumptions remain.
+
+Real-model-plus-real-source qualification has **not** been executed. The November 15 run used real sources with a controlled provider; this November 19 run used real Gemini with simulated evidence. These are separate executions and cannot be combined into a claim that one run exercised both. Streaming, production authentication/readiness and protected caching remain unqualified. The assessment rests on sanitized operator-collected records and subsequent review, not independently repeated provider calls.
+
 ## Scope and status
 
 Baseline: `3cd8592c97ebd2725a551893fdbf5d49f5406a55`. **IMPLEMENTATION COMPLETE / REAL-MODEL QUALIFICATION PENDING.** This report describes the isolated 005C qualification adapter with simulated native Gemini HTTP and simulated source evidence. Final qualification records are listed below. Successful real-model factual release remains unqualified. No Gemini, Tavily or PyPI origin requests were made in this implementation task.

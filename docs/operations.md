@@ -250,6 +250,8 @@ A live runner success prints `LIVE RUN COLLECTED: independent review required`, 
 
 ## Diagnostics and cleanup
 
+The [November 19, 2026 reviewed 005C-T run](task-005c-t.md#reviewed-real-model-qualification--november-19-2026) met narrow real-Gemini enforcement acceptance with simulated evidence. Its original collection-time pending fields remain unchanged; the dated review is the subsequent assessment. No repeat execution is needed to substantiate that review. The workflows below are for separately authorized future runs; real-model-plus-real-source execution remains unqualified.
+
 005C native Gemini qualification and the separate draft claim-analysis diagnostic have their own [operator procedure](real-model-qualification.md), runtime-secret boundary, cost review and sanitized artifacts. Default real calls are zero; generation and extraction need separate explicit authorization. The implementation phase never enables paid execution. Offline generation uses the actual gateway/native loader with simulated Gemini HTTP and simulated evidence:
 
 ```powershell
