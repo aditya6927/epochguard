@@ -32,6 +32,8 @@ The [005F controlled comparison](task-005f.md) at baseline `dc1ed88bfec47141a833
 
 The **ordinary-answer-only 005F cohort** has 20 cases: eight labelled unsafe (all withheld by the protected path, with four 403 contradictions and four 503 coverage refusals), eleven labelled correct (six delivered and five correct-but-unsupported refusals), and one unknown. The other four cases test evidence/ingress failures and are **not** part of that ordinary-answer denominator. These are agent-authored fixture labels; the per-case measurements must be exported and inspected locally before they can be published as independently recomputable observations.
 
+The [005H variable-evidence matrix](task-005h.md) at baseline `e052517df12e5d26f7c533ae6a51a01bdab7727c` passed 90 actual protected-gateway cases across 21 fixed, isolated profiles. Four independently varied pairs, from Python/requests `3.0.1`/`0.0.1` through `3.99.999`/`999.999.999`, exercised all nine forms, older contradictions, grammar refusals, missing plugins and source faults. Identical candidate text changed from ALLOW to REJECT when only Python evidence or only requests evidence changed. Measured totals were 41 ALLOW, 8 REJECT, 32 UNAVAILABLE and 9 INGRESS_REFUSED, with 47 Python/45 PyPI simulated invocations. Invalid evidence and receipt-v2 faults remained withheld. This adds offline parameterization evidence without changing production policy or real-world qualification claims.
+
 The four qualification combinations are distinct:
 
 | Provider | Evidence | Status |

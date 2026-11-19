@@ -1,0 +1,5 @@
+ARG VERIFIER_BASE=epochguard-verifier:004g
+FROM ${VERIFIER_BASE}
+COPY tests/boundedprose/ /app/boundedprose/
+COPY tests/gatecompare/ /app/gatecompare/
+RUN --network=none python -B -m pytest -c /app/pytest.ini -p no:cacheprovider /app/boundedprose/test_variable_evidence.py -q

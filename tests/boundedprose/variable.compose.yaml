@@ -1,0 +1,30 @@
+# Overlay the existing private G qualification. No new public route or port.
+services:
+  key-init:
+    image: ${EPOCHGUARD_005H_NATIVE_IMAGE:?immutable image required}
+  provider:
+    image: ${EPOCHGUARD_005H_NATIVE_IMAGE:?immutable image required}
+  gateway:
+    image: ${EPOCHGUARD_005H_NATIVE_IMAGE:?immutable image required}
+  gateway-control:
+    image: ${EPOCHGUARD_005H_NATIVE_IMAGE:?immutable image required}
+  ingress:
+    image: ${EPOCHGUARD_005H_NATIVE_IMAGE:?immutable image required}
+  ingress-unsafe:
+    image: ${EPOCHGUARD_005H_NATIVE_IMAGE:?immutable image required}
+  receipt-relay:
+    image: ${EPOCHGUARD_005H_NATIVE_IMAGE:?immutable image required}
+  ingress-faults:
+    image: ${EPOCHGUARD_005H_NATIVE_IMAGE:?immutable image required}
+  verifier:
+    image: ${EPOCHGUARD_005H_IMAGE:?immutable image required}
+    command: ["python", "-m", "uvicorn", "boundedprose.variable_fixture:app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--limit-concurrency", "32"]
+    volumes: ["${EPOCHGUARD_005H_PROFILE:?profile required}:/run/005h/profile.json:ro"]
+  qualification-client:
+    image: ${EPOCHGUARD_005H_IMAGE:?immutable image required}
+    command: ["python", "-m", "boundedprose.variable_client", "client"]
+    volumes: ["${EPOCHGUARD_005H_PROFILE:?profile required}:/run/005h/profile.json:ro"]
+  qualification-operator:
+    image: ${EPOCHGUARD_005H_IMAGE:?immutable image required}
+    command: ["python", "-m", "boundedprose.variable_client", "report"]
+    volumes: ["${EPOCHGUARD_005H_PROFILE:?profile required}:/run/005h/profile.json:ro"]
