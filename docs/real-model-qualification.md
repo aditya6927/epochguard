@@ -117,9 +117,11 @@ foreach ($batch in 1..3) {
 }
 ```
 
-Use the builder belonging to the intended Docker context; the name above is the inspected local builder. The 16 synthetic envelopes include missing/empty output, truncation, thinking/signatures, extra metadata/grounding annotations, malformed JSON, unsupported prose, exact support and contradiction. Three disposable batches keep the existing per-process budgets. They have no egress, credentials, real model calls or origin-source fetches, and cannot be combined with `--live`. Their successful results do not establish what the historical model actually returned.
+Use the builder belonging to the intended Docker context; the name above is the inspected local builder. The 18 synthetic envelopes include missing/empty output, truncation, thinking/signatures, extra metadata/grounding annotations, malformed JSON, unsupported prose, exact support and contradiction, plus two 005C-S conversion-collision controls. Three disposable batches keep the existing per-process budgets. They have no egress, credentials, real model calls or origin-source fetches, and cannot be combined with `--live`. Their successful results do not establish what the historical model actually returned.
 
 Inspect `client.json`, `observations.json`, `report.json` and process `stages.json`; the last is orchestration, while `native_stages` contains the Go boundaries. Root-cause uncertainty and exact offline outcomes belong in the [diagnostic report](task-005c-r.md). Successful new real-model verification still requires a separately authorized future run and independent review, with no automatic model, thinking or output-limit change.
+
+The later run `20261118T205130Z-06b231a3` preserves the exact visible text, STOP and single text/signature part, establishing its signature-related refusal. The [005C-S audit](task-005c-s.md) nevertheless withholds a typed-only exception: the converter can produce identical typed responses after discarding a file-data part or a second native candidate. The original part/candidate restrictions cannot be recovered from encrypted reasoning-detail fields alone. Signature compatibility and successful factual release are not qualified. A safe original-envelope validation or structural-provenance design is needed before enabling this path; do not silently turn on raw-response capture, strip metadata in the relay or relax legacy checks.
 
 ## Claim-analysis evaluation
 

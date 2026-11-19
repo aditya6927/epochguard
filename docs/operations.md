@@ -272,6 +272,8 @@ foreach ($batch in 1..3) {
 }
 ```
 
+The [005C-S contract audit](task-005c-s.md) adds two conversion-collision controls, bringing the three batches to 18 cases. Signature-bearing responses remain refused; passing these negative controls is not signature compatibility acceptance. Original provider shape/provenance must be available before that exception can be qualified. Both historical live directories remain read-only evidence; these commands make no real model or origin-source requests.
+
 Use the driver's sanitized case/build outputs to diagnose failures; ignored artifacts are local evidence, not published releases. The G runtime-log scan reads logs in memory and emits a fixed failure category rather than persisting an offending line. Do not expand diagnostic logging to candidate/provider/source bodies, receipt headers or secrets. Full CLI `--json` and evaluation exports intentionally contain supplied source text; use nonprivate fixtures or protect those exports separately.
 
 A failed build can reflect registry/network/toolchain availability rather than an enforcement regression. Keep that failure distinct from a passing unit or gateway result. Run only the relevant matching cleanup commands, inspect their exit status and preserve meaningful failure evidence. Cleanup does not remove the shared Buildx builder or previously saved live reports.

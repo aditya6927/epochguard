@@ -20,6 +20,12 @@ def fixtures():
     annotated["candidates"][0]["groundingMetadata"] = {
         "groundingChunks": [{"web": {"uri": "https://example.invalid/synthetic", "title": "synthetic"}}],
         "groundingSupports": [{"segment": {"startIndex": 0, "endIndex": 10, "text": "synthetic"}, "groundingChunkIndices": [0]}]}
+    signature = envelope(parts=[{"text": SUPPORTED, "thoughtSignature": "c3ludGhldGlj"}])
+    file_neighbor = copy.deepcopy(signature)
+    file_neighbor["candidates"][0]["content"]["parts"].append(
+        {"fileData": {"mimeType": "image/png", "fileUri": "https://example.invalid/synthetic.png"}})
+    two_candidates = copy.deepcopy(signature)
+    two_candidates["candidates"].append(envelope("Unaccounted second candidate.")["candidates"][0])
     return {
         "stop": (plain, "ALLOW", "evidence_policy_validated", True),
         "max_tokens": (envelope(reason="MAX_TOKENS"), "UNAVAILABLE", "unsupported_finish_reason", False),
@@ -37,6 +43,8 @@ def fixtures():
         "split_text": (envelope(parts=[{"text": SUPPORTED[:30]}, {"text": SUPPORTED[30:]}]), "UNAVAILABLE", "buffered_candidate_shape", False),
         "unknown_finish": (envelope(reason="SYNTHETIC_PRIVATE_REASON"), "UNAVAILABLE", "unsupported_finish_reason", False),
         "empty_text": (envelope(""), "UNAVAILABLE", "evidence_policy_validation_refused", True),
+        "signature_file_neighbor": (file_neighbor, "UNAVAILABLE", "unsupported_provider_annotations", False),
+        "signature_two_candidates": (two_candidates, "UNAVAILABLE", "unsupported_provider_annotations", False),
     }
 
 
