@@ -1,4 +1,5 @@
 {
+  "response_mode": "unadapted",
   "model": "gemini-operator-must-select",
   "max_requests": 4,
   "output_tokens": 256,

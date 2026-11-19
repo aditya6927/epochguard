@@ -272,7 +272,20 @@ foreach ($batch in 1..3) {
 }
 ```
 
-The [005C-S contract audit](task-005c-s.md) adds two conversion-collision controls, bringing the three batches to 18 cases. Signature-bearing responses remain refused; passing these negative controls is not signature compatibility acceptance. Original provider shape/provenance must be available before that exception can be qualified. Both historical live directories remain read-only evidence; these commands make no real model or origin-source requests.
+The [005C-S contract audit](task-005c-s.md) adds two conversion-collision controls, bringing the three unadapted batches to 18 cases. Signatures remain refused in that mode. Both historical live directories remain read-only evidence; these commands make no real model or origin-source requests.
+
+The isolated [005C-T adapter](task-005c-t.md) additionally has explicit strict-mode qualification. Rebuild `epochguard-model:005c` after source changes, then run:
+
+```powershell
+docker buildx build --builder desktop-linux --load -t epochguard-model:005c -f dev/Dockerfile.model .
+& .venv-003a/Scripts/python.exe tests/modelqualification/qualify.py --strict-adapter
+1..6 | ForEach-Object {
+    & .venv-003a/Scripts/python.exe tests/modelqualification/qualify.py --strict-adapter --adapter-batch $_
+    if ($LASTEXITCODE) { throw '005C-T offline batch failed' }
+}
+```
+
+These 36 original-envelope cases include the four signature-bearing policy scenarios, all known conversion collisions, malformed/ambiguous data and a signature-projected native response with the plugin missing. Each stack retains six model submissions and existing source ceilings, internal networks and disposable signing-volume cleanup. The ordinary strict run also preserves genuine provider-error and timeout distinctions. Configuration defaults to `unadapted`; `--strict-adapter` selects `strict-005ct` in generated offline settings. Future separately authorized live use requires the same explicit flag, matching trusted settings and a current source/mode-matching successful standard offline preflight. Adapter batches are offline-only and do not themselves count as live preflight. No unrelated profile enables adaptation.
 
 Use the driver's sanitized case/build outputs to diagnose failures; ignored artifacts are local evidence, not published releases. The G runtime-log scan reads logs in memory and emits a fixed failure category rather than persisting an offending line. Do not expand diagnostic logging to candidate/provider/source bodies, receipt headers or secrets. Full CLI `--json` and evaluation exports intentionally contain supplied source text; use nonprivate fixtures or protect those exports separately.
 

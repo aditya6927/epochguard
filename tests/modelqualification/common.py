@@ -3,6 +3,7 @@ import hashlib
 import argparse
 import json
 from pathlib import Path
+from typing import Literal
 from pydantic import Field
 from claim_analysis.schema import Strict, strict_json
 
@@ -30,6 +31,7 @@ def sha(data):
 
 
 class Settings(Strict):
+    response_mode: Literal["unadapted", "strict-005ct"] = "unadapted"
     model: str = Field(pattern=r"^gemini-[a-z0-9][a-z0-9.-]{0,95}$")
     max_requests: int = Field(ge=1, le=6)
     output_tokens: int = Field(default=256, ge=128, le=1024)

@@ -7,6 +7,7 @@ import socket
 import httpx
 from .common import OUTPUTS, PROMPTS, SUPPORTED, read_settings, sha
 from .response_shapes import SHAPE_PROMPTS, batch
+from .adapter_shapes import ADAPTER_PROMPTS, BATCHES, batch as adapter_batch
 
 PATH = "/openai/v1/chat/completions"
 
@@ -75,13 +76,16 @@ async def execute(action):
         raise ValueError("private service exposed to qualification client")
     live = os.getenv("EPOCHGUARD_005C_MODE") == "live"
     shape_batch = int(action[-1]) if action in {"shapes-1", "shapes-2", "shapes-3"} else None
-    if shape_batch is not None and live:
+    adaptation_batch = int(action.split("-")[-1]) if action in {"adapter-" + str(n) for n in BATCHES} else None
+    if (shape_batch is not None or adaptation_batch is not None) and live:
         raise ValueError("response shapes are offline only")
+    if adaptation_batch is not None and settings.response_mode != "strict-005ct":
+        raise ValueError("strict adapter configuration required")
     cases = []
     import time
-    names = batch(shape_batch) if shape_batch is not None else list(OUTPUTS) + ([] if live else ["provider_error", "timeout"]) + ["missing_plugin", "controlled_provider_error"]
+    names = adapter_batch(adaptation_batch) if adaptation_batch is not None else batch(shape_batch) if shape_batch is not None else list(OUTPUTS) + ([] if live else ["provider_error", "timeout"]) + ["missing_plugin", "controlled_provider_error"]
     for name in names:
-        value = {"model": "gemini/" + settings.model, "messages": [{"role": "user", "content": (PROMPTS | SHAPE_PROMPTS).get(name, SUPPORTED)}],
+        value = {"model": "gemini/" + settings.model, "messages": [{"role": "user", "content": (PROMPTS | SHAPE_PROMPTS | ADAPTER_PROMPTS).get(name, SUPPORTED)}],
                  "stream": False, "max_completion_tokens": settings.output_tokens}
         if name in {"missing_plugin", "controlled_provider_error"}:
             value.pop("max_completion_tokens")
@@ -89,7 +93,7 @@ async def execute(action):
             if name == "controlled_provider_error":
                 value["messages"][0]["role"] = "system"
         started = time.monotonic()
-        status, body = await call("ingress-unsafe" if name == "missing_plugin" else "ingress", 8082, "POST", PATH, value)
+        status, body = await call("ingress-unsafe" if name in {"missing_plugin", "adapter_missing_plugin"} else "ingress", 8082, "POST", PATH, value)
         outcome, content_hash = classify(status, body)
         cases.append({"scenario": name, "status": status, "outcome": outcome, "answer_released": status == 200,
                       "approved_content_sha256": content_hash, "elapsed_ms": round((time.monotonic()-started)*1000, 3),

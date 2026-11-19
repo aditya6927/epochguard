@@ -20,7 +20,7 @@ EpochGuard is a native Go extension of Bifrost, using its supported dynamic-plug
 | Other Bifrost versions, current `dev` | NOT TESTED | Rebuild both artifacts and rerun contracts, security and gateway tests before claiming compatibility |
 | Existing upstream plugins added to protected stack | REQUIRES INVESTIGATION | Ordering, request mutation, response conversion, logging and cache behavior can alter this boundary |
 | Streaming, arbitrary routes, background tasks, protected caching | UNSUPPORTED | Outside the qualified protected release contract |
-| Native Gemini generation / 005C | CONNECTIVITY OBSERVED; SIGNATURE COMPATIBILITY BLOCKED | Latest diagnostics establish signature-related refusal. Pinned core conversion loses original part/candidate structure, preventing a safe typed-only exception; strict eligibility remains. [005C-S audit](task-005c-s.md) |
+| Native Gemini generation / 005C | STRICT ADAPTER IMPLEMENTED; REAL-MODEL QUALIFICATION PENDING | [005C-T](task-005c-t.md) validates the original envelope before pinned conversion in an explicit isolated mode. Simulated gateway policy/collision controls pass. Default unadapted mode and strict shared typed eligibility remain; neither historical real run released an answer |
 
 ## Upstream sources and build equivalence
 

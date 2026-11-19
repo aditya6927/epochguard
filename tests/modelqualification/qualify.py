@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / "tests"), str(ROOT / "services/claim_analysis")]
 from modelqualification.common import OUTPUTS, Settings, SafeParser, read_settings, sha, write_new
 from modelqualification.response_shapes import FIXTURES, batch
+from modelqualification.adapter_shapes import FIXTURES as ADAPTER_FIXTURES, BATCHES, batch as adapter_batch, response as adapter_response
 
 
 def environment(live, directory, secret=None):
@@ -46,18 +47,28 @@ def gateway(settings):
     return config
 
 
-def validate(client, observation, live, shape_batch=None):
+def control_gateway(settings, live):
+    config = json.loads((ROOT / "dev/live/gateway-control.json").read_text())
+    if not live and settings.response_mode == "strict-005ct":
+        config["providers"]["gemini"] = gateway(settings)["providers"]["gemini"]
+        # Only the offline no-plugin control uses this simulated-provider key.
+        # The live control has no Gemini route and cannot spend a model call.
+        config["providers"]["gemini"]["keys"][0]["value"] = "offline-only"
+    return config
+
+
+def validate(client, observation, live, shape_batch=None, adaptation_batch=None):
     transport = observation["transport"]
     verifier = observation["verifier"]
     if verifier["fixture"] is not True or verifier["simulated_transports"] is not True:
         raise ValueError("evidence mode changed")
     records, cases = transport["records"], client["cases"]
-    required = batch(shape_batch) if shape_batch is not None else list(OUTPUTS) + ([] if live else ["provider_error", "timeout"])
+    required = adapter_batch(adaptation_batch) if adaptation_batch is not None else batch(shape_batch) if shape_batch is not None else list(OUTPUTS) + ([] if live else ["provider_error", "timeout"])
     if [r["scenario"] for r in records] != required or transport["real_provider"] is not live:
         raise ValueError("provider invocation accounting")
     if any(r["real_provider_invocation_attempted"] is not live for r in records) or transport["attempted"] != len(records) or sum(transport[k] for k in ("completed", "failed", "cancelled")) != len(records):
         raise ValueError("inconsistent invocation totals")
-    if [c["scenario"] for c in cases] != required + ([] if shape_batch is not None else ["missing_plugin", "controlled_provider_error"]):
+    if [c["scenario"] for c in cases] != required + ([] if shape_batch is not None or adaptation_batch is not None else ["missing_plugin", "controlled_provider_error"]):
         raise ValueError("case denominator")
     for case in cases:
         name = case["scenario"]
@@ -66,9 +77,39 @@ def validate(client, observation, live, shape_batch=None):
         case["observed_model_matches_intention"] = observed["matches_intended_text"] if observed else None
         stages = [r["stages"] for r in observation["native_stages"] if r["request_sha256"] == case["request_sha256"]]
         case["native_stages"] = stages[0] if len(stages) == 1 else None
-        if name != "missing_plugin" and case["native_stages"] is None:
+        if name not in {"missing_plugin", "adapter_missing_plugin"} and case["native_stages"] is None:
             raise ValueError("qualification stage observation missing")
-        if shape_batch is not None:
+        if adaptation_batch is not None:
+            _, expected, attempted = ADAPTER_FIXTURES[name.removeprefix("adapter_")]
+            diagnostic = observed.get("adapter", {})
+            if case["outcome"] != expected or case["status"] != {"ALLOW": 200, "REJECT": 403, "UNAVAILABLE": 503, "INGRESS_REFUSED": 503, "PROVIDER_ERROR": 502}[expected]:
+                raise ValueError("adapter protected outcome mismatch")
+            stages = case["native_stages"] or []
+            if ("verifier_request_attempted" in stages) is not attempted:
+                raise ValueError("adapter verifier boundary mismatch")
+            accepted = expected != "PROVIDER_ERROR"
+            if diagnostic.get("validation") != ("ACCEPTED" if accepted else "REFUSED") or diagnostic.get("projection_performed") is not accepted:
+                raise ValueError("adapter original boundary mismatch")
+            if diagnostic.get("original_response_sha256") != sha(adapter_response(name)):
+                raise ValueError("adapter original observation mismatch")
+            checked = [r for r in verifier["records"] if r["candidate_sha256"] == diagnostic.get("original_text_sha256")]
+            if attempted and (not checked or "verifier_request_completed" not in stages):
+                raise ValueError("adapter independent verifier missing")
+            if attempted:
+                verdict, coverage = {"ALLOW": ("SUPPORTED", "COMPLETE"), "REJECT": ("CONTRADICTED", "COMPLETE"),
+                                     "UNAVAILABLE": ("INSUFFICIENT", "UNCERTAIN")}[expected]
+                if not any(r["completed"] and r["verdict"] == verdict and r["coverage"] == coverage for r in checked):
+                    raise ValueError("adapter evidence verdict mismatch")
+            if accepted and (diagnostic.get("text_equal") is not True or diagnostic.get("original_text_sha256") != diagnostic.get("projected_text_sha256") or diagnostic.get("original_text_sha256") != observed["candidate_sha256"]):
+                raise ValueError("adapter text correspondence mismatch")
+            if accepted and diagnostic.get("signature_present") is not (name != "adapter_plain"):
+                raise ValueError("adapter signature observation mismatch")
+            if case["answer_released"] and (case["approved_content_sha256"] != diagnostic["original_text_sha256"] or not any(r["completed"] and r["verdict"] == "SUPPORTED" and r["coverage"] == "COMPLETE" for r in checked)):
+                raise ValueError("adapter release mismatch")
+            if not accepted and (case["answer_released"] or "provider_failure" not in stages or diagnostic.get("projected_response_sha256") is not None):
+                raise ValueError("adapter refusal escaped")
+            case["expectation_met"] = True
+        elif shape_batch is not None:
             _, expected, stage, verifier_attempted = FIXTURES[name.removeprefix("shape_")]
             if case["outcome"] != expected or stage not in case["native_stages"] or ("verifier_request_attempted" in case["native_stages"]) is not verifier_attempted:
                 raise ValueError("response shape boundary mismatch")
@@ -100,7 +141,8 @@ def validate(client, observation, live, shape_batch=None):
 
 def source_hash():
     paths = [*sorted((ROOT / "tests/modelqualification").glob("*.py")), ROOT / "internal/ingress/ingress.go",
-             ROOT / "cmd/protected-ingress/main.go", ROOT / "dev/model/start-gateway.sh", ROOT / "dev/prose/gateway.json",
+             ROOT / "cmd/protected-ingress/main.go", ROOT / "dev/model/start-gateway.sh", ROOT / "dev/model/settings.example.json",
+             ROOT / "dev/prose/gateway.json", ROOT / "dev/live/gateway-control.json",
              ROOT / "internal/ingress/model_test.go", ROOT / "compose.verify.005c.yaml", ROOT / "compose.verify.005c.live.yaml",
              ROOT / "compose.verify.005c.cleanup.yaml", ROOT / "dev/Dockerfile.model", ROOT / "dev/Dockerfile",
              *sorted((ROOT / "plugins/epochguard").glob("*.go")), ROOT / "plugins/epochguard/go.mod", ROOT / "plugins/epochguard/go.sum"]
@@ -110,20 +152,27 @@ def source_hash():
 def execute(args):
     live = args.live
     shape_batch = args.shape_batch
-    if live and shape_batch is not None:
+    adaptation_batch = args.adapter_batch
+    if (shape_batch is not None and (adaptation_batch is not None or args.strict_adapter)) or (adaptation_batch is not None and not args.strict_adapter):
+        raise ValueError("incompatible response qualification mode")
+    if live and (shape_batch is not None or adaptation_batch is not None):
         raise ValueError("response shape fixtures cannot run live")
-    settings = read_settings(args.settings) if live else Settings(model="gemini-offline-fixture", max_requests=6,
+    mode = "strict-005ct" if args.strict_adapter else "unadapted"
+    settings = read_settings(args.settings) if live else Settings(response_mode=mode, model="gemini-offline-fixture", max_requests=6,
         input_usd_per_million=0.0, output_usd_per_million=0.0, max_request_usd=0.25, max_run_usd=1.0)
+    if settings.response_mode != mode:
+        raise ValueError("explicit matching adapter configuration required")
     settings.preflight(live)
     if live:
         preflight = json.loads(Path(args.offline_preflight).read_text())
-        if preflight.get("source_sha256") != source_hash() or preflight.get("offline_passed") is not True:
+        if preflight.get("source_sha256") != source_hash() or preflight.get("offline_passed") is not True or preflight.get("model_configuration", {}).get("response_mode") != mode:
             raise ValueError("matching offline preflight required")
     directory = ROOT / "artifacts/005c" / ("live" if live else "offline") / (datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ-") + uuid.uuid4().hex[:8])
     env = environment(live, directory, args.secret_file)
     directory.mkdir(parents=True)
     write_new(directory / "settings.json", settings.model_dump())
     write_new(directory / "gateway.json", gateway(settings))
+    write_new(directory / "gateway-control.json", control_gateway(settings, live))
     compose = ["docker", "compose", "--env-file", "dev/lab.compose.env", "-f", "compose.verify.005c.yaml"]
     if live:
         compose += ["-f", "compose.verify.005c.live.yaml"]
@@ -164,18 +213,23 @@ def execute(args):
         before = role("before", "operator", "report")
         if before["transport"]["attempted"] or before["verifier"]["records"] or any(s["attempted"] for s in before["verifier"]["sources"].values()):
             raise ValueError("readiness used model or evidence")
-        client = role("client", "client", "client" if shape_batch is None else "shapes-" + str(shape_batch))
+        action = "adapter-" + str(adaptation_batch) if adaptation_batch is not None else "shapes-" + str(shape_batch) if shape_batch is not None else "client"
+        client = role("client", "client", action)
         write_new(directory / "client.json", client)
         observed = role("observations", "operator", "report")
+        if observed["transport"].get("response_mode") != mode:
+            raise ValueError("relay response configuration mismatch")
         raw_stages = run("native-stages", compose + ["exec", "-T", "gateway", "cat", "/tmp/epochguard-005cr.jsonl"])
         if len(raw_stages) > 64*1024:
             raise ValueError("qualification observation bound")
         observed["native_stages"] = [json.loads(line) for line in raw_stages.splitlines()]
         write_new(directory / "observations.json", observed)
         stage = "validate"
-        report = validate(client, observed, live, shape_batch)
+        report = validate(client, observed, live, shape_batch, adaptation_batch)
         report.update(source_revision=run("revision", ["git", "rev-parse", "HEAD"]), source_sha256=source_hash(),
-                      model_configuration=settings.model_dump(), offline_passed=not live and shape_batch is None, shape_batch=shape_batch)
+                      configuration_sha256=sha(json.dumps(settings.model_dump(), sort_keys=True, separators=(",", ":"))),
+                      model_configuration=settings.model_dump(), offline_passed=not live and shape_batch is None and adaptation_batch is None,
+                      shape_batch=shape_batch, adapter_batch=adaptation_batch)
     except Exception:
         failed_stage = stage
         if started_stack and not (directory / "observations.json").exists():
@@ -208,6 +262,8 @@ def main():
     parser.add_argument("--secret-file", type=Path)
     parser.add_argument("--offline-preflight", type=Path)
     parser.add_argument("--shape-batch", type=int, choices=(1, 2, 3))
+    parser.add_argument("--strict-adapter", action="store_true")
+    parser.add_argument("--adapter-batch", type=int, choices=BATCHES)
     args = parser.parse_args()
     try:
         execute(args)

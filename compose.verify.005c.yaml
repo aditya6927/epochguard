@@ -80,7 +80,7 @@ services:
   gateway-control:
     <<: *gateway
     command: ["/app/bifrost-http", "-app-dir", "/app/control", "-host", "0.0.0.0", "-port", "8080"]
-    volumes: ["./dev/live/gateway-control.json:/app/control/config.json:ro"]
+    volumes: ["${EPOCHGUARD_005C_RUN_DIR:?runner required}/gateway-control.json:/app/control/config.json:ro"]
   ingress:
     <<: *ingress
     environment: *ingress-env

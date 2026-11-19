@@ -19,6 +19,7 @@ This is the canonical index of implemented and measured scope. [Architecture](ar
 | [005C native model path and draft evaluation](task-005c.md) | Baseline `5bf1a0b81b1abf9afb7e4519990342c496aadc7b` plus 005C implementation; simulated provider/evidence | Native Gemini conversion and protected release controls; separate frozen 18-case draft comparison. Real-model gateway and analysis calls **PENDING OPERATOR RUN** |
 | [005C-R refusal investigation](task-005c-r.md) | Baseline `4a45673d16946b466e77e975a95954efdd1d4d14`; preserved operator run with real Gemini and simulated evidence | Four provider HTTP 200 responses, four UNAVAILABLE refusals, zero recorded verifier pipeline requests. Connectivity and safe non-release only; exact response shape was not recorded. New diagnostics/fixtures remain non-authorizing |
 | [005C-S signature contract audit](task-005c-s.md) | Baseline `0f5296ae9e7de2509d3781684a9e85e277b9439f`; latest preserved live diagnostics and synthetic converter controls | Latest real run confirms exact intended text with signatures and pre-verifier refusal. Actual pinned conversion collisions prevent a safe typed-only eligibility change; no real-model ALLOW/REJECT qualification |
+| [005C-T pre-conversion adapter](task-005c-t.md) | Baseline `3cd8592c97ebd2725a551893fdbf5d49f5406a55`; simulated native HTTP and simulated evidence | Explicit strict original-envelope validation/projection, actual pinned converter/native loader and existing Go/Python/v2/ingress. Signature-bearing support, contradiction and coverage refusal tested; real-model qualification pending |
 
 The four qualification combinations are distinct:
 
@@ -26,7 +27,7 @@ The four qualification combinations are distinct:
 | --- | --- | --- |
 | Controlled | Simulated | Existing G/G-L/Lab; 005C adds native Gemini transport simulation |
 | Controlled | Real | Narrow reviewed November 15 G-L source qualification; historical observations |
-| Real model | Simulated | Both preserved runs safely refused. Latest diagnostic run confirms the signature blocker; a safe typed-only compatibility change is blocked by conversion ambiguity. Successful factual release remains unqualified |
+| Real model | Simulated | Both preserved runs safely refused. Latest diagnostics confirm the signature blocker. The new strict pre-conversion adapter has simulated qualification only; successful real-model factual release remains unqualified |
 | Real model | Real | Not executed or qualified; no automatic combined mode |
 
 005C uses the unchanged 004A/004F analysis pipeline. Its [review packet](../tests/modelqualification/data/README.md) was newly authored from required categories and frozen before model execution, without held-out tuning. All labels remain agent drafts. Metrics count failed analyses as misses and show denominator, failures, all omissions, dynamic recall, exact-span and classification scores; independent-audit metrics also show unaccounted risk, unsupported mappings, false completeness and abstentions. Gemini cells remain null until actual execution. Real inference alone would not establish general factual correctness, PS06 compliance or per-claim freshness scoring; 005D is separate.

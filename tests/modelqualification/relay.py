@@ -9,6 +9,8 @@ from claim_analysis.schema import strict_json
 from .response_observations import observe_envelope
 from .response_shapes import SHAPE_PROMPTS, response as shape_response
 from .common import OUTPUTS, PROMPTS, read_settings, sha
+from .adapter import adapt
+from .adapter_shapes import ADAPTER_PROMPTS, response as adapter_response
 
 DEADLINE, RUN_SECONDS, REQUEST_LIMIT, RESPONSE_LIMIT = 15, 300, 8192, 65536
 
@@ -40,7 +42,7 @@ class Relay:
                 raise ValueError()
             prompt = content["parts"][0]["text"]
             phase = "prompt"
-            scenario = next(name for name, text in (PROMPTS | SHAPE_PROMPTS).items() if prompt == text)
+            scenario = next(name for name, text in (PROMPTS | SHAPE_PROMPTS | ADAPTER_PROMPTS).items() if prompt == text)
             if self.live and scenario not in OUTPUTS:
                 raise ValueError()
             config = value["generationConfig"]
@@ -80,8 +82,14 @@ class Relay:
                                    failure=None if response.status_code == 200 else "provider_http")
                         if response.status_code == 200:
                             self.observe(bytes(body), scenario, row)
-                        # Provider status/body reach Bifrost unchanged, including
-                        # genuine HTTP failures. No model output repair.
+                            if self.settings.response_mode == "strict-005ct":
+                                projected, diagnostic = adapt(bytes(body))
+                                row["adapter"] = diagnostic
+                                if projected is None:
+                                    return self.error(502)
+                                return Response(projected, status_code=200, media_type="application/json")
+                        # Unadapted successes and genuine HTTP failures retain
+                        # their original bytes/status. No model output repair.
                         return Response(bytes(body), status_code=response.status_code, media_type="application/json")
         except asyncio.CancelledError:
             if row is not None:
@@ -101,7 +109,7 @@ class Relay:
                 self.active = False
 
     def observe(self, body, scenario, row):
-        # Telemetry never influences enforcement or changes forwarded bytes.
+        # Original-envelope telemetry does not authorize the projection/release.
         try:
             value = strict_json(body)
         except Exception:
@@ -126,7 +134,9 @@ class Relay:
 
     async def simulated(self, request):
         prompt = strict_json(request.content)["contents"][0]["parts"][0]["text"]
-        name = next(name for name, text in (PROMPTS | SHAPE_PROMPTS).items() if prompt == text)
+        name = next(name for name, text in (PROMPTS | SHAPE_PROMPTS | ADAPTER_PROMPTS).items() if prompt == text)
+        if name in ADAPTER_PROMPTS:
+            return httpx.Response(200, content=adapter_response(name), headers={"Content-Type": "application/json"})
         if name in SHAPE_PROMPTS:
             return httpx.Response(200, content=shape_response(name), headers={"Content-Type": "application/json"})
         if name == "timeout":
@@ -139,6 +149,7 @@ class Relay:
 
     def report(self):
         return {"schema_version": "005c.transport.v1", "real_provider": self.live,
+                "response_mode": self.settings.response_mode,
                 "attempted": len(self.records), "completed": sum(r["state"] == "completed" for r in self.records),
                 "failed": sum(r["state"] == "failed" for r in self.records),
                 "cancelled": sum(r["state"] == "cancelled" for r in self.records),
