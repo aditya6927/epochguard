@@ -1,0 +1,2042 @@
+{
+  "schema_version": "005f.public-evidence.v1",
+  "source": "Local 005F measurement and report files; not independently re-executed or authenticated",
+  "dataset_sha256": "00bc7980901364e475e7dbeeaedbd4118da8348af8f0e915d9925d936edbefa9",
+  "run_source_revision": "dc1ed88bfec47141a83337e4b888d915a72f3408",
+  "run_source_sha256": "db54ecfd58684b5ab0c035ddbfd4593dc6e234af207344ed0d6579bd449ef34f",
+  "repetitions": 3,
+  "paths": {
+    "unprotected": "Unprotected pinned Bifrost + controlled provider",
+    "protected": "Protected ingress + pinned Bifrost plugin + verifier + receipt-v2"
+  },
+  "label_provenance": "Agent-authored synthetic expectations; not human-reviewed independent gold or real-world accuracy",
+  "ordinary_answer_results": {
+    "cases": 20,
+    "known_unsafe": 8,
+    "known_unsafe_delivered_unprotected": 8,
+    "known_unsafe_delivered_protected": 0,
+    "unsafe_rejected_as_contradicted": 4,
+    "unsafe_refused_for_unsupported_coverage": 4,
+    "known_correct": 11,
+    "correct_delivered_unprotected": 11,
+    "correct_delivered_protected": 6,
+    "correct_refused_protected": 5,
+    "unknown_or_inconclusive": 1
+  },
+  "infrastructure_or_evidence_controls": {
+    "cases": 4,
+    "source_unavailable_or_malformed": 3,
+    "missing_plugin": 1,
+    "all_protected_refused": true
+  },
+  "matched_pairs_total": 72,
+  "all_case_matched_added_latency_ms": {
+    "n": 72,
+    "p50_ms": 2.98878,
+    "p95_ms": 5.661154,
+    "mean_ms": 3.195995013888889
+  },
+  "cases": [
+    {
+      "id": "python-exact",
+      "cohort": "ordinary_answer",
+      "category": "supported",
+      "label": "correct",
+      "expected_protected_outcome": "ALLOW",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "python-recognized-form",
+      "cohort": "ordinary_answer",
+      "category": "supported",
+      "label": "correct",
+      "expected_protected_outcome": "ALLOW",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "pypi-exact",
+      "cohort": "ordinary_answer",
+      "category": "supported",
+      "label": "correct",
+      "expected_protected_outcome": "ALLOW",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "pypi-recognized-form",
+      "cohort": "ordinary_answer",
+      "category": "supported",
+      "label": "correct",
+      "expected_protected_outcome": "ALLOW",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "two-supported",
+      "cohort": "ordinary_answer",
+      "category": "supported",
+      "label": "correct",
+      "expected_protected_outcome": "ALLOW",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "two-supported-reversed",
+      "cohort": "ordinary_answer",
+      "category": "supported",
+      "label": "correct",
+      "expected_protected_outcome": "ALLOW",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "python-outdated",
+      "cohort": "ordinary_answer",
+      "category": "outdated",
+      "label": "unsafe",
+      "expected_protected_outcome": "REJECT",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "pypi-outdated",
+      "cohort": "ordinary_answer",
+      "category": "outdated",
+      "label": "unsafe",
+      "expected_protected_outcome": "REJECT",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "mixed-python-outdated",
+      "cohort": "ordinary_answer",
+      "category": "mixed",
+      "label": "unsafe",
+      "expected_protected_outcome": "REJECT",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "mixed-pypi-outdated",
+      "cohort": "ordinary_answer",
+      "category": "mixed",
+      "label": "unsafe",
+      "expected_protected_outcome": "REJECT",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "correct-python-paraphrase",
+      "cohort": "ordinary_answer",
+      "category": "paraphrase",
+      "label": "correct",
+      "expected_protected_outcome": "UNAVAILABLE",
+      "correct_but_outside_policy": true
+    },
+    {
+      "id": "correct-pypi-paraphrase",
+      "cohort": "ordinary_answer",
+      "category": "paraphrase",
+      "label": "correct",
+      "expected_protected_outcome": "UNAVAILABLE",
+      "correct_but_outside_policy": true
+    },
+    {
+      "id": "false-neighbor-moon",
+      "cohort": "ordinary_answer",
+      "category": "neighbor",
+      "label": "unsafe",
+      "expected_protected_outcome": "UNAVAILABLE",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "false-neighbor-arithmetic",
+      "cohort": "ordinary_answer",
+      "category": "neighbor",
+      "label": "unsafe",
+      "expected_protected_outcome": "UNAVAILABLE",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "unknown-neighbor",
+      "cohort": "ordinary_answer",
+      "category": "neighbor",
+      "label": "unknown",
+      "expected_protected_outcome": "UNAVAILABLE",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "harmless-neighbor",
+      "cohort": "ordinary_answer",
+      "category": "neighbor",
+      "label": "correct",
+      "expected_protected_outcome": "UNAVAILABLE",
+      "correct_but_outside_policy": true
+    },
+    {
+      "id": "python-policy-conflict",
+      "cohort": "ordinary_answer",
+      "category": "repeated",
+      "label": "unsafe",
+      "expected_protected_outcome": "UNAVAILABLE",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "pypi-policy-conflict",
+      "cohort": "ordinary_answer",
+      "category": "repeated",
+      "label": "unsafe",
+      "expected_protected_outcome": "UNAVAILABLE",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "python-policy-same-paraphrases",
+      "cohort": "ordinary_answer",
+      "category": "repeated",
+      "label": "correct",
+      "expected_protected_outcome": "UNAVAILABLE",
+      "correct_but_outside_policy": true
+    },
+    {
+      "id": "pypi-policy-identical",
+      "cohort": "ordinary_answer",
+      "category": "repeated",
+      "label": "correct",
+      "expected_protected_outcome": "UNAVAILABLE",
+      "correct_but_outside_policy": true
+    },
+    {
+      "id": "python-evidence-unavailable",
+      "cohort": "fault_or_ingress_control",
+      "category": "evidence",
+      "label": "unknown",
+      "expected_protected_outcome": "UNAVAILABLE",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "pypi-evidence-unavailable",
+      "cohort": "fault_or_ingress_control",
+      "category": "evidence",
+      "label": "unknown",
+      "expected_protected_outcome": "UNAVAILABLE",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "pypi-evidence-malformed",
+      "cohort": "fault_or_ingress_control",
+      "category": "evidence",
+      "label": "unknown",
+      "expected_protected_outcome": "UNAVAILABLE",
+      "correct_but_outside_policy": false
+    },
+    {
+      "id": "missing-plugin",
+      "cohort": "fault_or_ingress_control",
+      "category": "missing_plugin",
+      "label": "correct",
+      "expected_protected_outcome": "INGRESS_REFUSED",
+      "correct_but_outside_policy": false
+    }
+  ],
+  "paired_observations": [
+    {
+      "case_id": "correct-pypi-paraphrase",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.03455,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.789746,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.755196
+    },
+    {
+      "case_id": "correct-pypi-paraphrase",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.642818,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.205771,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.562953
+    },
+    {
+      "case_id": "correct-pypi-paraphrase",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.901629,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.077413,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.175784
+    },
+    {
+      "case_id": "correct-python-paraphrase",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.142767,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 3.917093,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 1.774326
+    },
+    {
+      "case_id": "correct-python-paraphrase",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.118323,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 5.114964,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.996641
+    },
+    {
+      "case_id": "correct-python-paraphrase",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.175634,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.010706,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 1.835072
+    },
+    {
+      "case_id": "false-neighbor-arithmetic",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.103141,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.691713,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.588572
+    },
+    {
+      "case_id": "false-neighbor-arithmetic",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.007662,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.966268,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.958606
+    },
+    {
+      "case_id": "false-neighbor-arithmetic",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.93031,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.354894,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.424584
+    },
+    {
+      "case_id": "false-neighbor-moon",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.918815,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.353376,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.434561
+    },
+    {
+      "case_id": "false-neighbor-moon",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.985277,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 3.9882,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.002923
+    },
+    {
+      "case_id": "false-neighbor-moon",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.021007,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.476562,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.455555
+    },
+    {
+      "case_id": "harmless-neighbor",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.942512,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.397521,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.455009
+    },
+    {
+      "case_id": "harmless-neighbor",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.289884,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 5.927397,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 3.637513
+    },
+    {
+      "case_id": "harmless-neighbor",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.040794,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.228482,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.187688
+    },
+    {
+      "case_id": "missing-plugin",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.59792,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "INGRESS_REFUSED",
+        "answer_delivered": false,
+        "elapsed_ms": 3.062146,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 1.464226
+    },
+    {
+      "case_id": "missing-plugin",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.133754,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "INGRESS_REFUSED",
+        "answer_delivered": false,
+        "elapsed_ms": 2.164825,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 0.031071
+    },
+    {
+      "case_id": "missing-plugin",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.60116,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "INGRESS_REFUSED",
+        "answer_delivered": false,
+        "elapsed_ms": 2.217573,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 0.616413
+    },
+    {
+      "case_id": "mixed-pypi-outdated",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.832145,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 403,
+        "outcome": "REJECT",
+        "answer_delivered": false,
+        "elapsed_ms": 6.67564,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 4.843495
+    },
+    {
+      "case_id": "mixed-pypi-outdated",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.807873,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 403,
+        "outcome": "REJECT",
+        "answer_delivered": false,
+        "elapsed_ms": 5.561329,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 2.753456
+    },
+    {
+      "case_id": "mixed-pypi-outdated",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.638157,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 403,
+        "outcome": "REJECT",
+        "answer_delivered": false,
+        "elapsed_ms": 7.125874,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 4.487717
+    },
+    {
+      "case_id": "mixed-python-outdated",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.897894,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 403,
+        "outcome": "REJECT",
+        "answer_delivered": false,
+        "elapsed_ms": 6.772638,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 3.874744
+    },
+    {
+      "case_id": "mixed-python-outdated",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.951433,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 403,
+        "outcome": "REJECT",
+        "answer_delivered": false,
+        "elapsed_ms": 7.430094,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 4.478661
+    },
+    {
+      "case_id": "mixed-python-outdated",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 4.796319,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 403,
+        "outcome": "REJECT",
+        "answer_delivered": false,
+        "elapsed_ms": 5.827855,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 1.031536
+    },
+    {
+      "case_id": "pypi-evidence-malformed",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.289836,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 6.287862,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 3.998026
+    },
+    {
+      "case_id": "pypi-evidence-malformed",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.427936,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 5.00502,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 2.577084
+    },
+    {
+      "case_id": "pypi-evidence-malformed",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.929475,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.87925,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 2.949775
+    },
+    {
+      "case_id": "pypi-evidence-unavailable",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.899811,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 6.198701,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 3.29889
+    },
+    {
+      "case_id": "pypi-evidence-unavailable",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.332295,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.635605,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 2.30331
+    },
+    {
+      "case_id": "pypi-evidence-unavailable",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.793965,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 5.393795,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 3.59983
+    },
+    {
+      "case_id": "pypi-exact",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.764748,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 7.460179,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 4.695431
+    },
+    {
+      "case_id": "pypi-exact",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.900624,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 5.87583,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 3.975206
+    },
+    {
+      "case_id": "pypi-exact",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.613037,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 5.580366,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 3.967329
+    },
+    {
+      "case_id": "pypi-outdated",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.870163,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 403,
+        "outcome": "REJECT",
+        "answer_delivered": false,
+        "elapsed_ms": 5.320533,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 3.45037
+    },
+    {
+      "case_id": "pypi-outdated",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.231818,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 403,
+        "outcome": "REJECT",
+        "answer_delivered": false,
+        "elapsed_ms": 5.452003,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 3.220185
+    },
+    {
+      "case_id": "pypi-outdated",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.261466,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 403,
+        "outcome": "REJECT",
+        "answer_delivered": false,
+        "elapsed_ms": 4.631218,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 2.369752
+    },
+    {
+      "case_id": "pypi-policy-conflict",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.844324,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.714514,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.87019
+    },
+    {
+      "case_id": "pypi-policy-conflict",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.563477,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.786886,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 3.223409
+    },
+    {
+      "case_id": "pypi-policy-conflict",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.234529,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 5.53732,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 3.302791
+    },
+    {
+      "case_id": "pypi-policy-identical",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.139254,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.465026,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.325772
+    },
+    {
+      "case_id": "pypi-policy-identical",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.549716,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.924797,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.375081
+    },
+    {
+      "case_id": "pypi-policy-identical",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.665771,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.865355,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.199584
+    },
+    {
+      "case_id": "pypi-recognized-form",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.838825,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 6.000913,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 4.162088
+    },
+    {
+      "case_id": "pypi-recognized-form",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.056542,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 5.045322,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 2.98878
+    },
+    {
+      "case_id": "pypi-recognized-form",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 3.541898,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 6.759188,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 3.21729
+    },
+    {
+      "case_id": "python-evidence-unavailable",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.226245,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 6.25388,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 4.027635
+    },
+    {
+      "case_id": "python-evidence-unavailable",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.30153,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 6.228117,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 3.926587
+    },
+    {
+      "case_id": "python-evidence-unavailable",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.177856,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 6.483781,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 4.305925
+    },
+    {
+      "case_id": "python-exact",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.380059,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 5.942314,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 3.562255
+    },
+    {
+      "case_id": "python-exact",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.584884,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 6.627674,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 4.04279
+    },
+    {
+      "case_id": "python-exact",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.873967,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 5.917651,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 4.043684
+    },
+    {
+      "case_id": "python-outdated",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 3.79367,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 403,
+        "outcome": "REJECT",
+        "answer_delivered": false,
+        "elapsed_ms": 7.967236,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 4.173566
+    },
+    {
+      "case_id": "python-outdated",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.197744,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 403,
+        "outcome": "REJECT",
+        "answer_delivered": false,
+        "elapsed_ms": 8.255408,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 6.057664
+    },
+    {
+      "case_id": "python-outdated",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 3.261099,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 403,
+        "outcome": "REJECT",
+        "answer_delivered": false,
+        "elapsed_ms": 5.037735,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 1.776636
+    },
+    {
+      "case_id": "python-policy-conflict",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.982966,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 3.715797,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 1.732831
+    },
+    {
+      "case_id": "python-policy-conflict",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.796122,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.013737,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.217615
+    },
+    {
+      "case_id": "python-policy-conflict",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.856525,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.689041,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.832516
+    },
+    {
+      "case_id": "python-policy-same-paraphrases",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.14652,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 6.723853,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 4.577333
+    },
+    {
+      "case_id": "python-policy-same-paraphrases",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.866623,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 6.010974,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 4.144351
+    },
+    {
+      "case_id": "python-policy-same-paraphrases",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.509973,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.203875,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 1.693902
+    },
+    {
+      "case_id": "python-recognized-form",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 3.356838,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 6.830489,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 3.473651
+    },
+    {
+      "case_id": "python-recognized-form",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 3.338344,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 5.525151,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.186807
+    },
+    {
+      "case_id": "python-recognized-form",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 3.129691,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 7.327461,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 4.19777
+    },
+    {
+      "case_id": "two-supported",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 3.195284,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 8.860368,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 5.665084
+    },
+    {
+      "case_id": "two-supported",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.801395,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 7.462549,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 5.661154
+    },
+    {
+      "case_id": "two-supported",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.198305,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 6.647441,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 4.449136
+    },
+    {
+      "case_id": "two-supported-reversed",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.033853,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 6.912471,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 4.878618
+    },
+    {
+      "case_id": "two-supported-reversed",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.374305,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 8.823427,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 6.449122
+    },
+    {
+      "case_id": "two-supported-reversed",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.55085,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 200,
+        "outcome": "ALLOW",
+        "answer_delivered": true,
+        "elapsed_ms": 6.885552,
+        "evidence_calls": {
+          "python": 1,
+          "pypi": 1
+        }
+      },
+      "path_latency_difference_ms": 4.334702
+    },
+    {
+      "case_id": "unknown-neighbor",
+      "repeat": 1,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 2.115607,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.693337,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.57773
+    },
+    {
+      "case_id": "unknown-neighbor",
+      "repeat": 2,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.848396,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.659432,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.811036
+    },
+    {
+      "case_id": "unknown-neighbor",
+      "repeat": 3,
+      "unprotected": {
+        "http_status": 200,
+        "outcome": "DELIVERED",
+        "answer_delivered": true,
+        "elapsed_ms": 1.944056,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "protected": {
+        "http_status": 503,
+        "outcome": "UNAVAILABLE",
+        "answer_delivered": false,
+        "elapsed_ms": 4.359122,
+        "evidence_calls": {
+          "python": 0,
+          "pypi": 0
+        }
+      },
+      "path_latency_difference_ms": 2.415066
+    }
+  ],
+  "measurement_limitations": [
+    "Fixture evidence and controlled provider; no real model or real sources",
+    "Unprotected Bifrost is the baseline, not direct HTTP delivery to provider",
+    "Observed added time is complete path-level difference, not pure plugin overhead",
+    "Per-case measurements reproduce local-run summaries; source records were not independently rerun",
+    "No credentials, receipts, raw candidate/source/provider bodies or local runtime details are included"
+  ]
+}

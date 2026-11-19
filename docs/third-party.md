@@ -1,8 +1,8 @@
 # License and third-party audit
 
-EpochGuard has no selected repository license. No `LICENSE` is added by this task. Public source availability does not by itself grant an open-source distribution license. Maintainers should decide licensing and contribution terms before publication as a licensed project or upstream submission.
+The EpochGuard repository's original code is licensed under [Apache-2.0](../LICENSE). The grant applies to the project authors' licensable contributions, not to third-party code under different terms. Redistribution still requires satisfying the respective third-party licenses and applicable notices.
 
-**Recommendation for maintainer consideration: Apache-2.0**, because its explicit patent grant and notice terms suit a gateway extension and align with Bifrost. This is a recommendation, not a grant or legal clearance. A maintainer must confirm authorship/permission and dependency obligations first.
+**Chosen repository license: Apache-2.0.** Its explicit patent grant and notice terms suit a gateway extension and align with Bifrost. This choice is not a certification of third-party redistribution clearance; authorship/permission and dependency notice obligations remain important.
 
 ## Inspected material
 

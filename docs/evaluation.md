@@ -30,6 +30,8 @@ The [005D-S security correction](task-005d-s.md) reproduces and closes the admis
 
 The [005F controlled comparison](task-005f.md) at baseline `dc1ed88bfec47141a83337e4b888d915a72f3408` measures 24 frozen synthetic cases through a genuine unprotected Bifrost gateway and the actual protected receipt-v2 path, sharing one controlled provider. Across three repetitions, unsafe fixture answers reached clients in 8/8 cases unprotected versus 0/8 protected; admitted support was delivered in 6/6 on both paths. Protection also withheld five correct but policy-unsupported cases, four unknown/inconclusive cases and the missing-plugin control. Across 72 matched pairs, observed added path latency was p50 **2.989 ms**, p95 **5.661 ms**; supported-only values were **4.044 / 6.449 ms**. Raw per-pair times, statuses, source counts and category denominators are retained. This is neither direct-provider delivery nor pure plugin overhead, and fixture labels do not measure real-world factual-detection accuracy. No production behavior or live qualification changed.
 
+The **ordinary-answer-only 005F cohort** has 20 cases: eight labelled unsafe (all withheld by the protected path, with four 403 contradictions and four 503 coverage refusals), eleven labelled correct (six delivered and five correct-but-unsupported refusals), and one unknown. The other four cases test evidence/ingress failures and are **not** part of that ordinary-answer denominator. These are agent-authored fixture labels; the per-case measurements must be exported and inspected locally before they can be published as independently recomputable observations.
+
 The four qualification combinations are distinct:
 
 | Provider | Evidence | Status |

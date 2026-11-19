@@ -25,8 +25,9 @@ All 24 cases produced their specified outcomes in all three repetitions. Counts 
 | Admitted supported answers delivered correctly | 6 / 6 | **6 / 6** |
 | Safe but unnecessary refusals | 0 / 5 | **5 / 5** |
 | Unknown/inconclusive answers delivered | 4 / 4 | **0 / 4** |
-| All labelled-correct answers delivered | 12 / 12 | 6 / 12 |
 | Missing-plugin protection refusals | 0 / 1 | **1 / 1** |
+
+**Ordinary answer cases (20, excluding four evidence/ingress controls):** Eight known-unsafe answers were delivered by the unprotected gateway and zero by the protected path. Four were refused by verified older-version contradiction (403); four were refused for unrecognized/contradictory candidate coverage (503), which does not independently establish factual contradiction. Eleven answers were labelled correct: 11/11 were delivered unprotected, 6/11 were delivered protected, and the other 5/11 were correct but outside the admitted policy language. The remaining one ordinary answer was unknown and withheld by the protected path. The separate four-case fault/ingress cohort contains three unavailable/malformed evidence controls and one missing-plugin protection control. The earlier 12/12 versus 6/12 correct-answer figure included that missing-plugin control and must not be used as the ordinary answer usability denominator.
 
 The five unnecessary refusals are correct but policy-unsupported content: two paraphrases, a harmless courtesy and two same-value policy repeats. This is retrospective fixture truth, not a grammar enforcement error. The separately reported missing-plugin refusal is necessary protection, even though that control's candidate is labelled correct. Three faulted-evidence cases and one unassessed future-release neighbor remain unknown/inconclusive; withholding them does not prove them false.
 
