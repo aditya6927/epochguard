@@ -1,0 +1,13 @@
+{
+  "response_mode": "strict-005ct",
+  "model": "gemini-operator-must-select",
+  "max_requests": 4,
+  "output_tokens": 256,
+  "input_usd_per_million": null,
+  "output_usd_per_million": null,
+  "max_request_usd": 0.01,
+  "max_run_usd": 0.05,
+  "python_request_usd": null,
+  "pypi_request_usd": null,
+  "max_source_run_usd": null
+}

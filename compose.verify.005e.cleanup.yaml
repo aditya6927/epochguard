@@ -1,0 +1,10 @@
+# Cleanup only; no startable service, secret or interpolation.
+name: epochguard-005e
+services: {}
+volumes:
+  receipt:
+networks:
+  client:
+  private:
+  model-egress:
+  evidence-egress:

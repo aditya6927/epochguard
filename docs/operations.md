@@ -248,6 +248,18 @@ Receipt protocol is fixed to `004g.receipt.v2`. Its validation outcome is inferr
 
 A live runner success prints `LIVE RUN COLLECTED: independent review required`, not final qualification approval. The report retains `live_qualification_pending=true` as its collection-time state. The November 15 records have since been reviewed; the canonical assessment lives in the dated report rather than rewriting preserved runtime artifacts. A safe refusal, successful fixture run or prior E live result is not a supported G factual delivery.
 
+## Combined model and evidence qualification
+
+005E has an independent [offline-first procedure](task-005e.md#reproduction) and a separate live overlay requiring both model and evidence authorization. After building the documented native/verifier/model dependencies, build its isolated image and run all seven offline batches:
+
+```powershell
+docker buildx build --builder desktop-linux --load -t epochguard-combined:005e -f dev/Dockerfile.combined .
+$env:PYTHONPATH = 'tests;services/verifier;services/claim_analysis'
+& .venv-003a/Scripts/python.exe tests/combinedqualification/qualify.py
+```
+
+This invocation has no live opt-in or external network. It checks the actual native loader, adapter, verifier, v2 ingress, source faults, drift and failed sampling. Success creates a 24-hour source/image-bound offline suite record; it does not authorize a live call. Future separately authorized use, source/model cost configuration, private-file ACLs, artifact interpretation and manual cleanup are documented in the task report. Disposable stacks retain private networks and signing-volume cleanup.
+
 ## Diagnostics and cleanup
 
 The [November 19, 2026 reviewed 005C-T run](task-005c-t.md#reviewed-real-model-qualification--november-19-2026) met narrow real-Gemini enforcement acceptance with simulated evidence. Its original collection-time pending fields remain unchanged; the dated review is the subsequent assessment. No repeat execution is needed to substantiate that review. The workflows below are for separately authorized future runs; real-model-plus-real-source execution remains unqualified.

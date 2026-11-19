@@ -21,6 +21,10 @@ class Relay:
         if live and transport is not None:
             raise ValueError("live transport replacement forbidden")
         self.settings, self.live, self.transport = settings, live, transport
+        # Trusted composition may supply a different bounded scenario plan. The
+        # ordinary 005C profile retains these exact prompts and live allowlist.
+        self.prompts = PROMPTS | SHAPE_PROMPTS | ADAPTER_PROMPTS
+        self.live_scenarios = set(OUTPUTS)
         self.records, self.reserved, self.active = [], 0.0, False
         self.rejections = {}
         self.started = time.monotonic()
@@ -42,8 +46,8 @@ class Relay:
                 raise ValueError()
             prompt = content["parts"][0]["text"]
             phase = "prompt"
-            scenario = next(name for name, text in (PROMPTS | SHAPE_PROMPTS | ADAPTER_PROMPTS).items() if prompt == text)
-            if self.live and scenario not in OUTPUTS:
+            scenario = next(name for name, text in self.prompts.items() if prompt == text)
+            if self.live and scenario not in self.live_scenarios:
                 raise ValueError()
             config = value["generationConfig"]
             phase = "generation_config"

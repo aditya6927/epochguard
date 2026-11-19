@@ -1,0 +1,40 @@
+# Explicit dual authorization. Only relay and verifier gain separate egress.
+services:
+  verifier:
+    environment:
+      EPOCHGUARD_005E_ALLOW_MODEL: ${EPOCHGUARD_005E_ALLOW_MODEL:?separate model authorization required}
+      EPOCHGUARD_005E_ALLOW_EVIDENCE: ${EPOCHGUARD_005E_ALLOW_EVIDENCE:?separate evidence authorization required}
+      EPOCHGUARD_RUN_LIVE_004E: "1"
+      EPOCHGUARD_RUN_LIVE_004G: "1"
+      EPOCHGUARD_004E_PROFILE: live
+      EPOCHGUARD_TAVILY_SECRET_FILE: /run/secrets/tavily_key
+    secrets: [tavily_key]
+    networks: [private, evidence-egress]
+  gateway:
+    environment:
+      EPOCHGUARD_005E_ALLOW_MODEL: ${EPOCHGUARD_005E_ALLOW_MODEL:?required}
+      EPOCHGUARD_005E_ALLOW_EVIDENCE: ${EPOCHGUARD_005E_ALLOW_EVIDENCE:?required}
+      EPOCHGUARD_005C_MODE: live
+      EPOCHGUARD_RUN_MODEL_005C: "1"
+    secrets: [provider]
+  relay:
+    environment:
+      EPOCHGUARD_005E_ALLOW_MODEL: ${EPOCHGUARD_005E_ALLOW_MODEL:?required}
+      EPOCHGUARD_005E_ALLOW_EVIDENCE: ${EPOCHGUARD_005E_ALLOW_EVIDENCE:?required}
+    networks: [private, model-egress]
+  qualification-client:
+    environment:
+      EPOCHGUARD_005E_ALLOW_MODEL: ${EPOCHGUARD_005E_ALLOW_MODEL:?required}
+      EPOCHGUARD_005E_ALLOW_EVIDENCE: ${EPOCHGUARD_005E_ALLOW_EVIDENCE:?required}
+  qualification-operator:
+    environment:
+      EPOCHGUARD_005E_ALLOW_MODEL: ${EPOCHGUARD_005E_ALLOW_MODEL:?required}
+      EPOCHGUARD_005E_ALLOW_EVIDENCE: ${EPOCHGUARD_005E_ALLOW_EVIDENCE:?required}
+secrets:
+  provider:
+    file: ${EPOCHGUARD_005E_MODEL_SECRET_FILE:?private runtime credential required}
+  tavily_key:
+    file: ${EPOCHGUARD_005E_EVIDENCE_SECRET_FILE:?private runtime credential required}
+networks:
+  model-egress: {}
+  evidence-egress: {}

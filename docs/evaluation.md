@@ -24,6 +24,8 @@ This is the canonical index of implemented and measured scope. [Architecture](ar
 
 The separate [005D reporting evaluation](task-005d.md) at baseline `2b09cb68806493019cbd1680373f71fa42a44c80` uses 23 fixed synthetic cases, the existing grammar/evidence pipeline and the actual independent Go validator. It checks 100/0/null scores, source/time/binding failures, stable order and non-authorizing diagnostic mutations. This is offline reporting evaluation, not an additional real-model or real-source qualification. Historical November 15/19 observations can be inspected without rescoring missing provenance or retrieving current data.
 
+The [005E combined harness](task-005e.md) adds a seven-batch offline wiring/fault qualification using simulated Gemini HTTP and fixture source transports. A separately opted-in live implementation is available, but no combined live result is collected or approved. The existing November 15 real-source and November 19 real-model reviews remain independent executions; the real-model/real-evidence row below remains unqualified.
+
 The four qualification combinations are distinct:
 
 | Provider | Evidence | Status |

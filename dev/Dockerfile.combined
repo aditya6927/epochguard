@@ -1,0 +1,6 @@
+# Separate qualification image; existing C/G/G-L entry points stay unchanged.
+FROM epochguard-model:005c
+COPY services/verifier/verifier/ /app/verifier/
+COPY tests/modelqualification/ /app/modelqualification/
+COPY tests/combinedqualification/ /app/combinedqualification/
+CMD ["python", "-m", "uvicorn", "combinedqualification.relay:app", "--factory", "--host", "0.0.0.0", "--port", "9001", "--no-access-log", "--log-level", "critical", "--limit-concurrency", "4"]

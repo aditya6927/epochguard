@@ -1,0 +1,118 @@
+# 005E offline combined profile. All networks internal; no ports or credentials.
+name: epochguard-005e
+x-native: &native
+  image: ${EPOCHGUARD_005E_NATIVE_IMAGE:-epochguard-dev:002a}
+  platform: linux/amd64
+x-gateway: &gateway
+  <<: *native
+  networks: [private]
+  environment: {BIFROST_SETUP_TOKEN: epochguard-local-dev-only}
+  tmpfs: ["/tmp:uid=10001,gid=10001,mode=1777"]
+  depends_on:
+    key-init: {condition: service_completed_successfully}
+    provider: {condition: service_healthy}
+    verifier: {condition: service_healthy}
+    relay: {condition: service_healthy}
+  healthcheck:
+    test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
+    interval: 2s
+    timeout: 2s
+    retries: 60
+x-ingress-env: &ingress-env
+  EPOCHGUARD_GATEWAY_URL: http://gateway:8080
+  EPOCHGUARD_ATTESTATION_SECRET_FILE: /run/receipt/receipt.hex
+  EPOCHGUARD_SETUP_TOKEN: epochguard-local-dev-only
+  EPOCHGUARD_INGRESS_PROFILE: 004g-live
+  EPOCHGUARD_MODEL_QUALIFICATION: "1"
+x-ingress: &ingress
+  <<: *native
+  command: ["/app/protected-ingress"]
+  networks: [client, private]
+  volumes: ["receipt:/run/receipt:ro"]
+  depends_on:
+    gateway: {condition: service_healthy}
+services:
+  key-init:
+    <<: *native
+    user: "0:0"
+    command: ["/app/protected-ingress", "-generate-fixture-secret", "/run/receipt/receipt.hex"]
+    environment: {EPOCHGUARD_TEST_MODE: "1"}
+    network_mode: none
+    volumes: ["receipt:/run/receipt"]
+  provider:
+    <<: *native
+    networks: [private]
+    command: ["/app/provider-fixture", "-answer-mode", "claim", "-qualification-004c", "-qualification-004gs"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9000/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  verifier:
+    image: ${EPOCHGUARD_005E_COMBINED_IMAGE:-epochguard-combined:005e}
+    platform: linux/amd64
+    networks: [private]
+    volumes: ["${EPOCHGUARD_005E_RUN_DIR:?runner required}/runtime.json:/run/qualification/runtime.json:ro"]
+    command: ["python", "-m", "uvicorn", "combinedqualification.sources:app", "--factory", "--host", "0.0.0.0", "--port", "8000", "--no-access-log", "--log-level", "critical", "--limit-concurrency", "32"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=2)"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  relay:
+    image: ${EPOCHGUARD_005E_COMBINED_IMAGE:-epochguard-combined:005e}
+    platform: linux/amd64
+    networks: [private]
+    volumes:
+      - "${EPOCHGUARD_005E_RUN_DIR:?runner required}/runtime.json:/run/qualification/runtime.json:ro"
+      - "${EPOCHGUARD_005E_RUN_DIR:?runner required}/plan.json:/run/qualification/plan.json:ro"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9001/health',timeout=2)"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  gateway:
+    <<: *gateway
+    command: ["sh", "/run/start-gateway.sh"]
+    volumes:
+      - "receipt:/run/receipt:ro"
+      - "./dev/combined/start-gateway.sh:/run/start-gateway.sh:ro"
+      - "./dev/model/start-gateway.sh:/run/start-model-gateway.sh:ro"
+      - "${EPOCHGUARD_005E_RUN_DIR:?runner required}/gateway.json:/app/verify/config.json:ro"
+  gateway-control:
+    <<: *gateway
+    command: ["/app/bifrost-http", "-app-dir", "/app/control", "-host", "0.0.0.0", "-port", "8080"]
+    volumes: ["./dev/live/gateway-control.json:/app/control/config.json:ro"]
+  ingress:
+    <<: *ingress
+    environment: *ingress-env
+  ingress-unsafe:
+    <<: *ingress
+    environment:
+      <<: *ingress-env
+      EPOCHGUARD_GATEWAY_URL: http://gateway-control:8080
+    depends_on:
+      gateway-control: {condition: service_healthy}
+  qualification-client:
+    profiles: [qualification]
+    image: ${EPOCHGUARD_005E_COMBINED_IMAGE:-epochguard-combined:005e}
+    platform: linux/amd64
+    networks: [client]
+    volumes:
+      - "${EPOCHGUARD_005E_RUN_DIR:?runner required}/runtime.json:/run/qualification/runtime.json:ro"
+      - "${EPOCHGUARD_005E_RUN_DIR:?runner required}/plan.json:/run/qualification/plan.json:ro"
+    command: ["python", "-m", "combinedqualification.runner", "client"]
+  qualification-operator:
+    profiles: [qualification]
+    image: ${EPOCHGUARD_005E_COMBINED_IMAGE:-epochguard-combined:005e}
+    platform: linux/amd64
+    networks: [private]
+    volumes: ["${EPOCHGUARD_005E_RUN_DIR:?runner required}/runtime.json:/run/qualification/runtime.json:ro"]
+    command: ["python", "-m", "combinedqualification.runner", "source-report"]
+volumes:
+  receipt:
+networks:
+  client:
+    internal: true
+  private:
+    internal: true

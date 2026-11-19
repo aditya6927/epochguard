@@ -75,6 +75,7 @@ func configure(config any) error {
 		Verifier                 *HTTPVerificationConfig `json:"verifier"`
 		Attestation              *attestationConfig      `json:"attestation"`
 		QualificationDiagnostics bool                    `json:"qualification_diagnostics"`
+		CombinedDiagnostics      bool                    `json:"combined_qualification_diagnostics"`
 	}
 	data, err := json.Marshal(config)
 	if err != nil {
@@ -87,6 +88,11 @@ func configure(config any) error {
 	}
 	if cfg.QualificationDiagnostics && (!cfg.TestOnly || cfg.Verifier == nil || cfg.Verifier.Mode != proseSchema || cfg.Attestation == nil || cfg.Attestation.Protocol != boundReceiptVersion) {
 		return errors.New("epochguard: qualification diagnostics require fixture prose with bound receipt")
+	}
+	// Separate explicit qualification telemetry for 005E. The original fixture-
+	// only flag keeps its restrictions; neither switch changes any decision.
+	if cfg.CombinedDiagnostics && (cfg.QualificationDiagnostics || cfg.Verifier == nil || cfg.Verifier.Mode != proseSchema || cfg.Attestation == nil || cfg.Attestation.Protocol != boundReceiptVersion) {
+		return errors.New("epochguard: combined diagnostics require explicit bound prose")
 	}
 	if cfg.Verifier != nil {
 		if cfg.Decision != "" || cfg.TestDecisionDelayMS != 0 || cfg.CacheNoStore {
@@ -131,7 +137,7 @@ func configure(config any) error {
 			identity = proseSchema + "/" + prosePolicy
 		}
 		p := &policy{source: source, cacheNoStore: true, attestation: key, receiptPolicy: identity}
-		if cfg.QualificationDiagnostics {
+		if cfg.QualificationDiagnostics || cfg.CombinedDiagnostics {
 			p.qualification = &qualificationSink{path: qualificationFile}
 		}
 		activePolicy.Store(p)
