@@ -51,6 +51,13 @@ def assemble(runtime, plan, client, observed, native):
                     case["verifier_record_index"] = index
                     if not checked["completed"] or "verifier_request_completed" not in case["native_stages"]:
                         raise ValueError("independent verifier incomplete")
+                    if name.endswith("_conflict"):
+                        diagnostic = checked.get("claim_report", {})
+                        if (checked["coverage"] != "UNCERTAIN" or checked["claims"] or
+                            checked["canonical_sha256"] is not None or checked.get("grammar_reason") != "REPEATED_CLAIM" or
+                            checked.get("source_calls_before") != checked.get("source_calls_after") or
+                            diagnostic.get("claims") != [] or diagnostic.get("authorization") is not False):
+                            raise ValueError("singleton conflict was not refused atomically")
                     for claim in checked["claims"]:
                         for evidence in claim["evidence"]:
                             sampled = next(e for e in plan.observations if e.url==evidence["url"])

@@ -87,15 +87,20 @@ def test_all_lossy_collisions_refused_before_conversion(name):
 
 
 @pytest.mark.parametrize("batch,verdicts",[("standard",["SUPPORTED","CONTRADICTED","INSUFFICIENT","INSUFFICIENT"]),
-    ("faults",["INSUFFICIENT"]*3),("identity",["INSUFFICIENT"]*2),("clock",["INSUFFICIENT"]*2),("drift",["CONTRADICTED"])])
+    ("faults",["INSUFFICIENT"]*3),("identity",["INSUFFICIENT"]*4),("clock",["INSUFFICIENT"]*2),("drift",["CONTRADICTED"])])
 def test_actual_existing_source_parsers_and_budgets(batch,verdicts):
     async def scenario():
         r,app,plan = await prepared(batch)
         outputs,_ = scenarios(plan,r)
         got = []
         for name,text in list(outputs.items())[:len(verdicts)]:
+            before = len(app.state.pipeline.report()["source_budget"]["calls"])
             result = await app.state.pipeline.verify(Request(request_id="offline_"+name,candidate=text,candidate_sha256=sha(text)))
             got.append(result.verification.verdict if result.verification else "INSUFFICIENT")
+            if name.endswith("_conflict"):
+                assert result.coverage == "UNCERTAIN" and result.reason_code == "REPEATED_CLAIM"
+                assert result.mappings == [] and result.verification is None
+                assert len(app.state.pipeline.report()["source_budget"]["calls"]) == before
         assert got==verdicts
         report = app.state.pipeline.report()
         assert all(v["attempted"]<=3 for v in report["sources"].values())

@@ -26,6 +26,8 @@ The separate [005D reporting evaluation](task-005d.md) at baseline `2b09cb688064
 
 The [005E combined harness](task-005e.md) adds a seven-batch offline wiring/fault qualification using simulated Gemini HTTP and fixture source transports. A separately opted-in live implementation is available, but no combined live result is collected or approved. The existing November 15 real-source and November 19 real-model reviews remain independent executions; the real-model/real-evidence row below remains unqualified.
 
+The [005D-S security correction](task-005d-s.md) reproduces and closes the admission of multiple versions of one singleton policy. Its corrected offline evidence includes independent Python/Go refusal of captured pre-fix SUPPORTED records, zero-retrieval grammar controls, all nine forms, the updated 23-case reporting corpus and all seven rebuilt 005E batches with actual protected conflict controls. The frozen `eight-claims` text now expects UNAVAILABLE with no score entries instead of REJECT with eight numeric scores. Historical reporting evaluations and November 15/19 runs retain their original revisions and artifacts; they do not retroactively include this correction. Combined live qualification remains pending.
+
 The four qualification combinations are distinct:
 
 | Provider | Evidence | Status |

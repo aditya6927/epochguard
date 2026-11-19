@@ -111,7 +111,7 @@ func multiTextBound(text string) bool {
 // byte positions into Python code-point offsets and reject all unknown content.
 func multiGrammar(text string) ([]multiBound, string) {
 	var required []multiBound
-	seen := map[string]bool{}
+	seenPolicies := map[string]bool{}
 	for cursor := 0; cursor < len(text); {
 		if strings.ContainsRune(" \t\r\n", rune(text[cursor])) {
 			cursor++
@@ -128,13 +128,14 @@ func multiGrammar(text string) ([]multiBound, string) {
 		if end < len(text) && !strings.ContainsRune(" \t\r\n", rune(text[end])) {
 			return nil, "UNRECOGNIZED_CONTENT"
 		}
-		if seen[match[0]] {
+		// Each fixed policy denotes one singleton observation per candidate.
+		if seenPolicies[policyID] {
 			return nil, "REPEATED_CLAIM"
 		}
 		if len(required) == 8 {
 			return nil, "CLAIM_LIMIT"
 		}
-		seen[match[0]] = true
+		seenPolicies[policyID] = true
 		source := multiSource{ClaimID: fmt.Sprintf("c%03d", len(required)+1), SourceText: match[0],
 			Start: utf8.RuneCountInString(text[:cursor]), End: utf8.RuneCountInString(text[:end]),
 			Factuality: "FACTUAL", Temporal: "DYNAMIC", FreshEvidence: "REQUIRED", Uncertainty: []string{}}

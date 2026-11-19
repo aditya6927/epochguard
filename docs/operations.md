@@ -252,6 +252,8 @@ A live runner success prints `LIVE RUN COLLECTED: independent review required`, 
 
 005E has an independent [offline-first procedure](task-005e.md#reproduction) and a separate live overlay requiring both model and evidence authorization. After building the documented native/verifier/model dependencies, build its isolated image and run all seven offline batches:
 
+After the [005D-S singleton correction](task-005d-s.md), rebuild native and the complete verifier 004C → 004E → 004G → 004G-L → model → combined dependency chain. Do not use pre-fix images as corrected evidence. The offline identity batch additionally sends Python and PyPI repeated-policy candidates; each must finish independent verification, retrieve no evidence and return protected 503 without answer text. Standard two-policy support must still return 200. Source/image hashes and disposable-stack cleanup are recorded in each new suite; preserve prior qualification directories.
+
 ```powershell
 docker buildx build --builder desktop-linux --load -t epochguard-combined:005e -f dev/Dockerfile.combined .
 $env:PYTHONPATH = 'tests;services/verifier;services/claim_analysis'

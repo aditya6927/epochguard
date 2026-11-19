@@ -184,85 +184,12 @@
   },
   {
     "text": "PyPI reports requests version 2.34.0.\nPyPI reports requests version 2.34.1.\nPyPI reports requests version 2.34.2.\nPyPI reports requests version 2.34.3.\nPyPI reports requests version 2.34.4.\nPyPI reports requests version 2.34.5.\nPyPI reports requests version 2.34.6.\nPyPI reports requests version 2.34.7.",
-    "reason": "BOUNDED_GRAMMAR",
-    "mappings": [
-      {
-        "claim_id": "c001",
-        "source_text": "PyPI reports requests version 2.34.0.",
-        "start": 0,
-        "end": 37,
-        "policy_id": "pypi-requests-reported-v1",
-        "version": "2.34.0",
-        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.0."
-      },
-      {
-        "claim_id": "c002",
-        "source_text": "PyPI reports requests version 2.34.1.",
-        "start": 38,
-        "end": 75,
-        "policy_id": "pypi-requests-reported-v1",
-        "version": "2.34.1",
-        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.1."
-      },
-      {
-        "claim_id": "c003",
-        "source_text": "PyPI reports requests version 2.34.2.",
-        "start": 76,
-        "end": 113,
-        "policy_id": "pypi-requests-reported-v1",
-        "version": "2.34.2",
-        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.2."
-      },
-      {
-        "claim_id": "c004",
-        "source_text": "PyPI reports requests version 2.34.3.",
-        "start": 114,
-        "end": 151,
-        "policy_id": "pypi-requests-reported-v1",
-        "version": "2.34.3",
-        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.3."
-      },
-      {
-        "claim_id": "c005",
-        "source_text": "PyPI reports requests version 2.34.4.",
-        "start": 152,
-        "end": 189,
-        "policy_id": "pypi-requests-reported-v1",
-        "version": "2.34.4",
-        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.4."
-      },
-      {
-        "claim_id": "c006",
-        "source_text": "PyPI reports requests version 2.34.5.",
-        "start": 190,
-        "end": 227,
-        "policy_id": "pypi-requests-reported-v1",
-        "version": "2.34.5",
-        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.5."
-      },
-      {
-        "claim_id": "c007",
-        "source_text": "PyPI reports requests version 2.34.6.",
-        "start": 228,
-        "end": 265,
-        "policy_id": "pypi-requests-reported-v1",
-        "version": "2.34.6",
-        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.6."
-      },
-      {
-        "claim_id": "c008",
-        "source_text": "PyPI reports requests version 2.34.7.",
-        "start": 266,
-        "end": 303,
-        "policy_id": "pypi-requests-reported-v1",
-        "version": "2.34.7",
-        "canonical": "The version reported for requests by the PyPI JSON API is 2.34.7."
-      }
-    ]
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
   },
   {
     "text": "PyPI reports requests version 2.34.0.\nPyPI reports requests version 2.34.1.\nPyPI reports requests version 2.34.2.\nPyPI reports requests version 2.34.3.\nPyPI reports requests version 2.34.4.\nPyPI reports requests version 2.34.5.\nPyPI reports requests version 2.34.6.\nPyPI reports requests version 2.34.7.\nPyPI reports requests version 2.34.8.",
-    "reason": "CLAIM_LIMIT",
+    "reason": "REPEATED_CLAIM",
     "mappings": []
   },
   {
@@ -373,6 +300,621 @@
   {
     "text": "python.org currently lists Python 3.15.2 as its latest stable Windows release.\nPyPI reports requests version 2.34.2.",
     "reason": "UNRECOGNIZED_CONTENT",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.6.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\tPython.org currently lists Python 3.88.6 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.6.\tPython.org currently lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\tPython.org currently lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\tPython.org lists Python 3.88.6 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.6.\tPython.org lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\tPython.org lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\tPython.org lists 3.88.6 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.6.\tPython.org lists 3.88.7 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\tPython.org lists 3.88.7 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\tPython.org lists Python 3.88.6 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.6.\tPython.org lists Python 3.88.7 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\tPython.org lists Python 3.88.7 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.6 as its latest stable Windows release.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.\tPython.org currently lists Python 3.88.6 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.6 as its latest stable Windows release.\tPython.org currently lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.\tPython.org currently lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.\tPython.org lists Python 3.88.6 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.6 as its latest stable Windows release.\tPython.org lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.\tPython.org lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.\tPython.org lists 3.88.6 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.6 as its latest stable Windows release.\tPython.org lists 3.88.7 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.\tPython.org lists 3.88.7 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.\tPython.org lists Python 3.88.6 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.6 as its latest stable Windows release.\tPython.org lists Python 3.88.7 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.\tPython.org lists Python 3.88.7 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable Windows release.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.6 as its latest stable Windows release.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable Windows release.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable Windows release.\tPython.org currently lists Python 3.88.6 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.6 as its latest stable Windows release.\tPython.org currently lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable Windows release.\tPython.org currently lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable Windows release.\tPython.org lists Python 3.88.6 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.6 as its latest stable Windows release.\tPython.org lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable Windows release.\tPython.org lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable Windows release.\tPython.org lists 3.88.6 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.6 as its latest stable Windows release.\tPython.org lists 3.88.7 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable Windows release.\tPython.org lists 3.88.7 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable Windows release.\tPython.org lists Python 3.88.6 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.6 as its latest stable Windows release.\tPython.org lists Python 3.88.7 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable Windows release.\tPython.org lists Python 3.88.7 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.7 as the latest stable Windows release.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.6 as the latest stable Windows release.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.7 as the latest stable Windows release.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.7 as the latest stable Windows release.\tPython.org currently lists Python 3.88.6 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.6 as the latest stable Windows release.\tPython.org currently lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.7 as the latest stable Windows release.\tPython.org currently lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.7 as the latest stable Windows release.\tPython.org lists Python 3.88.6 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.6 as the latest stable Windows release.\tPython.org lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.7 as the latest stable Windows release.\tPython.org lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.7 as the latest stable Windows release.\tPython.org lists 3.88.6 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.6 as the latest stable Windows release.\tPython.org lists 3.88.7 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.7 as the latest stable Windows release.\tPython.org lists 3.88.7 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.7 as the latest stable Windows release.\tPython.org lists Python 3.88.6 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.6 as the latest stable Windows release.\tPython.org lists Python 3.88.7 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists 3.88.7 as the latest stable Windows release.\tPython.org lists Python 3.88.7 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable release for Windows.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.6 as its latest stable release for Windows.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable release for Windows.\tThe latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable release for Windows.\tPython.org currently lists Python 3.88.6 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.6 as its latest stable release for Windows.\tPython.org currently lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable release for Windows.\tPython.org currently lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable release for Windows.\tPython.org lists Python 3.88.6 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.6 as its latest stable release for Windows.\tPython.org lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable release for Windows.\tPython.org lists Python 3.88.7 as its latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable release for Windows.\tPython.org lists 3.88.6 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.6 as its latest stable release for Windows.\tPython.org lists 3.88.7 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable release for Windows.\tPython.org lists 3.88.7 as the latest stable Windows release.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable release for Windows.\tPython.org lists Python 3.88.6 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.6 as its latest stable release for Windows.\tPython.org lists Python 3.88.7 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "Python.org lists Python 3.88.7 as its latest stable release for Windows.\tPython.org lists Python 3.88.7 as its latest stable release for Windows.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The version reported for requests by the PyPI JSON API is 2.88.7.\tThe version reported for requests by the PyPI JSON API is 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The version reported for requests by the PyPI JSON API is 2.88.6.\tThe version reported for requests by the PyPI JSON API is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The version reported for requests by the PyPI JSON API is 2.88.7.\tThe version reported for requests by the PyPI JSON API is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The version reported for requests by the PyPI JSON API is 2.88.7.\tPyPI reports requests version 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The version reported for requests by the PyPI JSON API is 2.88.6.\tPyPI reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The version reported for requests by the PyPI JSON API is 2.88.7.\tPyPI reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The version reported for requests by the PyPI JSON API is 2.88.7.\tThe PyPI JSON API reports requests version 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The version reported for requests by the PyPI JSON API is 2.88.6.\tThe PyPI JSON API reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The version reported for requests by the PyPI JSON API is 2.88.7.\tThe PyPI JSON API reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The version reported for requests by the PyPI JSON API is 2.88.7.\tAccording to the PyPI JSON API, the version of requests is 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The version reported for requests by the PyPI JSON API is 2.88.6.\tAccording to the PyPI JSON API, the version of requests is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The version reported for requests by the PyPI JSON API is 2.88.7.\tAccording to the PyPI JSON API, the version of requests is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "PyPI reports requests version 2.88.7.\tThe version reported for requests by the PyPI JSON API is 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "PyPI reports requests version 2.88.6.\tThe version reported for requests by the PyPI JSON API is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "PyPI reports requests version 2.88.7.\tThe version reported for requests by the PyPI JSON API is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "PyPI reports requests version 2.88.7.\tPyPI reports requests version 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "PyPI reports requests version 2.88.6.\tPyPI reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "PyPI reports requests version 2.88.7.\tPyPI reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "PyPI reports requests version 2.88.7.\tThe PyPI JSON API reports requests version 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "PyPI reports requests version 2.88.6.\tThe PyPI JSON API reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "PyPI reports requests version 2.88.7.\tThe PyPI JSON API reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "PyPI reports requests version 2.88.7.\tAccording to the PyPI JSON API, the version of requests is 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "PyPI reports requests version 2.88.6.\tAccording to the PyPI JSON API, the version of requests is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "PyPI reports requests version 2.88.7.\tAccording to the PyPI JSON API, the version of requests is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The PyPI JSON API reports requests version 2.88.7.\tThe version reported for requests by the PyPI JSON API is 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The PyPI JSON API reports requests version 2.88.6.\tThe version reported for requests by the PyPI JSON API is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The PyPI JSON API reports requests version 2.88.7.\tThe version reported for requests by the PyPI JSON API is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The PyPI JSON API reports requests version 2.88.7.\tPyPI reports requests version 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The PyPI JSON API reports requests version 2.88.6.\tPyPI reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The PyPI JSON API reports requests version 2.88.7.\tPyPI reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The PyPI JSON API reports requests version 2.88.7.\tThe PyPI JSON API reports requests version 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The PyPI JSON API reports requests version 2.88.6.\tThe PyPI JSON API reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The PyPI JSON API reports requests version 2.88.7.\tThe PyPI JSON API reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The PyPI JSON API reports requests version 2.88.7.\tAccording to the PyPI JSON API, the version of requests is 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The PyPI JSON API reports requests version 2.88.6.\tAccording to the PyPI JSON API, the version of requests is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "The PyPI JSON API reports requests version 2.88.7.\tAccording to the PyPI JSON API, the version of requests is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "According to the PyPI JSON API, the version of requests is 2.88.7.\tThe version reported for requests by the PyPI JSON API is 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "According to the PyPI JSON API, the version of requests is 2.88.6.\tThe version reported for requests by the PyPI JSON API is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "According to the PyPI JSON API, the version of requests is 2.88.7.\tThe version reported for requests by the PyPI JSON API is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "According to the PyPI JSON API, the version of requests is 2.88.7.\tPyPI reports requests version 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "According to the PyPI JSON API, the version of requests is 2.88.6.\tPyPI reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "According to the PyPI JSON API, the version of requests is 2.88.7.\tPyPI reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "According to the PyPI JSON API, the version of requests is 2.88.7.\tThe PyPI JSON API reports requests version 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "According to the PyPI JSON API, the version of requests is 2.88.6.\tThe PyPI JSON API reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "According to the PyPI JSON API, the version of requests is 2.88.7.\tThe PyPI JSON API reports requests version 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "According to the PyPI JSON API, the version of requests is 2.88.7.\tAccording to the PyPI JSON API, the version of requests is 2.88.6.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "According to the PyPI JSON API, the version of requests is 2.88.6.\tAccording to the PyPI JSON API, the version of requests is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
+    "mappings": []
+  },
+  {
+    "text": "According to the PyPI JSON API, the version of requests is 2.88.7.\tAccording to the PyPI JSON API, the version of requests is 2.88.7.",
+    "reason": "REPEATED_CLAIM",
     "mappings": []
   }
 ]

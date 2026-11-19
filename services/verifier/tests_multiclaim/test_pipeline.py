@@ -78,7 +78,8 @@ def test_claim_limit_does_not_shorten_required_set():
     text = "\n".join(pypi_claim(f"2.88.{i}") for i in range(9))
     pipeline, _ = scenario("A", clock=lambda: NOW)
     result = asyncio.run(pipeline.verify(make_request(text)))
-    assert result.coverage.reason_code == "CLAIM_LIMIT" and result.verdict == "INSUFFICIENT"
+    # Singleton-policy refusal precedes the unchanged eight-claim wire limit.
+    assert result.coverage.reason_code == "REPEATED_CLAIM" and result.verdict == "INSUFFICIENT"
     assert all(s.calls == 0 for s in pipeline.sources.values())
 
 

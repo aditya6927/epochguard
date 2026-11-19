@@ -1,0 +1,267 @@
+{
+  "multi": {
+    "schema_version": "004b.v1",
+    "policy_id": "multi-claim-templates-v1",
+    "request_id": "005ds-before",
+    "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.1.\nThe latest stable Python 3 release for Windows listed on Python.org is 3.15.2.",
+    "candidate_sha256": "5deb8a821707c74684239d66457fd4a8214f66a9deb832663d894f40a9c153f0",
+    "extraction_status": "TRUSTED_GRAMMAR",
+    "binding_status": "VALID",
+    "extraction": {
+      "schema_version": "004a.v1",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.1.",
+          "start": 0,
+          "end": 78,
+          "normalized_proposition": null,
+          "factuality": "FACTUAL",
+          "temporal": "DYNAMIC",
+          "fresh_evidence": "REQUIRED",
+          "uncertainty": [],
+          "temporal_reference": null
+        },
+        {
+          "claim_id": "c002",
+          "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2.",
+          "start": 79,
+          "end": 157,
+          "normalized_proposition": null,
+          "factuality": "FACTUAL",
+          "temporal": "DYNAMIC",
+          "fresh_evidence": "REQUIRED",
+          "uncertainty": [],
+          "temporal_reference": null
+        }
+      ]
+    },
+    "coverage": {
+      "status": "COMPLETE",
+      "reason_code": "EXACT_TEMPLATES",
+      "required_claim_ids": [
+        "c001",
+        "c002"
+      ]
+    },
+    "claims": [
+      {
+        "claim": {
+          "source": {
+            "claim_id": "c001",
+            "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.1.",
+            "start": 0,
+            "end": 78,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          },
+          "candidate_sha256": "5deb8a821707c74684239d66457fd4a8214f66a9deb832663d894f40a9c153f0",
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.15.1"
+        },
+        "verdict": "SUPPORTED",
+        "reason_code": "MATCHED_PRIMARY_LABEL",
+        "evidence_requirements_satisfied": true,
+        "evidence": [
+          {
+            "evidence_id": "88ae7fadc9739cad1f737fc1bfef90eebde46e56b18768b904e65f3a9e46d103",
+            "url": "https://www.python.org/downloads/windows/",
+            "retrieval_mode": "fixture",
+            "retrieval_id": "offline-fixture",
+            "content_sha256": "6ba43e7e86a78d698c186d1b435a45d1aff914beda10f5e8680d78375f014729",
+            "observed_version": "3.15.1",
+            "retrieved_at": "2026-11-19T12:00:00Z",
+            "observed_at": "2026-11-19T12:00:00Z"
+          }
+        ]
+      },
+      {
+        "claim": {
+          "source": {
+            "claim_id": "c002",
+            "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2.",
+            "start": 79,
+            "end": 157,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          },
+          "candidate_sha256": "5deb8a821707c74684239d66457fd4a8214f66a9deb832663d894f40a9c153f0",
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.15.2"
+        },
+        "verdict": "SUPPORTED",
+        "reason_code": "MATCHED_PRIMARY_LABEL",
+        "evidence_requirements_satisfied": true,
+        "evidence": [
+          {
+            "evidence_id": "03533fc973f1a4760084d20351fa330bcb4531b7b061340cf09d13e04eea4cfe",
+            "url": "https://www.python.org/downloads/windows/",
+            "retrieval_mode": "fixture",
+            "retrieval_id": "offline-fixture",
+            "content_sha256": "fa49198c7296be69ff447479153ebd7407ffe1071ce72815b2afbb2d870aa8f0",
+            "observed_version": "3.15.2",
+            "retrieved_at": "2026-11-19T12:00:00Z",
+            "observed_at": "2026-11-19T12:00:00Z"
+          }
+        ]
+      }
+    ],
+    "verdict": "SUPPORTED",
+    "checked_at": "2026-11-19T12:00:00Z"
+  },
+  "prose": {
+    "schema_version": "004g.v1",
+    "policy_id": "bounded-prose-v1",
+    "request_id": "005ds-before",
+    "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.1.\nThe latest stable Python 3 release for Windows listed on Python.org is 3.15.2.",
+    "candidate_sha256": "5deb8a821707c74684239d66457fd4a8214f66a9deb832663d894f40a9c153f0",
+    "coverage": "COMPLETE",
+    "reason_code": "BOUNDED_GRAMMAR",
+    "mappings": [
+      {
+        "claim_id": "c001",
+        "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.1.",
+        "start": 0,
+        "end": 78,
+        "policy_id": "python-windows-latest-v1",
+        "version": "3.15.1",
+        "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.1."
+      },
+      {
+        "claim_id": "c002",
+        "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2.",
+        "start": 79,
+        "end": 157,
+        "policy_id": "python-windows-latest-v1",
+        "version": "3.15.2",
+        "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2."
+      }
+    ],
+    "verification": {
+      "schema_version": "004b.v1",
+      "policy_id": "multi-claim-templates-v1",
+      "request_id": "005ds-before",
+      "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.1.\nThe latest stable Python 3 release for Windows listed on Python.org is 3.15.2.",
+      "candidate_sha256": "5deb8a821707c74684239d66457fd4a8214f66a9deb832663d894f40a9c153f0",
+      "extraction_status": "TRUSTED_GRAMMAR",
+      "binding_status": "VALID",
+      "extraction": {
+        "schema_version": "004a.v1",
+        "claims": [
+          {
+            "claim_id": "c001",
+            "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.1.",
+            "start": 0,
+            "end": 78,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          },
+          {
+            "claim_id": "c002",
+            "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2.",
+            "start": 79,
+            "end": 157,
+            "normalized_proposition": null,
+            "factuality": "FACTUAL",
+            "temporal": "DYNAMIC",
+            "fresh_evidence": "REQUIRED",
+            "uncertainty": [],
+            "temporal_reference": null
+          }
+        ]
+      },
+      "coverage": {
+        "status": "COMPLETE",
+        "reason_code": "EXACT_TEMPLATES",
+        "required_claim_ids": [
+          "c001",
+          "c002"
+        ]
+      },
+      "claims": [
+        {
+          "claim": {
+            "source": {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.1.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            },
+            "candidate_sha256": "5deb8a821707c74684239d66457fd4a8214f66a9deb832663d894f40a9c153f0",
+            "policy_id": "python-windows-latest-v1",
+            "version": "3.15.1"
+          },
+          "verdict": "SUPPORTED",
+          "reason_code": "MATCHED_PRIMARY_LABEL",
+          "evidence_requirements_satisfied": true,
+          "evidence": [
+            {
+              "evidence_id": "88ae7fadc9739cad1f737fc1bfef90eebde46e56b18768b904e65f3a9e46d103",
+              "url": "https://www.python.org/downloads/windows/",
+              "retrieval_mode": "fixture",
+              "retrieval_id": "offline-fixture",
+              "content_sha256": "6ba43e7e86a78d698c186d1b435a45d1aff914beda10f5e8680d78375f014729",
+              "observed_version": "3.15.1",
+              "retrieved_at": "2026-11-19T12:00:00Z",
+              "observed_at": "2026-11-19T12:00:00Z"
+            }
+          ]
+        },
+        {
+          "claim": {
+            "source": {
+              "claim_id": "c002",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.15.2.",
+              "start": 79,
+              "end": 157,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            },
+            "candidate_sha256": "5deb8a821707c74684239d66457fd4a8214f66a9deb832663d894f40a9c153f0",
+            "policy_id": "python-windows-latest-v1",
+            "version": "3.15.2"
+          },
+          "verdict": "SUPPORTED",
+          "reason_code": "MATCHED_PRIMARY_LABEL",
+          "evidence_requirements_satisfied": true,
+          "evidence": [
+            {
+              "evidence_id": "03533fc973f1a4760084d20351fa330bcb4531b7b061340cf09d13e04eea4cfe",
+              "url": "https://www.python.org/downloads/windows/",
+              "retrieval_mode": "fixture",
+              "retrieval_id": "offline-fixture",
+              "content_sha256": "fa49198c7296be69ff447479153ebd7407ffe1071ce72815b2afbb2d870aa8f0",
+              "observed_version": "3.15.2",
+              "retrieved_at": "2026-11-19T12:00:00Z",
+              "observed_at": "2026-11-19T12:00:00Z"
+            }
+          ]
+        }
+      ],
+      "verdict": "SUPPORTED",
+      "checked_at": "2026-11-19T12:00:00Z"
+    }
+  }
+}

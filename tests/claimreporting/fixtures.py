@@ -37,7 +37,8 @@ CASES = [
     ("wrong-evidence-digest", PY, "evidence-hash", "UNAVAILABLE", [None], ["INVALID_RECORD"]),
     ("expired-bound-evidence", PY, "bound-expired", "UNAVAILABLE", [None], ["STALE_OBSERVATION"]),
     ("ambiguous-source", PY, "ambiguous", "UNAVAILABLE", [None], ["AMBIGUOUS_EVIDENCE"]),
-    ("eight-claims", "\n".join([PY.replace("3.88.7", "3.88."+str(i)) for i in range(7,-1,-1)]), "none", "REJECT", [100]+[0]*7, ["MATCHED_OBSERVATION"]+["OLDER_THAN_OBSERVATION"]*7),
+    # Same frozen text; 005D-S corrects its formerly admitted repeated policy.
+    ("eight-claims", "\n".join([PY.replace("3.88.7", "3.88."+str(i)) for i in range(7,-1,-1)]), "none", "UNAVAILABLE", [], []),
 ]
 
 

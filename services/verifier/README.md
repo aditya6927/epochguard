@@ -5,7 +5,7 @@ This service supplies bounded evidence records to native Go enforcement. It does
 | Private endpoint | Contract / language | Qualification |
 | --- | --- | --- |
 | `POST /v1/verify` | `003a.v1`, one Python Windows template | Legacy narrow live qualification |
-| `POST /v1/verify/multiclaim` | `004b.v1`, two exact templates, up to eight claims | Narrow live qualification with controlled provider and explicitly legacy v1 protected receipts |
+| `POST /v1/verify/multiclaim` | `004b.v1`, two exact templates, one assertion per policy; wire limit eight | Narrow live qualification with controlled provider and explicitly legacy v1 protected receipts |
 | `POST /v1/verify/prose` | `004g.v1` / `bounded-prose-v1`, nine exact ASCII forms | Narrow November 15, 2026 live acceptance reviewed and met with controlled provider and v2 ingress; [assessment](../../docs/task-004gl.md#reviewed-live-qualification--november-15-2026) |
 
 [Architecture](../../docs/architecture.md) defines the trust/receipt contracts; [operations](../../docs/operations.md) provides fresh-clone builds, isolated regressions and explicitly gated live workflows. The credential-free bounded-prose demonstration uses only a standard-library host runner:
@@ -33,7 +33,7 @@ $env:PYTHONPATH = 'services/verifier;services/claim_analysis'
 
 The input must already exist; this inspector performs no verification/retrieval call and does not generate an input result. For existing G-L/005C sanitized `observations.json`, use `--kind qualification --record-index 0` and the recorded source profile (`fixture` or `live`). The November 19 real-Gemini run used `fixture` evidence; the November 15 source run used `live`. Historical exports omit required original mappings, comparison flags and evaluation time, so these derived reports retain recorded source observations with null scores/age and `NOT_RECORDED`. No historical file is modified or silently refreshed. Numeric reports require a complete original Python result; local input provenance remains trusted, not cryptographically authenticated.
 
-The input, JSON output and HTML output are each bounded to 65,536 bytes; output creation refuses existing files and input aliases. Reports preserve only candidate/evidence digests and bounded structured metadata. `evaluated_at` is the original verifier `checked_at`, while `generated_at` is report creation time. Application observation age uses the existing -2..60-second window; tolerated future observations have null age and an explicit time status. Origin publication time is unavailable. See [the exact schema, fixed evaluation and commands](../../docs/task-005d.md). The unchanged nine-form grammar admits one to eight claims; unsupported neighboring prose prevents partial numeric scoring.
+The input, JSON output and HTML output are each bounded to 65,536 bytes; output creation refuses existing files and input aliases. Reports preserve only candidate/evidence digests and bounded structured metadata. `evaluated_at` is the original verifier `checked_at`, while `generated_at` is report creation time. Application observation age uses the existing -2..60-second window; tolerated future observations have null age and an explicit time status. Origin publication time is unavailable. See [the original schema, fixed evaluation and commands](../../docs/task-005d.md). The [005D-S correction](../../docs/task-005d-s.md) restricts the unchanged nine forms to one assertion per policy, at most two claims. Repeated policies and unsupported neighbors produce no partial mappings or numeric score entries; reports retain `authorization=false`.
 
 ## Experimental natural-language planning
 
@@ -63,7 +63,7 @@ tests are not model-quality evidence. The [planning report](../../docs/task-004f
 
 ## Supported response languages
 
-The legacy `003a.v1` endpoint accepts only the first sentence below and retains its 512-byte Go candidate bound. The `004b.v1` multi-claim mode accepts one to eight sentences from these two templates:
+The legacy `003a.v1` endpoint accepts only the first sentence below and retains its 512-byte Go candidate bound. The `004b.v1` multi-claim mode accepts at most one assertion per policy from these two templates (at most two admitted claims; unchanged eight-claim wire bound):
 
 ```text
 The latest stable Python 3 release for Windows listed on Python.org is 3.X.Y.
@@ -96,7 +96,7 @@ The PyPI JSON API reports requests version V.
 According to the PyPI JSON API, the version of requests is V.
 ```
 
-G accepts only ASCII, one to eight sentences and SP/TAB/CR/LF separators, with exact internal wording/case/punctuation. A duplicate policy/version is refused even if expressed by a different form. Different versions remain separate required claims. There is no greeting, opinion or nonfactual exception. Negations, qualifiers, Unicode punctuation, Markdown and unsupported extra prose cannot pass. Original content is never normalized for client delivery; only a separately bound newline-joined canonical comparison is sent to the two-policy engine.
+G accepts only ASCII and SP/TAB/CR/LF separators, with exact internal wording/case/punctuation. Each policy may appear once, so at most two claims can be admitted. Repeated policies are refused atomically as `UNCERTAIN` / `REPEATED_CLAIM` regardless of version or sentence form, before evidence retrieval. No partial mappings survive; protected delivery returns 503 UNAVAILABLE rather than a source-verified 403. The transport/schema bound remains eight. There is no greeting, opinion or nonfactual exception. Negations, qualifiers, Unicode punctuation, Markdown and unsupported extra prose cannot pass. Original content is never normalized for client delivery; only a separately bound newline-joined canonical comparison is sent to the two-policy engine.
 
 This is a whole-response grammar, not general semantic coverage. One supported claim cannot authorize unverified neighboring content.
 
@@ -206,7 +206,8 @@ policies or verdicts. The original extraction is retained without rewriting it.
 
 Reuse one Pipeline per event loop. It owns only an active-request count, bounded
 to four by default (trusted configurable 1..16); admission has no waiter queue.
-Each request processes at most eight claims sequentially, with a shared default
+Each admitted request processes at most two distinct policy claims sequentially
+(the transport bound remains eight), with a shared default
 five-second work deadline and four-second per-retrieval ceiling. No retries,
 background tasks, retained candidates, evidence cache or asynchronous writes are
 introduced. Caller cancellation propagates and releases admission. Excess work

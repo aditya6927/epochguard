@@ -2,6 +2,8 @@
 
 EpochGuard is a native Go extension of Bifrost, using its supported dynamic-plugin installation mechanism. A dynamically built gateway is a supported Bifrost installation; the default static release is a different distribution that cannot load this plugin. This qualification covers the HTTP API, without the upstream dashboard.
 
+The [005D-S security correction](task-005d-s.md) changes candidate admission independently in Python and Go without changing pinned Bifrost contracts, policy identifiers, sentence forms or receipt protocols. Each policy is now limited to one assertion per candidate. Existing pre-fix images must be rebuilt together with their verifier and qualification dependencies before using the corrected evidence.
+
 ## Qualified baseline
 
 | Component or configuration | Assessment | Boundary |

@@ -69,7 +69,7 @@ The JSON tab contains only the safe presentation record. No raw receipt, interna
 
 ## Language and input limits
 
-The Lab uses the unchanged [nine-form bounded language](../services/verifier/README.md#supported-response-languages), one to eight claims. Exact case, internal spaces and punctuation matter. ASCII SP/TAB/CR/LF can separate sentences. Original submitted content is preserved by the backend; ordinary browser textarea editing uses the browser's newline conventions. Backend/API tests separately exercise explicit CR/LF/tab strings.
+The Lab uses the unchanged [nine-form bounded language](../services/verifier/README.md#supported-response-languages), with one assertion per fixed policy and at most two admitted claims. The transport bound remains eight; repeated policies refuse the entire candidate without source calls. Exact case, internal spaces and punctuation matter. ASCII SP/TAB/CR/LF can separate sentences. Original submitted content is preserved by the backend; ordinary browser textarea editing uses the browser's newline conventions. Backend/API tests separately exercise explicit CR/LF/tab strings.
 
 The browser counts Unicode code points and UTF-8 bytes; input is bounded to 8,192 code points/32,768 bytes. This is a transport bound, not grammar approval: non-ASCII or otherwise unsupported prose still goes to the real gate and cannot authorize release. The backend refuses malformed UTF-8, ambiguous/unknown/duplicate JSON fields, invalid controls, unpaired-surrogate replacement and oversized requests without reflecting input. Empty or out-of-bounds input cannot dispatch.
 

@@ -32,6 +32,9 @@ def aggregate(required: list[BoundClaim], results: list[ClaimResult], coverage: 
         ids = [c.source.claim_id for c in required]
         if coverage.status != "COMPLETE" or not required or ids != coverage.required_claim_ids:
             return "INSUFFICIENT"
+        # Defense in depth for callers supplying forged COMPLETE coverage.
+        if len({c.policy_id for c in required}) != len(required):
+            return "INSUFFICIENT"
         positions = []
         for result in results:
             index = ids.index(result.claim.source.claim_id)

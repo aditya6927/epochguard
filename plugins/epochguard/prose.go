@@ -59,7 +59,7 @@ func proseGrammar(text string) ([]proseMapping, string) {
 		}
 	}
 	mappings := []proseMapping{}
-	seen := map[string]bool{}
+	seenPolicies := map[string]bool{}
 	for cursor := 0; cursor < len(text); {
 		if strings.ContainsRune(" \t\r\n", rune(text[cursor])) {
 			cursor++
@@ -85,13 +85,14 @@ func proseGrammar(text string) ([]proseMapping, string) {
 		if policyID == verificationPolicy {
 			canonical = "The latest stable Python 3 release for Windows listed on Python.org is " + match[1] + "."
 		}
-		if seen[canonical] {
+		// Different versions and paraphrases cannot repeat a singleton policy.
+		if seenPolicies[policyID] {
 			return nil, "REPEATED_CLAIM"
 		}
 		if len(mappings) == 8 {
 			return nil, "CLAIM_LIMIT"
 		}
-		seen[canonical] = true
+		seenPolicies[policyID] = true
 		mappings = append(mappings, proseMapping{fmt.Sprintf("c%03d", len(mappings)+1), match[0], cursor, end, policyID, match[1], canonical})
 		cursor = end
 	}

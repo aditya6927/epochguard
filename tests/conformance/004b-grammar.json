@@ -155,17 +155,17 @@
     "claims": []
   },
   {
-    "text": "😀 The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\nThe version reported for requests by the PyPI JSON API is 2.88.7.",
+    "text": "\u00f0\u0178\u02dc\u20ac The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\nThe version reported for requests by the PyPI JSON API is 2.88.7.",
     "reason": "UNRECOGNIZED_CONTENT",
     "claims": []
   },
   {
-    "text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\nThe version reported for requests by the PyPI JSON API is 2.88.7.",
+    "text": "The latest stable Python 3 release for Windows listed on Python.org\u00c2\u00a0is 3.88.7.\nThe version reported for requests by the PyPI JSON API\u00c2\u00a0is 2.88.7.",
     "reason": "UNRECOGNIZED_CONTENT",
     "claims": []
   },
   {
-    "text": "The latest stable Pythоn 3 release for Windows listed on Pythоn.org is 3.88.7.\nThe version reported for requests by the PyPI JSON API is 2.88.7.",
+    "text": "The latest stable Pyth\u00d0\u00ben 3 release for Windows listed on Pyth\u00d0\u00ben.org is 3.88.7.\nThe version reported for requests by the PyPI JSON API is 2.88.7.",
     "reason": "UNRECOGNIZED_CONTENT",
     "claims": []
   },
@@ -181,7 +181,7 @@
   },
   {
     "text": "The version reported for requests by the PyPI JSON API is 2.88.0.\nThe version reported for requests by the PyPI JSON API is 2.88.1.\nThe version reported for requests by the PyPI JSON API is 2.88.2.\nThe version reported for requests by the PyPI JSON API is 2.88.3.\nThe version reported for requests by the PyPI JSON API is 2.88.4.\nThe version reported for requests by the PyPI JSON API is 2.88.5.\nThe version reported for requests by the PyPI JSON API is 2.88.6.\nThe version reported for requests by the PyPI JSON API is 2.88.7.\nThe version reported for requests by the PyPI JSON API is 2.88.8.",
-    "reason": "CLAIM_LIMIT",
+    "reason": "REPEATED_CLAIM",
     "claims": []
   },
   {

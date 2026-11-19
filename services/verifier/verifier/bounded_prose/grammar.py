@@ -22,7 +22,7 @@ REGISTRY = tuple(ORIGINAL) + tuple((policy, pattern) for policy, forms in PARAPH
 def parse(text):
     if not text.isascii() or len(text) > 8192:
         return [], "UNRECOGNIZED_CONTENT"
-    cursor, mappings, seen = 0, [], set()
+    cursor, mappings, seen_policies = 0, [], set()
     while cursor < len(text):
         if text[cursor] in SPACE:
             cursor += 1
@@ -36,11 +36,12 @@ def parse(text):
         if found.end() < len(text) and text[found.end()] not in SPACE:
             return [], "UNRECOGNIZED_CONTENT"
         sentence = canonical(policy, found[1])
-        if sentence in seen:
+        # Paraphrases and different versions still assert the same singleton.
+        if policy in seen_policies:
             return [], "REPEATED_CLAIM"
         if len(mappings) == 8:
             return [], "CLAIM_LIMIT"
-        seen.add(sentence)
+        seen_policies.add(policy)
         mappings.append(Mapping(claim_id=f"c{len(mappings)+1:03d}", source_text=found[0],
                                 start=cursor, end=found.end(), policy_id=policy,
                                 version=found[1], canonical=sentence))

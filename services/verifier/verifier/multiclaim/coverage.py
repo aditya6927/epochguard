@@ -18,7 +18,7 @@ def uncertain(reason):
 
 
 def qualify(text: str) -> tuple[list[BoundClaim], Coverage]:
-    cursor, claims, seen = 0, [], set()
+    cursor, claims, seen_policies = 0, [], set()
     while cursor < len(text):
         if text[cursor] in SPACE:
             cursor += 1
@@ -31,11 +31,13 @@ def qualify(text: str) -> tuple[list[BoundClaim], Coverage]:
             return [], uncertain("UNRECOGNIZED_CONTENT")
         if match.end() < len(text) and text[match.end()] not in SPACE:
             return [], uncertain("UNRECOGNIZED_CONTENT")
-        if match.group() in seen:
+        # Both fixed policies describe a singleton observation, not a history.
+        # Refuse atomically before extraction or evidence can run.
+        if policy_id in seen_policies:
             return [], uncertain("REPEATED_CLAIM")
         if len(claims) == MAX_CLAIMS:
             return [], uncertain("CLAIM_LIMIT")
-        seen.add(match.group())
+        seen_policies.add(policy_id)
         source = Claim(claim_id=f"c{len(claims)+1:03d}", source_text=match.group(),
                        start=cursor, end=match.end(), normalized_proposition=None,
                        factuality="FACTUAL", temporal="DYNAMIC", fresh_evidence="REQUIRED",

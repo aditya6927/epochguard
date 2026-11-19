@@ -16,6 +16,7 @@ EpochGuard buffers AI gateway answers, checks fixed evidence policies, and refus
 | 005C native Gemini qualification | **Narrow real-model enforcement qualification reviewed and met** November 19, 2026: `gemini-3.5-flash-lite`, strict pre-conversion adaptation, simulated evidence, four model cases and six expected client outcomes. Shared typed eligibility remains strict. Real-model plus real-source execution and draft analysis quality remain unqualified. [Reviewed scope](task-005c-t.md#reviewed-real-model-qualification--november-19-2026) |
 | 005E combined qualification | Isolated offline harness for Gemini → strict adapter → native gateway/plugin → bounded verifier → receipt-v2 ingress. Live implementation requires separate model/evidence authorization and a current offline suite; **combined live qualification pending**. [Architecture, budgets and evidence](task-005e.md) |
 | EpochGuard-owned protected cache / atomic revocation | Proposed in [ADR 0003](decisions/0003-protected-cache-ownership.md); not implemented |
+| 005D-S singleton consistency | Each candidate may assert each fixed policy once. Python and Go independently refuse repeated policies before evidence authorization; eight remains the transport bound. [Security correction and corrected offline qualification](task-005d-s.md) |
 
 The live multi-claim runner printed `LIVE RUN COLLECTED: independent result review required`. Subsequent inspection found its five client expectations met; three attempted/completed application-level retrievals per source were recorded, not billing or origin-fetch counts. See [004E evidence](task-004e.md), [legacy live evidence](task-003b.md) and [current security regression evidence](task-004gs.md). These reports qualify their stated revisions and finite test cases, not arbitrary provider/model compatibility or production readiness.
 
@@ -77,12 +78,14 @@ Three private verifier endpoints have separate contracts:
 | Endpoint | Contract | Candidate language |
 | --- | --- | --- |
 | `POST /v1/verify` | `003a.v1` | One exact Python Windows release-label sentence |
-| `POST /v1/verify/multiclaim` | `004b.v1` | One to eight sentences from two exact templates |
-| `POST /v1/verify/prose` | `004g.v1` | One to eight sentences from nine exact ASCII forms |
+| `POST /v1/verify/multiclaim` | `004b.v1` | One assertion per fixed policy, at most two; two exact templates; wire limit eight |
+| `POST /v1/verify/prose` | `004g.v1` | One assertion per fixed policy, at most two; nine exact ASCII forms; wire limit eight |
 
 Trusted process configuration selects the mode, evidence source mode and policy. Inference headers, prompts and model output cannot choose them. The [verifier guide](../services/verifier/README.md#supported-response-languages) specifies exact syntax, separators, version bounds and examples.
 
 Bounded prose binds original text/digest/spans separately from reconstructed canonical comparison sentences. Python derives mappings from original text; Go independently rederives the whole original/canonical relationship, including count, order, offsets, IDs and hashes, before checking the embedded two-policy evidence result. A COMPLETE grammar parse establishes coverage only within that finite syntax. It does not prove general semantic completeness or the correctness of a model's claim selection.
+
+Both policies are singleton observations. Repeating a policy, including with a different version or another recognized form, returns atomic `UNCERTAIN` / `REPEATED_CLAIM`: no mappings, evidence retrieval or approved text, and protected 503 UNAVAILABLE. It is a candidate-consistency failure rather than a source-authenticated 403 contradiction. Python aggregation also rejects duplicate required policies independently of declared COMPLETE coverage. Both result schemas and Go validators reparse the candidate. [005D-S](task-005d-s.md) corrects an earlier full-text deduplication gap; historical qualifications describe their original revisions.
 
 | Policy | Fixed observation and checks |
 | --- | --- |

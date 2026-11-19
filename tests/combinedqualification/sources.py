@@ -72,8 +72,12 @@ class CombinedProse(ObservedProse):
 
     async def verify(self, request):
         index = len(self.records)
+        source_calls_before = len(self.evidence_pipeline.ledger.calls)
         result = await super().verify(request)
         if request.candidate != CANARY:
+            self.records[index].update(grammar_reason=result.reason_code,
+                source_calls_before=source_calls_before,
+                source_calls_after=len(self.evidence_pipeline.ledger.calls))
             try:
                 report = from_result(result, profile="live" if self.runtime.live else "fixture")
                 self.records[index]["claim_report"] = report.model_dump(mode="json")
