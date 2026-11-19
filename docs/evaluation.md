@@ -22,6 +22,8 @@ This is the canonical index of implemented and measured scope. [Architecture](ar
 | [005C-T pre-conversion adapter](task-005c-t.md) | Baseline `3cd8592c97ebd2725a551893fdbf5d49f5406a55`; simulated native HTTP and simulated evidence | Original implementation tested strict original-envelope validation/projection, actual pinned converter/native loader and existing Go/Python/v2/ingress. Real-model qualification was pending at implementation time; subsequent review follows |
 | [005C-T reviewed real-model run](task-005c-t.md#reviewed-real-model-qualification--november-19-2026) | November 19, 2026; revision `87d877c43f3ab46d9d62d279e457f16b8df9c0c3`, run `20261119T092712Z-6d95a336`; real `gemini-3.5-flash-lite`, `strict-005ct`, simulated evidence | **Narrow real-model enforcement qualification met:** four completed HTTP 200 generations, four completed independent verifier records, all six expected protected outcomes; exact supported text released, contradiction and unsupported text withheld. Sanitized-record review, no repeated calls; collection-time pending fields preserved |
 
+The separate [005D reporting evaluation](task-005d.md) at baseline `2b09cb68806493019cbd1680373f71fa42a44c80` uses 23 fixed synthetic cases, the existing grammar/evidence pipeline and the actual independent Go validator. It checks 100/0/null scores, source/time/binding failures, stable order and non-authorizing diagnostic mutations. This is offline reporting evaluation, not an additional real-model or real-source qualification. Historical November 15/19 observations can be inspected without rescoring missing provenance or retrieving current data.
+
 The four qualification combinations are distinct:
 
 | Provider | Evidence | Status |

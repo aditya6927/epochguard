@@ -34,6 +34,6 @@ COPY scripts/ ./scripts/
 RUN --network=none python -B -m pytest -c services/verifier/pytest.ini -p no:cacheprovider \
     services/verifier/tests services/verifier/tests_multiclaim services/verifier/tests_gateway \
     services/verifier/tests_live services/verifier/tests_prose services/verifier/tests_bounded_prose \
-    services/verifier/tests_live_g services/claim_analysis/tests tests/modelqualification -q
+    services/verifier/tests_live_g services/verifier/tests_claim_report services/claim_analysis/tests tests/modelqualification -q
 RUN --network=none python -B -m unittest discover -s tests/lab -p test_manage.py \
     && python -B -m unittest discover -s scripts -p 'test_*.py'

@@ -20,6 +20,21 @@ The November 14, 2026 maintainer-authorized exact-template run used actual Tavil
 
 `verifier.multiclaim` is not imported by the legacy `/v1/verify` endpoint. The experimental root-context images include the sibling claim-analysis schema package; the original legacy Docker context remains independent. `verifier.bounded_prose` invokes the existing two-policy evidence engine using independently reconstructed canonical sentences, while separately binding original text/spans. Go rederives those mappings and never consumes 004F planning records.
 
+## Local claim-level reporting (005D)
+
+`verifier.claim_report` emits `005d.claim-report.v1` JSON and optional static HTML for a local operator. It is separate from every HTTP endpoint and enforcement decision. A complete existing `004g.v1` result is revalidated with the current Python schemas, grammar and evidence comparison contract. Each recognized claim receives an ordered evidence-linked entry: 100 for valid SUPPORTED, 0 for valid older-version CONTRADICTED and null for uncertain, invalid, expired or absent evidence. Scores are evidence-relative snapshots, not probabilities, model confidence or origin-freshness attestations. They cannot authorize delivery or prove Go/HMAC validation.
+
+Use the existing locked environment, with no credentials or service connection:
+
+```powershell
+$env:PYTHONPATH = 'services/verifier;services/claim_analysis'
+& .venv-003a/Scripts/python.exe -m verifier.claim_report --input artifacts/operator-result.json --kind bounded-result --evidence-profile fixture --output artifacts/operator-claims.json --html artifacts/operator-claims.html
+```
+
+The input must already exist; this inspector performs no verification/retrieval call and does not generate an input result. For existing G-L/005C sanitized `observations.json`, use `--kind qualification --record-index 0` and the recorded source profile (`fixture` or `live`). The November 19 real-Gemini run used `fixture` evidence; the November 15 source run used `live`. Historical exports omit required original mappings, comparison flags and evaluation time, so these derived reports retain recorded source observations with null scores/age and `NOT_RECORDED`. No historical file is modified or silently refreshed. Numeric reports require a complete original Python result; local input provenance remains trusted, not cryptographically authenticated.
+
+The input, JSON output and HTML output are each bounded to 65,536 bytes; output creation refuses existing files and input aliases. Reports preserve only candidate/evidence digests and bounded structured metadata. `evaluated_at` is the original verifier `checked_at`, while `generated_at` is report creation time. Application observation age uses the existing -2..60-second window; tolerated future observations have null age and an explicit time status. Origin publication time is unavailable. See [the exact schema, fixed evaluation and commands](../../docs/task-005d.md). The unchanged nine-form grammar admits one to eight claims; unsupported neighboring prose prevents partial numeric scoring.
+
 ## Experimental natural-language planning
 
 `verifier.prose` is the separate [004F analysis experiment](../../docs/task-004f.md).

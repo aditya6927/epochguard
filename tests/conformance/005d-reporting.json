@@ -1,0 +1,3575 @@
+[
+  {
+    "name": "python-supported",
+    "expected": "ALLOW",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+          "start": 0,
+          "end": 78,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.7",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+        "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+                "start": 0,
+                "end": 78,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "verdict": "SUPPORTED",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "COMPLETE",
+      "report_reason": "VALIDATED_RESULT",
+      "input_sha256": "74bc39eb5074b7b953dec97a0083dc8c8727c45e9a7895197b9558365fd83038",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "COMPLETE",
+      "verdict": "SUPPORTED",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+          "coverage": "COMPLETE",
+          "verdict": "SUPPORTED",
+          "freshness_score": 100,
+          "score_reason": "MATCHED_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "python-windows",
+          "source_url": "https://www.python.org/downloads/windows/",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "3.88.7",
+          "evidence_digest": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "python-older",
+    "expected": "REJECT",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.6 as its latest stable Windows release.",
+      "candidate_sha256": "28a4162cc06069f265bbb8edb3241a837ec19c10f44fb4a2c58c7c36a894574f",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "Python.org currently lists Python 3.88.6 as its latest stable Windows release.",
+          "start": 0,
+          "end": 78,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.6",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.6."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.6.",
+        "candidate_sha256": "915ce833b4cbc513b311e5ad57a3afc8c11f62c223597d7e24d8b6db60c6b7e7",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.6.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.6.",
+                "start": 0,
+                "end": 78,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "915ce833b4cbc513b311e5ad57a3afc8c11f62c223597d7e24d8b6db60c6b7e7",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.6"
+            },
+            "verdict": "CONTRADICTED",
+            "reason_code": "OLDER_THAN_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "verdict": "CONTRADICTED",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "COMPLETE",
+      "report_reason": "VALIDATED_RESULT",
+      "input_sha256": "3888db951121efb823ec2cb5bbd9ec430d264a114d3835bf75f02a70d2e33ec3",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "28a4162cc06069f265bbb8edb3241a837ec19c10f44fb4a2c58c7c36a894574f",
+      "coverage": "COMPLETE",
+      "verdict": "CONTRADICTED",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "28a4162cc06069f265bbb8edb3241a837ec19c10f44fb4a2c58c7c36a894574f",
+          "coverage": "COMPLETE",
+          "verdict": "CONTRADICTED",
+          "freshness_score": 0,
+          "score_reason": "OLDER_THAN_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "python-windows",
+          "source_url": "https://www.python.org/downloads/windows/",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "3.88.7",
+          "evidence_digest": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "pypi-supported",
+    "expected": "ALLOW",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "PyPI reports requests version 2.88.7.",
+      "candidate_sha256": "f96e0cce223392a9cfc15080855ff75c8d2863cf442d4aec25c0fc645e94f16a",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "PyPI reports requests version 2.88.7.",
+          "start": 0,
+          "end": 37,
+          "policy_id": "pypi-requests-reported-v1",
+          "version": "2.88.7",
+          "canonical": "The version reported for requests by the PyPI JSON API is 2.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+        "candidate_sha256": "0b939a5281db80aca2aee6039b51901b97a44a10ef50de3de412b3f9b3469e49",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+              "start": 0,
+              "end": 65,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+                "start": 0,
+                "end": 65,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "0b939a5281db80aca2aee6039b51901b97a44a10ef50de3de412b3f9b3469e49",
+              "policy_id": "pypi-requests-reported-v1",
+              "version": "2.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PYPI_VERSION",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "5d15c41bb8ede709171ab6f6e575e597739df9847847228acb6a609f48d535dd",
+                "url": "https://pypi.org/pypi/requests/json",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "194812b27a63699d1d9d59a1fe9dc9c6a9e5c2a0bd464faacdcb5742eb4afeb6",
+                "observed_version": "2.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "verdict": "SUPPORTED",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "COMPLETE",
+      "report_reason": "VALIDATED_RESULT",
+      "input_sha256": "7312ad0a645fd55b7f8e27e3f6fce0d039a262fbcb43f2e7dd096211e5aa44d3",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "f96e0cce223392a9cfc15080855ff75c8d2863cf442d4aec25c0fc645e94f16a",
+      "coverage": "COMPLETE",
+      "verdict": "SUPPORTED",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "pypi-requests-reported-v1",
+          "candidate_sha256": "f96e0cce223392a9cfc15080855ff75c8d2863cf442d4aec25c0fc645e94f16a",
+          "coverage": "COMPLETE",
+          "verdict": "SUPPORTED",
+          "freshness_score": 100,
+          "score_reason": "MATCHED_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "pypi-requests",
+          "source_url": "https://pypi.org/pypi/requests/json",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "2.88.7",
+          "evidence_digest": "194812b27a63699d1d9d59a1fe9dc9c6a9e5c2a0bd464faacdcb5742eb4afeb6",
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "pypi-older",
+    "expected": "REJECT",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "PyPI reports requests version 2.88.6.",
+      "candidate_sha256": "e44eff78e2222b476ad1726502767c6664c477c705fd5abbc8c36116656922e8",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "PyPI reports requests version 2.88.6.",
+          "start": 0,
+          "end": 37,
+          "policy_id": "pypi-requests-reported-v1",
+          "version": "2.88.6",
+          "canonical": "The version reported for requests by the PyPI JSON API is 2.88.6."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The version reported for requests by the PyPI JSON API is 2.88.6.",
+        "candidate_sha256": "8c3e8e514748bc2965cc18eb0c7679eaaae5c59a9f5c7519873791af4898a9db",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The version reported for requests by the PyPI JSON API is 2.88.6.",
+              "start": 0,
+              "end": 65,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The version reported for requests by the PyPI JSON API is 2.88.6.",
+                "start": 0,
+                "end": 65,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "8c3e8e514748bc2965cc18eb0c7679eaaae5c59a9f5c7519873791af4898a9db",
+              "policy_id": "pypi-requests-reported-v1",
+              "version": "2.88.6"
+            },
+            "verdict": "CONTRADICTED",
+            "reason_code": "OLDER_THAN_PYPI_VERSION",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "5d15c41bb8ede709171ab6f6e575e597739df9847847228acb6a609f48d535dd",
+                "url": "https://pypi.org/pypi/requests/json",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "194812b27a63699d1d9d59a1fe9dc9c6a9e5c2a0bd464faacdcb5742eb4afeb6",
+                "observed_version": "2.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "verdict": "CONTRADICTED",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "COMPLETE",
+      "report_reason": "VALIDATED_RESULT",
+      "input_sha256": "9c69f74f40e1d670a276a7a8d1b0713e319db7d6c6f258547422a051cbb646cf",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "e44eff78e2222b476ad1726502767c6664c477c705fd5abbc8c36116656922e8",
+      "coverage": "COMPLETE",
+      "verdict": "CONTRADICTED",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "pypi-requests-reported-v1",
+          "candidate_sha256": "e44eff78e2222b476ad1726502767c6664c477c705fd5abbc8c36116656922e8",
+          "coverage": "COMPLETE",
+          "verdict": "CONTRADICTED",
+          "freshness_score": 0,
+          "score_reason": "OLDER_THAN_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "pypi-requests",
+          "source_url": "https://pypi.org/pypi/requests/json",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "2.88.7",
+          "evidence_digest": "194812b27a63699d1d9d59a1fe9dc9c6a9e5c2a0bd464faacdcb5742eb4afeb6",
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "two-supported",
+    "expected": "ALLOW",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.\nPyPI reports requests version 2.88.7.",
+      "candidate_sha256": "fb6f13725b5d5f7e80e5058893307f7198ad91dfa76e10e1290f109850abc3bc",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+          "start": 0,
+          "end": 78,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.7",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+        },
+        {
+          "claim_id": "c002",
+          "source_text": "PyPI reports requests version 2.88.7.",
+          "start": 79,
+          "end": 116,
+          "policy_id": "pypi-requests-reported-v1",
+          "version": "2.88.7",
+          "canonical": "The version reported for requests by the PyPI JSON API is 2.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\nThe version reported for requests by the PyPI JSON API is 2.88.7.",
+        "candidate_sha256": "06b51cd21557ed85314f7ac507c2f0c77e56c816cc0c294dbf96af2148f11585",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            },
+            {
+              "claim_id": "c002",
+              "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+              "start": 79,
+              "end": 144,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001",
+            "c002"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+                "start": 0,
+                "end": 78,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "06b51cd21557ed85314f7ac507c2f0c77e56c816cc0c294dbf96af2148f11585",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          },
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c002",
+                "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+                "start": 79,
+                "end": 144,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "06b51cd21557ed85314f7ac507c2f0c77e56c816cc0c294dbf96af2148f11585",
+              "policy_id": "pypi-requests-reported-v1",
+              "version": "2.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PYPI_VERSION",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "5d15c41bb8ede709171ab6f6e575e597739df9847847228acb6a609f48d535dd",
+                "url": "https://pypi.org/pypi/requests/json",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "194812b27a63699d1d9d59a1fe9dc9c6a9e5c2a0bd464faacdcb5742eb4afeb6",
+                "observed_version": "2.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "verdict": "SUPPORTED",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "COMPLETE",
+      "report_reason": "VALIDATED_RESULT",
+      "input_sha256": "6c52bf359a2cbab91101d1f5b71e4af4f4f27b7e790b73801540fc56a52c2a34",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "fb6f13725b5d5f7e80e5058893307f7198ad91dfa76e10e1290f109850abc3bc",
+      "coverage": "COMPLETE",
+      "verdict": "SUPPORTED",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "fb6f13725b5d5f7e80e5058893307f7198ad91dfa76e10e1290f109850abc3bc",
+          "coverage": "COMPLETE",
+          "verdict": "SUPPORTED",
+          "freshness_score": 100,
+          "score_reason": "MATCHED_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "python-windows",
+          "source_url": "https://www.python.org/downloads/windows/",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "3.88.7",
+          "evidence_digest": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+          "origin_published_at": null
+        },
+        {
+          "claim_id": "c002",
+          "claim_index": 2,
+          "policy_id": "pypi-requests-reported-v1",
+          "candidate_sha256": "fb6f13725b5d5f7e80e5058893307f7198ad91dfa76e10e1290f109850abc3bc",
+          "coverage": "COMPLETE",
+          "verdict": "SUPPORTED",
+          "freshness_score": 100,
+          "score_reason": "MATCHED_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "pypi-requests",
+          "source_url": "https://pypi.org/pypi/requests/json",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "2.88.7",
+          "evidence_digest": "194812b27a63699d1d9d59a1fe9dc9c6a9e5c2a0bd464faacdcb5742eb4afeb6",
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "mixed-contradiction",
+    "expected": "REJECT",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.\nPyPI reports requests version 2.88.6.",
+      "candidate_sha256": "04e6ae02aed42af7629e5a75cbe57136ba01b8eea2ecd72c815c193c46472d49",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+          "start": 0,
+          "end": 78,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.7",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+        },
+        {
+          "claim_id": "c002",
+          "source_text": "PyPI reports requests version 2.88.6.",
+          "start": 79,
+          "end": 116,
+          "policy_id": "pypi-requests-reported-v1",
+          "version": "2.88.6",
+          "canonical": "The version reported for requests by the PyPI JSON API is 2.88.6."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\nThe version reported for requests by the PyPI JSON API is 2.88.6.",
+        "candidate_sha256": "7d821c7879cbb24044b2edf0f39aba0b0de94d7f8d8c492a27ed2176e98f9112",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            },
+            {
+              "claim_id": "c002",
+              "source_text": "The version reported for requests by the PyPI JSON API is 2.88.6.",
+              "start": 79,
+              "end": 144,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001",
+            "c002"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+                "start": 0,
+                "end": 78,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "7d821c7879cbb24044b2edf0f39aba0b0de94d7f8d8c492a27ed2176e98f9112",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          },
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c002",
+                "source_text": "The version reported for requests by the PyPI JSON API is 2.88.6.",
+                "start": 79,
+                "end": 144,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "7d821c7879cbb24044b2edf0f39aba0b0de94d7f8d8c492a27ed2176e98f9112",
+              "policy_id": "pypi-requests-reported-v1",
+              "version": "2.88.6"
+            },
+            "verdict": "CONTRADICTED",
+            "reason_code": "OLDER_THAN_PYPI_VERSION",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "5d15c41bb8ede709171ab6f6e575e597739df9847847228acb6a609f48d535dd",
+                "url": "https://pypi.org/pypi/requests/json",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "194812b27a63699d1d9d59a1fe9dc9c6a9e5c2a0bd464faacdcb5742eb4afeb6",
+                "observed_version": "2.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "verdict": "CONTRADICTED",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "COMPLETE",
+      "report_reason": "VALIDATED_RESULT",
+      "input_sha256": "06762e19cb35d393b253240daf819f432e66d8406070c18822a37f60fb1498ea",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "04e6ae02aed42af7629e5a75cbe57136ba01b8eea2ecd72c815c193c46472d49",
+      "coverage": "COMPLETE",
+      "verdict": "CONTRADICTED",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "04e6ae02aed42af7629e5a75cbe57136ba01b8eea2ecd72c815c193c46472d49",
+          "coverage": "COMPLETE",
+          "verdict": "SUPPORTED",
+          "freshness_score": 100,
+          "score_reason": "MATCHED_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "python-windows",
+          "source_url": "https://www.python.org/downloads/windows/",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "3.88.7",
+          "evidence_digest": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+          "origin_published_at": null
+        },
+        {
+          "claim_id": "c002",
+          "claim_index": 2,
+          "policy_id": "pypi-requests-reported-v1",
+          "candidate_sha256": "04e6ae02aed42af7629e5a75cbe57136ba01b8eea2ecd72c815c193c46472d49",
+          "coverage": "COMPLETE",
+          "verdict": "CONTRADICTED",
+          "freshness_score": 0,
+          "score_reason": "OLDER_THAN_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "pypi-requests",
+          "source_url": "https://pypi.org/pypi/requests/json",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "2.88.7",
+          "evidence_digest": "194812b27a63699d1d9d59a1fe9dc9c6a9e5c2a0bd464faacdcb5742eb4afeb6",
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "ahead",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "PyPI reports requests version 2.88.8.",
+      "candidate_sha256": "f0a716b6f17d8ef1c99edb7eb9cbefe93812ef490bae7009470db0352db3afab",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "PyPI reports requests version 2.88.8.",
+          "start": 0,
+          "end": 37,
+          "policy_id": "pypi-requests-reported-v1",
+          "version": "2.88.8",
+          "canonical": "The version reported for requests by the PyPI JSON API is 2.88.8."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The version reported for requests by the PyPI JSON API is 2.88.8.",
+        "candidate_sha256": "2c6493db7d926f96d03bb16ce5e1970b20cedbdd4ec4c0c7c2f359ac70d3e1fc",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The version reported for requests by the PyPI JSON API is 2.88.8.",
+              "start": 0,
+              "end": 65,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The version reported for requests by the PyPI JSON API is 2.88.8.",
+                "start": 0,
+                "end": 65,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "2c6493db7d926f96d03bb16ce5e1970b20cedbdd4ec4c0c7c2f359ac70d3e1fc",
+              "policy_id": "pypi-requests-reported-v1",
+              "version": "2.88.8"
+            },
+            "verdict": "INSUFFICIENT",
+            "reason_code": "CLAIM_AHEAD_OF_SOURCE",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "5d15c41bb8ede709171ab6f6e575e597739df9847847228acb6a609f48d535dd",
+                "url": "https://pypi.org/pypi/requests/json",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "194812b27a63699d1d9d59a1fe9dc9c6a9e5c2a0bd464faacdcb5742eb4afeb6",
+                "observed_version": "2.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "verdict": "INSUFFICIENT",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "COMPLETE",
+      "report_reason": "VALIDATED_RESULT",
+      "input_sha256": "5df02430d8d392088580c63c4bb48b4648596bc6137696fa353653c798757535",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "f0a716b6f17d8ef1c99edb7eb9cbefe93812ef490bae7009470db0352db3afab",
+      "coverage": "COMPLETE",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "pypi-requests-reported-v1",
+          "candidate_sha256": "f0a716b6f17d8ef1c99edb7eb9cbefe93812ef490bae7009470db0352db3afab",
+          "coverage": "COMPLETE",
+          "verdict": "INSUFFICIENT",
+          "freshness_score": null,
+          "score_reason": "CLAIM_AHEAD_OF_SOURCE",
+          "evidence_mode": "fixture",
+          "source_id": "pypi-requests",
+          "source_url": "https://pypi.org/pypi/requests/json",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "2.88.7",
+          "evidence_digest": "194812b27a63699d1d9d59a1fe9dc9c6a9e5c2a0bd464faacdcb5742eb4afeb6",
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "malformed-evidence",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "PyPI reports requests version 2.88.7.",
+      "candidate_sha256": "f96e0cce223392a9cfc15080855ff75c8d2863cf442d4aec25c0fc645e94f16a",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "PyPI reports requests version 2.88.7.",
+          "start": 0,
+          "end": 37,
+          "policy_id": "pypi-requests-reported-v1",
+          "version": "2.88.7",
+          "canonical": "The version reported for requests by the PyPI JSON API is 2.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+        "candidate_sha256": "0b939a5281db80aca2aee6039b51901b97a44a10ef50de3de412b3f9b3469e49",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+              "start": 0,
+              "end": 65,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+                "start": 0,
+                "end": 65,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "0b939a5281db80aca2aee6039b51901b97a44a10ef50de3de412b3f9b3469e49",
+              "policy_id": "pypi-requests-reported-v1",
+              "version": "2.88.7"
+            },
+            "verdict": "INSUFFICIENT",
+            "reason_code": "INSUFFICIENT_EVIDENCE",
+            "evidence_requirements_satisfied": false,
+            "evidence": []
+          }
+        ],
+        "verdict": "INSUFFICIENT",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "INCOMPLETE",
+      "report_reason": "INCOMPLETE_EVIDENCE",
+      "input_sha256": "79cbc34b21af44f8396c4338904087d27508647c20a7af7efafc971d46b62acc",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "f96e0cce223392a9cfc15080855ff75c8d2863cf442d4aec25c0fc645e94f16a",
+      "coverage": "COMPLETE",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "pypi-requests-reported-v1",
+          "candidate_sha256": "f96e0cce223392a9cfc15080855ff75c8d2863cf442d4aec25c0fc645e94f16a",
+          "coverage": "COMPLETE",
+          "verdict": "INSUFFICIENT",
+          "freshness_score": null,
+          "score_reason": "INSUFFICIENT_EVIDENCE",
+          "evidence_mode": null,
+          "source_id": "pypi-requests",
+          "source_url": null,
+          "observed_at": null,
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": null,
+          "observation_time_status": "NOT_RECORDED",
+          "observed_version": null,
+          "evidence_digest": null,
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "unavailable-evidence",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+          "start": 0,
+          "end": 78,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.7",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+        "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+                "start": 0,
+                "end": 78,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.7"
+            },
+            "verdict": "INSUFFICIENT",
+            "reason_code": "RETRIEVAL_FAILURE",
+            "evidence_requirements_satisfied": false,
+            "evidence": []
+          }
+        ],
+        "verdict": "INSUFFICIENT",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "INCOMPLETE",
+      "report_reason": "INCOMPLETE_EVIDENCE",
+      "input_sha256": "72d2f0df4120590d2f039b0b1b5f5b5da32ad69702cec521ced04a2fa1409336",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "COMPLETE",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+          "coverage": "COMPLETE",
+          "verdict": "INSUFFICIENT",
+          "freshness_score": null,
+          "score_reason": "RETRIEVAL_FAILURE",
+          "evidence_mode": null,
+          "source_id": "python-windows",
+          "source_url": null,
+          "observed_at": null,
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": null,
+          "observation_time_status": "NOT_RECORDED",
+          "observed_version": null,
+          "evidence_digest": null,
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "expired-source",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+          "start": 0,
+          "end": 78,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.7",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+        "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+                "start": 0,
+                "end": 78,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.7"
+            },
+            "verdict": "INSUFFICIENT",
+            "reason_code": "STALE_OBSERVATION",
+            "evidence_requirements_satisfied": false,
+            "evidence": []
+          }
+        ],
+        "verdict": "INSUFFICIENT",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "INCOMPLETE",
+      "report_reason": "INCOMPLETE_EVIDENCE",
+      "input_sha256": "cbc69ae7a023a474e9a4db0024b55cc4aa98a4547a84cbc625a86f2597f340b7",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "COMPLETE",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+          "coverage": "COMPLETE",
+          "verdict": "INSUFFICIENT",
+          "freshness_score": null,
+          "score_reason": "STALE_OBSERVATION",
+          "evidence_mode": null,
+          "source_id": "python-windows",
+          "source_url": null,
+          "observed_at": null,
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": null,
+          "observation_time_status": "NOT_RECORDED",
+          "observed_version": null,
+          "evidence_digest": null,
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "missing-source",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "PyPI reports requests version 2.88.7.",
+      "candidate_sha256": "f96e0cce223392a9cfc15080855ff75c8d2863cf442d4aec25c0fc645e94f16a",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "PyPI reports requests version 2.88.7.",
+          "start": 0,
+          "end": 37,
+          "policy_id": "pypi-requests-reported-v1",
+          "version": "2.88.7",
+          "canonical": "The version reported for requests by the PyPI JSON API is 2.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+        "candidate_sha256": "0b939a5281db80aca2aee6039b51901b97a44a10ef50de3de412b3f9b3469e49",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+              "start": 0,
+              "end": 65,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+                "start": 0,
+                "end": 65,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "0b939a5281db80aca2aee6039b51901b97a44a10ef50de3de412b3f9b3469e49",
+              "policy_id": "pypi-requests-reported-v1",
+              "version": "2.88.7"
+            },
+            "verdict": "INSUFFICIENT",
+            "reason_code": "RETRIEVAL_FAILURE",
+            "evidence_requirements_satisfied": false,
+            "evidence": []
+          }
+        ],
+        "verdict": "INSUFFICIENT",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "INCOMPLETE",
+      "report_reason": "INCOMPLETE_EVIDENCE",
+      "input_sha256": "eb1793a74919c7f738bd356a2683581c4e3e39cbdba72ae4f16ba6449080c15a",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "f96e0cce223392a9cfc15080855ff75c8d2863cf442d4aec25c0fc645e94f16a",
+      "coverage": "COMPLETE",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "pypi-requests-reported-v1",
+          "candidate_sha256": "f96e0cce223392a9cfc15080855ff75c8d2863cf442d4aec25c0fc645e94f16a",
+          "coverage": "COMPLETE",
+          "verdict": "INSUFFICIENT",
+          "freshness_score": null,
+          "score_reason": "RETRIEVAL_FAILURE",
+          "evidence_mode": null,
+          "source_id": "pypi-requests",
+          "source_url": null,
+          "observed_at": null,
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": null,
+          "observation_time_status": "NOT_RECORDED",
+          "observed_version": null,
+          "evidence_digest": null,
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "wrong-source-mode",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "PyPI reports requests version 2.88.7.",
+      "candidate_sha256": "f96e0cce223392a9cfc15080855ff75c8d2863cf442d4aec25c0fc645e94f16a",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "PyPI reports requests version 2.88.7.",
+          "start": 0,
+          "end": 37,
+          "policy_id": "pypi-requests-reported-v1",
+          "version": "2.88.7",
+          "canonical": "The version reported for requests by the PyPI JSON API is 2.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+        "candidate_sha256": "0b939a5281db80aca2aee6039b51901b97a44a10ef50de3de412b3f9b3469e49",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+              "start": 0,
+              "end": 65,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+                "start": 0,
+                "end": 65,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "0b939a5281db80aca2aee6039b51901b97a44a10ef50de3de412b3f9b3469e49",
+              "policy_id": "pypi-requests-reported-v1",
+              "version": "2.88.7"
+            },
+            "verdict": "INSUFFICIENT",
+            "reason_code": "RETRIEVAL_FAILURE",
+            "evidence_requirements_satisfied": false,
+            "evidence": []
+          }
+        ],
+        "verdict": "INSUFFICIENT",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "INCOMPLETE",
+      "report_reason": "INCOMPLETE_EVIDENCE",
+      "input_sha256": "eb1793a74919c7f738bd356a2683581c4e3e39cbdba72ae4f16ba6449080c15a",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "f96e0cce223392a9cfc15080855ff75c8d2863cf442d4aec25c0fc645e94f16a",
+      "coverage": "COMPLETE",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "pypi-requests-reported-v1",
+          "candidate_sha256": "f96e0cce223392a9cfc15080855ff75c8d2863cf442d4aec25c0fc645e94f16a",
+          "coverage": "COMPLETE",
+          "verdict": "INSUFFICIENT",
+          "freshness_score": null,
+          "score_reason": "RETRIEVAL_FAILURE",
+          "evidence_mode": null,
+          "source_id": "pypi-requests",
+          "source_url": null,
+          "observed_at": null,
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": null,
+          "observation_time_status": "NOT_RECORDED",
+          "observed_version": null,
+          "evidence_digest": null,
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "paraphrase",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "The newest stable Python for Windows is version 3.88.7.",
+      "candidate_sha256": "c7df77c165ac66164ec53bbeeb8f660c5061f1c7c228073f87b3a8b3c0631166",
+      "coverage": "UNCERTAIN",
+      "reason_code": "UNRECOGNIZED_CONTENT",
+      "mappings": [],
+      "verification": null
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "COMPLETE",
+      "report_reason": "UNSUPPORTED_LANGUAGE",
+      "input_sha256": "a9511933b6e8afe593d908fcab094fa908d021eb573ac03dfa93bafda65d1bfc",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "c7df77c165ac66164ec53bbeeb8f660c5061f1c7c228073f87b3a8b3c0631166",
+      "coverage": "UNCERTAIN",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": null,
+      "claims": []
+    }
+  },
+  {
+    "name": "neighbor",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.7 as its latest stable Windows release. The Moon is made of cheese.",
+      "candidate_sha256": "f9b1eb5114ad4609899b8d6ea19d0d4990d189b70787d8e5ee1a8b574ff88b93",
+      "coverage": "UNCERTAIN",
+      "reason_code": "UNRECOGNIZED_CONTENT",
+      "mappings": [],
+      "verification": null
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "COMPLETE",
+      "report_reason": "UNSUPPORTED_LANGUAGE",
+      "input_sha256": "3372167922fd845f496fb6921172cb2d822f686dd13a20ad584a4cd42ab478be",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "f9b1eb5114ad4609899b8d6ea19d0d4990d189b70787d8e5ee1a8b574ff88b93",
+      "coverage": "UNCERTAIN",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": null,
+      "claims": []
+    }
+  },
+  {
+    "name": "reordered-input",
+    "expected": "ALLOW",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "PyPI reports requests version 2.88.7.\tPython.org currently lists Python 3.88.7 as its latest stable Windows release.",
+      "candidate_sha256": "fb89615127457e2b02c67b4bd9da7101a6f763f366b85f9b284171daf4bec3d6",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "PyPI reports requests version 2.88.7.",
+          "start": 0,
+          "end": 37,
+          "policy_id": "pypi-requests-reported-v1",
+          "version": "2.88.7",
+          "canonical": "The version reported for requests by the PyPI JSON API is 2.88.7."
+        },
+        {
+          "claim_id": "c002",
+          "source_text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+          "start": 38,
+          "end": 116,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.7",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The version reported for requests by the PyPI JSON API is 2.88.7.\nThe latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+        "candidate_sha256": "566edc23ef522506763cf2e81957035f13209cec46c0d590e99f8a12bafe2491",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+              "start": 0,
+              "end": 65,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            },
+            {
+              "claim_id": "c002",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+              "start": 66,
+              "end": 144,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001",
+            "c002"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+                "start": 0,
+                "end": 65,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "566edc23ef522506763cf2e81957035f13209cec46c0d590e99f8a12bafe2491",
+              "policy_id": "pypi-requests-reported-v1",
+              "version": "2.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PYPI_VERSION",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "5d15c41bb8ede709171ab6f6e575e597739df9847847228acb6a609f48d535dd",
+                "url": "https://pypi.org/pypi/requests/json",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "194812b27a63699d1d9d59a1fe9dc9c6a9e5c2a0bd464faacdcb5742eb4afeb6",
+                "observed_version": "2.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          },
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c002",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+                "start": 66,
+                "end": 144,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "566edc23ef522506763cf2e81957035f13209cec46c0d590e99f8a12bafe2491",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "verdict": "SUPPORTED",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "COMPLETE",
+      "report_reason": "VALIDATED_RESULT",
+      "input_sha256": "39baf1d257edcca9abb9d637bdfefae31e5d18aa9f82aa56e560e91ff817a502",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "fb89615127457e2b02c67b4bd9da7101a6f763f366b85f9b284171daf4bec3d6",
+      "coverage": "COMPLETE",
+      "verdict": "SUPPORTED",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "pypi-requests-reported-v1",
+          "candidate_sha256": "fb89615127457e2b02c67b4bd9da7101a6f763f366b85f9b284171daf4bec3d6",
+          "coverage": "COMPLETE",
+          "verdict": "SUPPORTED",
+          "freshness_score": 100,
+          "score_reason": "MATCHED_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "pypi-requests",
+          "source_url": "https://pypi.org/pypi/requests/json",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "2.88.7",
+          "evidence_digest": "194812b27a63699d1d9d59a1fe9dc9c6a9e5c2a0bd464faacdcb5742eb4afeb6",
+          "origin_published_at": null
+        },
+        {
+          "claim_id": "c002",
+          "claim_index": 2,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "fb89615127457e2b02c67b4bd9da7101a6f763f366b85f9b284171daf4bec3d6",
+          "coverage": "COMPLETE",
+          "verdict": "SUPPORTED",
+          "freshness_score": 100,
+          "score_reason": "MATCHED_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "python-windows",
+          "source_url": "https://www.python.org/downloads/windows/",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "3.88.7",
+          "evidence_digest": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "reordered-mappings",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.\nPyPI reports requests version 2.88.7.",
+      "candidate_sha256": "fb6f13725b5d5f7e80e5058893307f7198ad91dfa76e10e1290f109850abc3bc",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c002",
+          "source_text": "PyPI reports requests version 2.88.7.",
+          "start": 79,
+          "end": 116,
+          "policy_id": "pypi-requests-reported-v1",
+          "version": "2.88.7",
+          "canonical": "The version reported for requests by the PyPI JSON API is 2.88.7."
+        },
+        {
+          "claim_id": "c001",
+          "source_text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+          "start": 0,
+          "end": 78,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.7",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\nThe version reported for requests by the PyPI JSON API is 2.88.7.",
+        "candidate_sha256": "06b51cd21557ed85314f7ac507c2f0c77e56c816cc0c294dbf96af2148f11585",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            },
+            {
+              "claim_id": "c002",
+              "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+              "start": 79,
+              "end": 144,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001",
+            "c002"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+                "start": 0,
+                "end": 78,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "06b51cd21557ed85314f7ac507c2f0c77e56c816cc0c294dbf96af2148f11585",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          },
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c002",
+                "source_text": "The version reported for requests by the PyPI JSON API is 2.88.7.",
+                "start": 79,
+                "end": 144,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "06b51cd21557ed85314f7ac507c2f0c77e56c816cc0c294dbf96af2148f11585",
+              "policy_id": "pypi-requests-reported-v1",
+              "version": "2.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PYPI_VERSION",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "5d15c41bb8ede709171ab6f6e575e597739df9847847228acb6a609f48d535dd",
+                "url": "https://pypi.org/pypi/requests/json",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "194812b27a63699d1d9d59a1fe9dc9c6a9e5c2a0bd464faacdcb5742eb4afeb6",
+                "observed_version": "2.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "verdict": "SUPPORTED",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "INCOMPLETE",
+      "report_reason": "INVALID_RECORD",
+      "input_sha256": "97ac7778f5d2505b69ecd3eff375d40e7669cbd9b1a870530e4040d7caa6c640",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "fb6f13725b5d5f7e80e5058893307f7198ad91dfa76e10e1290f109850abc3bc",
+      "coverage": "UNCERTAIN",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": null,
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "fb6f13725b5d5f7e80e5058893307f7198ad91dfa76e10e1290f109850abc3bc",
+          "coverage": "UNCERTAIN",
+          "verdict": "INSUFFICIENT",
+          "freshness_score": null,
+          "score_reason": "INVALID_RECORD",
+          "evidence_mode": null,
+          "source_id": "python-windows",
+          "source_url": null,
+          "observed_at": null,
+          "evaluated_at": null,
+          "observation_age_ms": null,
+          "observation_time_status": "NOT_RECORDED",
+          "observed_version": null,
+          "evidence_digest": null,
+          "origin_published_at": null
+        },
+        {
+          "claim_id": "c002",
+          "claim_index": 2,
+          "policy_id": "pypi-requests-reported-v1",
+          "candidate_sha256": "fb6f13725b5d5f7e80e5058893307f7198ad91dfa76e10e1290f109850abc3bc",
+          "coverage": "UNCERTAIN",
+          "verdict": "INSUFFICIENT",
+          "freshness_score": null,
+          "score_reason": "INVALID_RECORD",
+          "evidence_mode": null,
+          "source_id": "pypi-requests",
+          "source_url": null,
+          "observed_at": null,
+          "evaluated_at": null,
+          "observation_age_ms": null,
+          "observation_time_status": "NOT_RECORDED",
+          "observed_version": null,
+          "evidence_digest": null,
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "missing-mapping",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+        "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+                "start": 0,
+                "end": 78,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "verdict": "SUPPORTED",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "INCOMPLETE",
+      "report_reason": "INVALID_RECORD",
+      "input_sha256": "8971249553ea41ea5889683798840d8660c5863c4301e45881652bc0a0e3c6ba",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "UNCERTAIN",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": null,
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+          "coverage": "UNCERTAIN",
+          "verdict": "INSUFFICIENT",
+          "freshness_score": null,
+          "score_reason": "INVALID_RECORD",
+          "evidence_mode": null,
+          "source_id": "python-windows",
+          "source_url": null,
+          "observed_at": null,
+          "evaluated_at": null,
+          "observation_age_ms": null,
+          "observation_time_status": "NOT_RECORDED",
+          "observed_version": null,
+          "evidence_digest": null,
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "malformed-mapping",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+          "start": 1,
+          "end": 78,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.7",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+        "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+                "start": 0,
+                "end": 78,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "verdict": "SUPPORTED",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "INCOMPLETE",
+      "report_reason": "INVALID_RECORD",
+      "input_sha256": "4c6aa9bd85fde89697f6a3a570565a514077b24fd6d92e523097dd24d7c230f1",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "UNCERTAIN",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": null,
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+          "coverage": "UNCERTAIN",
+          "verdict": "INSUFFICIENT",
+          "freshness_score": null,
+          "score_reason": "INVALID_RECORD",
+          "evidence_mode": null,
+          "source_id": "python-windows",
+          "source_url": null,
+          "observed_at": null,
+          "evaluated_at": null,
+          "observation_age_ms": null,
+          "observation_time_status": "NOT_RECORDED",
+          "observed_version": null,
+          "evidence_digest": null,
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "wrong-original-digest",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+      "candidate_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+          "start": 0,
+          "end": 78,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.7",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+        "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+                "start": 0,
+                "end": 78,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "verdict": "SUPPORTED",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "invalid_input",
+      "report_status": "INCOMPLETE",
+      "report_reason": "INVALID_RECORD",
+      "input_sha256": "219f6fceb85162bbefd6fdb304ca3daeb97c91db326b52f1f674f5ef9b467e9d",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": null,
+      "coverage": "UNCERTAIN",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": null,
+      "claims": []
+    }
+  },
+  {
+    "name": "wrong-evidence-digest",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+          "start": 0,
+          "end": 78,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.7",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+        "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+                "start": 0,
+                "end": 78,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "verdict": "SUPPORTED",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "INCOMPLETE",
+      "report_reason": "INVALID_RECORD",
+      "input_sha256": "3d611359757c29bebd90134a894870affaa11b12e939a71d84943726e741abca",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "UNCERTAIN",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": null,
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+          "coverage": "UNCERTAIN",
+          "verdict": "INSUFFICIENT",
+          "freshness_score": null,
+          "score_reason": "INVALID_RECORD",
+          "evidence_mode": null,
+          "source_id": "python-windows",
+          "source_url": null,
+          "observed_at": null,
+          "evaluated_at": null,
+          "observation_age_ms": null,
+          "observation_time_status": "NOT_RECORDED",
+          "observed_version": null,
+          "evidence_digest": null,
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "expired-bound-evidence",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+          "start": 0,
+          "end": 78,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.7",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+        "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+                "start": 0,
+                "end": 78,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T11:58:59+00:00",
+                "observed_at": "2026-11-19T11:58:59+00:00"
+              }
+            ]
+          }
+        ],
+        "verdict": "INSUFFICIENT",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "INCOMPLETE",
+      "report_reason": "INCOMPLETE_EVIDENCE",
+      "input_sha256": "d5db66c7ddc3cf1ee9f6cdda61a4195fb1b0d225eafce511c0a39426bf11101d",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "COMPLETE",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+          "coverage": "COMPLETE",
+          "verdict": "SUPPORTED",
+          "freshness_score": null,
+          "score_reason": "STALE_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "python-windows",
+          "source_url": "https://www.python.org/downloads/windows/",
+          "observed_at": "2026-11-19T11:58:59Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": null,
+          "observation_time_status": "INVALID",
+          "observed_version": "3.88.7",
+          "evidence_digest": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "ambiguous-source",
+    "expected": "UNAVAILABLE",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+          "start": 0,
+          "end": 78,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.7",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+        "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+                "start": 0,
+                "end": 78,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b33a62c4eabed98611d8bc1e388c0da0a627cff5de0b877de172059fdef6c12f",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.7"
+            },
+            "verdict": "INSUFFICIENT",
+            "reason_code": "AMBIGUOUS_EVIDENCE",
+            "evidence_requirements_satisfied": false,
+            "evidence": []
+          }
+        ],
+        "verdict": "INSUFFICIENT",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "INCOMPLETE",
+      "report_reason": "INCOMPLETE_EVIDENCE",
+      "input_sha256": "7a88cc7a2a2af0e9eae88adb0b3e9e08a744347d3df4ababb0df276c0b6d5418",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+      "coverage": "COMPLETE",
+      "verdict": "INSUFFICIENT",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "97170a881eb704ceb909823038bcd20074780a3b6d32bc9994fc1d894f2083bb",
+          "coverage": "COMPLETE",
+          "verdict": "INSUFFICIENT",
+          "freshness_score": null,
+          "score_reason": "AMBIGUOUS_EVIDENCE",
+          "evidence_mode": null,
+          "source_id": "python-windows",
+          "source_url": null,
+          "observed_at": null,
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": null,
+          "observation_time_status": "NOT_RECORDED",
+          "observed_version": null,
+          "evidence_digest": null,
+          "origin_published_at": null
+        }
+      ]
+    }
+  },
+  {
+    "name": "eight-claims",
+    "expected": "REJECT",
+    "result": {
+      "schema_version": "004g.v1",
+      "policy_id": "bounded-prose-v1",
+      "request_id": "005d-offline",
+      "candidate": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.\nPython.org currently lists Python 3.88.6 as its latest stable Windows release.\nPython.org currently lists Python 3.88.5 as its latest stable Windows release.\nPython.org currently lists Python 3.88.4 as its latest stable Windows release.\nPython.org currently lists Python 3.88.3 as its latest stable Windows release.\nPython.org currently lists Python 3.88.2 as its latest stable Windows release.\nPython.org currently lists Python 3.88.1 as its latest stable Windows release.\nPython.org currently lists Python 3.88.0 as its latest stable Windows release.",
+      "candidate_sha256": "d73ef884d78c7c2a7d01579b1623f0f4b1d44a83608f745300507b704997eca8",
+      "coverage": "COMPLETE",
+      "reason_code": "BOUNDED_GRAMMAR",
+      "mappings": [
+        {
+          "claim_id": "c001",
+          "source_text": "Python.org currently lists Python 3.88.7 as its latest stable Windows release.",
+          "start": 0,
+          "end": 78,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.7",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7."
+        },
+        {
+          "claim_id": "c002",
+          "source_text": "Python.org currently lists Python 3.88.6 as its latest stable Windows release.",
+          "start": 79,
+          "end": 157,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.6",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.6."
+        },
+        {
+          "claim_id": "c003",
+          "source_text": "Python.org currently lists Python 3.88.5 as its latest stable Windows release.",
+          "start": 158,
+          "end": 236,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.5",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.5."
+        },
+        {
+          "claim_id": "c004",
+          "source_text": "Python.org currently lists Python 3.88.4 as its latest stable Windows release.",
+          "start": 237,
+          "end": 315,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.4",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.4."
+        },
+        {
+          "claim_id": "c005",
+          "source_text": "Python.org currently lists Python 3.88.3 as its latest stable Windows release.",
+          "start": 316,
+          "end": 394,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.3",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.3."
+        },
+        {
+          "claim_id": "c006",
+          "source_text": "Python.org currently lists Python 3.88.2 as its latest stable Windows release.",
+          "start": 395,
+          "end": 473,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.2",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.2."
+        },
+        {
+          "claim_id": "c007",
+          "source_text": "Python.org currently lists Python 3.88.1 as its latest stable Windows release.",
+          "start": 474,
+          "end": 552,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.1",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.1."
+        },
+        {
+          "claim_id": "c008",
+          "source_text": "Python.org currently lists Python 3.88.0 as its latest stable Windows release.",
+          "start": 553,
+          "end": 631,
+          "policy_id": "python-windows-latest-v1",
+          "version": "3.88.0",
+          "canonical": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.0."
+        }
+      ],
+      "verification": {
+        "schema_version": "004b.v1",
+        "policy_id": "multi-claim-templates-v1",
+        "request_id": "005d-offline",
+        "candidate": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.\nThe latest stable Python 3 release for Windows listed on Python.org is 3.88.6.\nThe latest stable Python 3 release for Windows listed on Python.org is 3.88.5.\nThe latest stable Python 3 release for Windows listed on Python.org is 3.88.4.\nThe latest stable Python 3 release for Windows listed on Python.org is 3.88.3.\nThe latest stable Python 3 release for Windows listed on Python.org is 3.88.2.\nThe latest stable Python 3 release for Windows listed on Python.org is 3.88.1.\nThe latest stable Python 3 release for Windows listed on Python.org is 3.88.0.",
+        "candidate_sha256": "b1281fee00c2c21a891a0506cff504339e49861980b7dfd76d5a7590920c6c9b",
+        "extraction_status": "TRUSTED_GRAMMAR",
+        "binding_status": "VALID",
+        "extraction": {
+          "schema_version": "004a.v1",
+          "claims": [
+            {
+              "claim_id": "c001",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+              "start": 0,
+              "end": 78,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            },
+            {
+              "claim_id": "c002",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.6.",
+              "start": 79,
+              "end": 157,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            },
+            {
+              "claim_id": "c003",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.5.",
+              "start": 158,
+              "end": 236,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            },
+            {
+              "claim_id": "c004",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.4.",
+              "start": 237,
+              "end": 315,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            },
+            {
+              "claim_id": "c005",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.3.",
+              "start": 316,
+              "end": 394,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            },
+            {
+              "claim_id": "c006",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.2.",
+              "start": 395,
+              "end": 473,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            },
+            {
+              "claim_id": "c007",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.1.",
+              "start": 474,
+              "end": 552,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            },
+            {
+              "claim_id": "c008",
+              "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.0.",
+              "start": 553,
+              "end": 631,
+              "normalized_proposition": null,
+              "factuality": "FACTUAL",
+              "temporal": "DYNAMIC",
+              "fresh_evidence": "REQUIRED",
+              "uncertainty": [],
+              "temporal_reference": null
+            }
+          ]
+        },
+        "coverage": {
+          "status": "COMPLETE",
+          "reason_code": "EXACT_TEMPLATES",
+          "required_claim_ids": [
+            "c001",
+            "c002",
+            "c003",
+            "c004",
+            "c005",
+            "c006",
+            "c007",
+            "c008"
+          ]
+        },
+        "claims": [
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c001",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.7.",
+                "start": 0,
+                "end": 78,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b1281fee00c2c21a891a0506cff504339e49861980b7dfd76d5a7590920c6c9b",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.7"
+            },
+            "verdict": "SUPPORTED",
+            "reason_code": "MATCHED_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          },
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c002",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.6.",
+                "start": 79,
+                "end": 157,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b1281fee00c2c21a891a0506cff504339e49861980b7dfd76d5a7590920c6c9b",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.6"
+            },
+            "verdict": "CONTRADICTED",
+            "reason_code": "OLDER_THAN_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          },
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c003",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.5.",
+                "start": 158,
+                "end": 236,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b1281fee00c2c21a891a0506cff504339e49861980b7dfd76d5a7590920c6c9b",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.5"
+            },
+            "verdict": "CONTRADICTED",
+            "reason_code": "OLDER_THAN_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          },
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c004",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.4.",
+                "start": 237,
+                "end": 315,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b1281fee00c2c21a891a0506cff504339e49861980b7dfd76d5a7590920c6c9b",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.4"
+            },
+            "verdict": "CONTRADICTED",
+            "reason_code": "OLDER_THAN_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          },
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c005",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.3.",
+                "start": 316,
+                "end": 394,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b1281fee00c2c21a891a0506cff504339e49861980b7dfd76d5a7590920c6c9b",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.3"
+            },
+            "verdict": "CONTRADICTED",
+            "reason_code": "OLDER_THAN_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          },
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c006",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.2.",
+                "start": 395,
+                "end": 473,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b1281fee00c2c21a891a0506cff504339e49861980b7dfd76d5a7590920c6c9b",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.2"
+            },
+            "verdict": "CONTRADICTED",
+            "reason_code": "OLDER_THAN_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          },
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c007",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.1.",
+                "start": 474,
+                "end": 552,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b1281fee00c2c21a891a0506cff504339e49861980b7dfd76d5a7590920c6c9b",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.1"
+            },
+            "verdict": "CONTRADICTED",
+            "reason_code": "OLDER_THAN_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          },
+          {
+            "claim": {
+              "source": {
+                "claim_id": "c008",
+                "source_text": "The latest stable Python 3 release for Windows listed on Python.org is 3.88.0.",
+                "start": 553,
+                "end": 631,
+                "normalized_proposition": null,
+                "factuality": "FACTUAL",
+                "temporal": "DYNAMIC",
+                "fresh_evidence": "REQUIRED",
+                "uncertainty": [],
+                "temporal_reference": null
+              },
+              "candidate_sha256": "b1281fee00c2c21a891a0506cff504339e49861980b7dfd76d5a7590920c6c9b",
+              "policy_id": "python-windows-latest-v1",
+              "version": "3.88.0"
+            },
+            "verdict": "CONTRADICTED",
+            "reason_code": "OLDER_THAN_PRIMARY_LABEL",
+            "evidence_requirements_satisfied": true,
+            "evidence": [
+              {
+                "evidence_id": "3f8a7efd89dcb707a39e002deeb43e0fac71fc62d4425c1aa1d28b64791a4ee3",
+                "url": "https://www.python.org/downloads/windows/",
+                "retrieval_mode": "fixture",
+                "retrieval_id": "offline-fixture",
+                "content_sha256": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+                "observed_version": "3.88.7",
+                "retrieved_at": "2026-11-19T12:00:00Z",
+                "observed_at": "2026-11-19T12:00:00Z"
+              }
+            ]
+          }
+        ],
+        "verdict": "CONTRADICTED",
+        "checked_at": "2026-11-19T12:00:00Z"
+      }
+    },
+    "report": {
+      "schema_version": "005d.claim-report.v1",
+      "authorization": false,
+      "basis": "python_result_diagnostic",
+      "report_status": "COMPLETE",
+      "report_reason": "VALIDATED_RESULT",
+      "input_sha256": "7cb4daa1f7c338ecfb05b8e4f7da01938e2866f3a8533710d4401d2ea8e640da",
+      "record_index": null,
+      "evidence_profile": "fixture",
+      "candidate_sha256": "d73ef884d78c7c2a7d01579b1623f0f4b1d44a83608f745300507b704997eca8",
+      "coverage": "COMPLETE",
+      "verdict": "CONTRADICTED",
+      "generated_at": "2026-11-19T12:00:00Z",
+      "evaluated_at": "2026-11-19T12:00:00Z",
+      "claims": [
+        {
+          "claim_id": "c001",
+          "claim_index": 1,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "d73ef884d78c7c2a7d01579b1623f0f4b1d44a83608f745300507b704997eca8",
+          "coverage": "COMPLETE",
+          "verdict": "SUPPORTED",
+          "freshness_score": 100,
+          "score_reason": "MATCHED_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "python-windows",
+          "source_url": "https://www.python.org/downloads/windows/",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "3.88.7",
+          "evidence_digest": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+          "origin_published_at": null
+        },
+        {
+          "claim_id": "c002",
+          "claim_index": 2,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "d73ef884d78c7c2a7d01579b1623f0f4b1d44a83608f745300507b704997eca8",
+          "coverage": "COMPLETE",
+          "verdict": "CONTRADICTED",
+          "freshness_score": 0,
+          "score_reason": "OLDER_THAN_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "python-windows",
+          "source_url": "https://www.python.org/downloads/windows/",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "3.88.7",
+          "evidence_digest": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+          "origin_published_at": null
+        },
+        {
+          "claim_id": "c003",
+          "claim_index": 3,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "d73ef884d78c7c2a7d01579b1623f0f4b1d44a83608f745300507b704997eca8",
+          "coverage": "COMPLETE",
+          "verdict": "CONTRADICTED",
+          "freshness_score": 0,
+          "score_reason": "OLDER_THAN_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "python-windows",
+          "source_url": "https://www.python.org/downloads/windows/",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "3.88.7",
+          "evidence_digest": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+          "origin_published_at": null
+        },
+        {
+          "claim_id": "c004",
+          "claim_index": 4,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "d73ef884d78c7c2a7d01579b1623f0f4b1d44a83608f745300507b704997eca8",
+          "coverage": "COMPLETE",
+          "verdict": "CONTRADICTED",
+          "freshness_score": 0,
+          "score_reason": "OLDER_THAN_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "python-windows",
+          "source_url": "https://www.python.org/downloads/windows/",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "3.88.7",
+          "evidence_digest": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+          "origin_published_at": null
+        },
+        {
+          "claim_id": "c005",
+          "claim_index": 5,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "d73ef884d78c7c2a7d01579b1623f0f4b1d44a83608f745300507b704997eca8",
+          "coverage": "COMPLETE",
+          "verdict": "CONTRADICTED",
+          "freshness_score": 0,
+          "score_reason": "OLDER_THAN_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "python-windows",
+          "source_url": "https://www.python.org/downloads/windows/",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "3.88.7",
+          "evidence_digest": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+          "origin_published_at": null
+        },
+        {
+          "claim_id": "c006",
+          "claim_index": 6,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "d73ef884d78c7c2a7d01579b1623f0f4b1d44a83608f745300507b704997eca8",
+          "coverage": "COMPLETE",
+          "verdict": "CONTRADICTED",
+          "freshness_score": 0,
+          "score_reason": "OLDER_THAN_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "python-windows",
+          "source_url": "https://www.python.org/downloads/windows/",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "3.88.7",
+          "evidence_digest": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+          "origin_published_at": null
+        },
+        {
+          "claim_id": "c007",
+          "claim_index": 7,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "d73ef884d78c7c2a7d01579b1623f0f4b1d44a83608f745300507b704997eca8",
+          "coverage": "COMPLETE",
+          "verdict": "CONTRADICTED",
+          "freshness_score": 0,
+          "score_reason": "OLDER_THAN_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "python-windows",
+          "source_url": "https://www.python.org/downloads/windows/",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "3.88.7",
+          "evidence_digest": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+          "origin_published_at": null
+        },
+        {
+          "claim_id": "c008",
+          "claim_index": 8,
+          "policy_id": "python-windows-latest-v1",
+          "candidate_sha256": "d73ef884d78c7c2a7d01579b1623f0f4b1d44a83608f745300507b704997eca8",
+          "coverage": "COMPLETE",
+          "verdict": "CONTRADICTED",
+          "freshness_score": 0,
+          "score_reason": "OLDER_THAN_OBSERVATION",
+          "evidence_mode": "fixture",
+          "source_id": "python-windows",
+          "source_url": "https://www.python.org/downloads/windows/",
+          "observed_at": "2026-11-19T12:00:00Z",
+          "evaluated_at": "2026-11-19T12:00:00Z",
+          "observation_age_ms": 0,
+          "observation_time_status": "MEASURED",
+          "observed_version": "3.88.7",
+          "evidence_digest": "9e8e8777b67b10f6cfc8a244a9cd30571bc5b3b8aaec536288dd92b95490523b",
+          "origin_published_at": null
+        }
+      ]
+    }
+  }
+]
