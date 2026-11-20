@@ -63,4 +63,29 @@ Verify the page says **LIVE**, submit the target statement once, then inspect th
 
 Budget admission reserves a maximum serialized-input bytes-as-tokens estimate (131072), the configured output ceiling and one search price **before search**. Reservations survive errors/cancellation/no-model outcomes. At most one search and one model submission per admitted claim; no retries, redirects, fallback or tools. These are per-process application planning limits, not a provider billing guarantee. Restart resets counters. The bridge is not an egress firewall: offline clients use simulated transports; live clients use only fixed provider HTTPS endpoints and ignore proxy environment variables. Do not bind this service publicly.
 
+## Model validation diagnostics
+
+[005J](../../docs/task-005j.md) replaces the former broad `INVALID_MODEL_OUTPUT` reason with eight fixed categories. All remain INSUFFICIENT_EVIDENCE, `authorization=false`; the response fields and successful assessment behavior are unchanged.
+
+| Reason | Failed check |
+| --- | --- |
+| `MODEL_FINISH_INCOMPLETE` | A present finish reason is not STOP, including MAX_TOKENS and safety finishes |
+| `MODEL_ENVELOPE_INVALID` | Malformed outer response, missing/ambiguous candidates, parts, role or usage metadata |
+| `MODEL_JSON_INVALID` | Invalid, duplicate-key, nonfinite, oversized or malformed structured answer JSON |
+| `MODEL_SCHEMA_INVALID` | Structured answer does not satisfy the strict local model schema |
+| `MODEL_CLAIM_MISMATCH` | Model did not preserve the exact original claim |
+| `MODEL_SOURCE_COVERAGE` | Per-source assessment IDs are missing, repeated or do not equal the retrieved set |
+| `MODEL_CITATION_BINDING` | Citation IDs are repeated or not in the retrieved set |
+| `MODEL_QUOTATION_BINDING` | Quotation is not an exact snippet substring or decisive quote is too short |
+
+Each failure emits one bounded JSON warning through `epochguard.experimental.model_validation`. It contains only the category, an allowlisted finish reason (otherwise UNKNOWN/MISSING), bounded integer usage counts, configured output cap, source count and redacted validation field paths. Missing counts remain unknown. It never emits original claims, excerpts, raw JSON, signatures, keys, exception messages or Pydantic inputs. Unknown schema field names are `[unknown]`. Diagnostics remain backend logs; they add no browser response field or endpoint. Logging failure cannot change the refusal.
+
+Operators can inspect these safe records privately without resolving live Compose variables:
+
+```powershell
+docker compose --env-file dev/lab.compose.env --project-name epochguard-005i -f compose.explorer.cleanup.yaml logs --no-color explorer | Select-String '005j.model-validation.v1'
+```
+
+A container built before 005J cannot retroactively reveal its old failure's finish/usage. Rebuilding/recreating a live process is deliberate operator work and resets process budgets; do not repeat a live request just to debug. Keep the default 1536-token cap pending evidence. If a separately authorized assessment records MAX_TOKENS, consider 3072 within the existing 4096 ceiling after reviewing cost admission. STOP with a schema/claim/source/citation/quote failure is not evidence that more tokens would fix it. [Offline size measurements and limitations](../../docs/task-005j.md#output-token-investigation) distinguish characters from actual token counts. No setting or thinking strategy is automatically changed.
+
 See [architecture and measured limitations](../../docs/task-005i.md) and [packet provenance](data/README.md).

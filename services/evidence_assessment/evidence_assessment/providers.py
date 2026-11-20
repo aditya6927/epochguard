@@ -2,8 +2,10 @@ import asyncio
 import json
 
 import httpx
+from pydantic import ValidationError
 from claim_analysis.gemini import provider_schema
 from .config import Failure, require_live
+from .diagnostics import AssessedModel, ModelDiagnostics
 from .schema import ModelAssessment
 from .sources import validated_results
 
@@ -101,15 +103,25 @@ class Assessor:
         if len(json.dumps(payload,ensure_ascii=False).encode())>130048:
             raise Failure("PROMPT_TOO_LARGE")
         self.calls+=1
-        value=await post(MODEL_ROOT+self.settings.model+":generateContent",payload,{"x-goog-api-key":self._key},
-                         self.settings.model_seconds,self._transport,"MODEL",65536)
+        try:
+            value=await post(MODEL_ROOT+self.settings.model+":generateContent",payload,{"x-goog-api-key":self._key},
+                             self.settings.model_seconds,self._transport,"MODEL",65536)
+        except Failure as error:
+            if str(error)=="MODEL_INVALID_RESPONSE":
+                diagnostic=ModelDiagnostics.capture(None,self.settings.max_output_tokens,len(sources))
+                raise diagnostic.failure("MODEL_ENVELOPE_INVALID") from None
+            raise
+        diagnostic=ModelDiagnostics.capture(value,self.settings.max_output_tokens,len(sources))
         try:
             candidates=value["candidates"]
-            if not isinstance(candidates,list) or len(candidates)!=1 or candidates[0]["finishReason"]!="STOP": raise ValueError()
+            if not isinstance(candidates,list) or len(candidates)!=1 or not isinstance(candidates[0],dict): raise ValueError()
             candidate=candidates[0]
+            if not isinstance(candidate.get("finishReason"),str): raise ValueError()
+            if candidate["finishReason"]!="STOP":
+                raise diagnostic.failure("MODEL_FINISH_INCOMPLETE")
             if candidate.get("groundingMetadata") or candidate.get("citationMetadata"): raise ValueError()
             content=candidate["content"]
-            if content.get("role")!="model" or len(content["parts"])!=1: raise ValueError()
+            if content.get("role")!="model" or not isinstance(content["parts"],list) or len(content["parts"])!=1: raise ValueError()
             part=content["parts"][0]
             if set(part)-{"text","thoughtSignature"} or not isinstance(part.get("text"),str): raise ValueError()
             signature=part.get("thoughtSignature")
@@ -118,7 +130,18 @@ class Assessor:
             if usage:
                 incoming,total=usage.get("promptTokenCount"),usage.get("totalTokenCount")
                 if type(incoming) is not int or type(total) is not int or not 0<=incoming<=total: raise ValueError()
-            record=strict_load(part["text"].encode(),16384)
-            return ModelAssessment.model_validate(record)
+        except Failure:
+            raise
         except Exception:
-            raise Failure("INVALID_MODEL_OUTPUT") from None
+            raise diagnostic.failure("MODEL_ENVELOPE_INVALID") from None
+        try:
+            record=strict_load(part["text"].encode(),16384)
+        except Exception:
+            raise diagnostic.failure("MODEL_JSON_INVALID") from None
+        try:
+            record=ModelAssessment.model_validate(record)
+        except ValidationError as error:
+            # Never log str(error), messages, inputs, contexts or arbitrary keys.
+            locations=(item["loc"] for item in error.errors(include_input=False,include_context=False,include_url=False))
+            raise diagnostic.failure("MODEL_SCHEMA_INVALID",locations) from None
+        return AssessedModel(record,diagnostic)

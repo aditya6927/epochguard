@@ -8,6 +8,8 @@ Run commands from the repository root. These are workflows to execute deliberate
 
 The [Explorer guide](../services/evidence_assessment/README.md) documents frozen-packet evaluation, optional browser qualification and a separately authorized live smoke with private external files, independent provider opt-ins and explicit costs. No normal startup or test command makes paid calls. [005I](task-005i.md) records actual measurements and known semantic/source limitations. The existing protected five-case smoke can be reproduced with `py -3.12 tests/evidence_assessment/protected_smoke.py` after building the documented native/004G images; it uses a separate private project, records immutable local image IDs and removes its signing volume.
 
+[005J](task-005j.md) adds safe backend model-failure diagnostics and an offline `tests/evidence_assessment/output_budget.py` size investigation. See the [diagnostic guide](../services/evidence_assessment/README.md#model-validation-diagnostics) for fixed categories and credential-free log inspection. No automatic live retry, output-cap increase, private-setting edit or container restart follows from a validation failure.
+
 ## Interactive offline Lab
 
 Use the [Verification Lab guide](verification-lab.md) for the actual React/Go browser application and its separate loopback-only Compose stack. From PowerShell, `py -3.12 tests/lab/manage.py up --build` builds/starts it and `py -3.12 tests/lab/manage.py down` removes it. The helper bypasses `.env`; no credential or live evidence is used. The headless qualifications below remain separate from judge interaction.

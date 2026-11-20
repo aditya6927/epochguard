@@ -27,7 +27,10 @@ def test_frozen_http_packet(row):
     result=asyncio.run(pipe.assess(Request(claim=row['claim'])))
     assert result.mode=='experimental-evidence' and result.authorization is False
     assert result.claim==row['claim']
-    assert (result.assessment,result.reason_code)==(row['expected'],row['expected_reason'])
+    # Keep the historical packet bytes/labels; refine only its old broad error.
+    reason={'injected-instructions':'MODEL_SCHEMA_INVALID','forged-citation':'MODEL_CITATION_BINDING',
+            'forged-quotation':'MODEL_QUOTATION_BINDING'}.get(row['id'],row['expected_reason'])
+    assert (result.assessment,result.reason_code)==(row['expected'],reason)
     assert pipe.search.calls==row['expected_search_calls']
     assert pipe.assessor.calls==row['expected_model_calls']
     assert pipe.active==0 and result.uncertainty
@@ -129,7 +132,9 @@ def test_provider_envelope_failure_cannot_conclude(kind):
         return httpx.Response(200,json=value)
     pipe.assessor._transport=httpx.MockTransport(response)
     result=asyncio.run(pipe.assess(Request(claim=row['claim'])))
-    assert result.assessment=='INSUFFICIENT_EVIDENCE' and result.reason_code=='INVALID_MODEL_OUTPUT'
+    reason={'incomplete':'MODEL_FINISH_INCOMPLETE','duplicate-json':'MODEL_JSON_INVALID',
+            'extra-json':'MODEL_JSON_INVALID'}.get(kind,'MODEL_ENVELOPE_INVALID')
+    assert result.assessment=='INSUFFICIENT_EVIDENCE' and result.reason_code==reason
     assert pipe.assessor.calls==1
 
 

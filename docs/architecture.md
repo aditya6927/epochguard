@@ -25,6 +25,8 @@ The live multi-claim runner printed `LIVE RUN COLLECTED: independent result revi
 
 The [Evidence Explorer](../services/evidence_assessment/README.md) runs separately from all protected components. Its fixed `/api/assess` accepts one original claim, validates up to five search excerpts, then validates a single structured model assessment and source IDs. A conclusive assessment requires two cited publisher groups, consistent model-assessed stances, verbatim evidence quotes and resolved independence; conflicting/missing/malformed evidence abstains. Domain grouping and model interpretation are fallible heuristics, not independently verified semantics or ownership. It never calls the fixed-policy verifier, handles signing keys, changes ingress, or consumes a receipt. Retrieval time and unverified publication metadata remain separate. See [security limits](security.md#experimental-evidence-explorer).
 
+[005J](task-005j.md) distinguishes incomplete finish, envelope, JSON/schema and original-claim/source/citation/quotation failures with fixed reason codes. Request-local immutable structural diagnostics travel alongside the parsed record and produce bounded backend warnings on failure, without changing public response fields, semantic checks, authorization or protected components. Counters/finish reasons are untrusted provider observations, not factual or billing attestations.
+
 | Component | Responsibility and owned state |
 | --- | --- |
 | [Protected ingress](../internal/ingress/ingress.go) | Route/body admission, retained forwarded bytes, fresh nonce, complete upstream buffering, independent receipt/body checks and safe client release |

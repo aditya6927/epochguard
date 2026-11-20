@@ -26,11 +26,14 @@ async def evaluate(directory):
             'assessment':result.assessment,'reason_code':result.reason_code,'authorization':result.authorization,
             'source_count':len(result.sources),'citation_ids':result.citation_ids,
             'search_calls':pipeline.search.calls,'model_calls':pipeline.assessor.calls,'elapsed_ns':time.perf_counter_ns()-started}
-        row['expectation_met']=(result.assessment==case['expected'] and result.reason_code==case['expected_reason'] and
+        # Original 005I fixture and historical reports retain their broad label.
+        expected_reason={'injected-instructions':'MODEL_SCHEMA_INVALID','forged-citation':'MODEL_CITATION_BINDING',
+                         'forged-quotation':'MODEL_QUOTATION_BINDING'}.get(case['id'],case['expected_reason'])
+        row['expectation_met']=(result.assessment==case['expected'] and result.reason_code==expected_reason and
             row['search_calls']==case['expected_search_calls'] and row['model_calls']==case['expected_model_calls'] and
             result.claim==case['claim'] and result.authorization is False)
         rows.append(row)
-    report={'schema_version':'005i.offline-evaluation.v1','mode':'experimental-evidence','authorization':False,
+    report={'schema_version':'005i.offline-evaluation.v1','reason_taxonomy':'005j.v1','mode':'experimental-evidence','authorization':False,
         'simulated':True,'packet_sha256':PACKET_SHA256,'clock':data['reference_time'],'cases':rows,
         'passed':sum(row['expectation_met'] for row in rows),'total':len(rows),
         'search_calls':sum(row['search_calls'] for row in rows),'model_calls':sum(row['model_calls'] for row in rows),

@@ -51,17 +51,22 @@ class Pipeline:
                     for other in sources[:i]:
                         if SequenceMatcher(None,source.snippet.casefold(),other.snippet.casefold()).ratio()>=.88:
                             return self.result(claim,"DUPLICATED_EVIDENCE","The excerpts may repeat the same source material.",sources=sources)
-                reply=await self.assessor.assess(claim,sources,self.clock())
+                assessed=await self.assessor.assess(claim,sources,self.clock())
+                reply,diagnostic=assessed.record,assessed.diagnostics
                 actual={s.id:s for s in sources}
                 evaluated={s.source_id:s for s in reply.source_assessments}
-                if (reply.claim!=claim or len(evaluated)!=len(reply.source_assessments) or set(evaluated)!=set(actual) or
-                    len(set(reply.citation_ids))!=len(reply.citation_ids) or not set(reply.citation_ids)<=set(actual)):
-                    raise Failure("INVALID_MODEL_OUTPUT")
-                for key,item in evaluated.items():
+                if reply.claim!=claim:
+                    raise diagnostic.failure("MODEL_CLAIM_MISMATCH",(("claim",),))
+                if len(evaluated)!=len(reply.source_assessments) or set(evaluated)!=set(actual):
+                    raise diagnostic.failure("MODEL_SOURCE_COVERAGE",(("source_assessments",),))
+                if len(set(reply.citation_ids))!=len(reply.citation_ids) or not set(reply.citation_ids)<=set(actual):
+                    raise diagnostic.failure("MODEL_CITATION_BINDING",(("citation_ids",),))
+                for index,item in enumerate(reply.source_assessments):
+                    key=item.source_id
                     if item.quote and item.quote not in actual[key].snippet:
-                        raise Failure("INVALID_MODEL_OUTPUT")
+                        raise diagnostic.failure("MODEL_QUOTATION_BINDING",(("source_assessments",index,"quote"),))
                     if item.stance in {"SUPPORTS","CONTRADICTS"} and len(item.quote.strip())<20:
-                        raise Failure("INVALID_MODEL_OUTPUT")
+                        raise diagnostic.failure("MODEL_QUOTATION_BINDING",(("source_assessments",index,"quote"),))
                 if reply.scope!="SINGLE_FACT":
                     return self.result(claim,"SCOPE_ABSTENTION","The model could not resolve this as one self-contained factual statement.",sources=sources)
                 if reply.assessment=="INSUFFICIENT_EVIDENCE":

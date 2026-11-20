@@ -18,8 +18,8 @@ BASE = next(row for row in packet()['cases'] if row['id'] == 'stable-fact')
 @pytest.mark.parametrize('mutation,reason', [
     ('opposite', 'SOURCE_DISAGREEMENT'), ('unclear', 'SOURCE_DISAGREEMENT'),
     ('uncertain', 'INSUFFICIENT_CORROBORATION'), ('one-citation', 'INSUFFICIENT_CORROBORATION'),
-    ('wrong-claim', 'INVALID_MODEL_OUTPUT'), ('missing-source', 'INVALID_MODEL_OUTPUT'),
-    ('duplicate-source', 'INVALID_MODEL_OUTPUT'), ('blank-quote', 'INVALID_MODEL_OUTPUT')])
+    ('wrong-claim', 'MODEL_CLAIM_MISMATCH'), ('missing-source', 'MODEL_SOURCE_COVERAGE'),
+    ('duplicate-source', 'MODEL_SOURCE_COVERAGE'), ('blank-quote', 'MODEL_QUOTATION_BINDING')])
 def test_model_cannot_bypass_corroboration(mutation, reason):
     row = copy.deepcopy(BASE)
     record = row['model_record']
