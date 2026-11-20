@@ -6,6 +6,14 @@ Today it checks two propositions: the latest stable Python 3 release label on Py
 
 EpochGuard uses Bifrost's supported native Go plugin interfaces and official dynamic-binary mechanism, with a separate protected ingress and evidence verifier. The qualified installation is the pinned Linux/amd64 HTTP gateway built together with its `.so`; no tracked upstream source patch is required. [Compatibility and installation](docs/compatibility.md) distinguish this supported extension path from untested versions and static distributions.
 
+## What EpochGuard demonstrates
+
+- **[005F controlled comparison](docs/task-005f.md):** 24 frozen synthetic cases × three repetitions = 72 matched gateway pairs. Of eight authored unsafe ordinary-answer cases, the unprotected Bifrost path delivered 8/8 and the protected path 0/8; both delivered all six admitted supported cases. Observed added protected-path latency: p50 **2.989 ms**, p95 **5.661 ms**. [Public per-pair evidence](docs/evidence/005f-public.json).
+- **[005H variable evidence](docs/task-005h.md):** 90 actual protected-gateway cases across 21 isolated profiles: **41 ALLOW, 8 REJECT, 32 UNAVAILABLE, 9 INGRESS_REFUSED**. Distinct controlled synthetic versions exercised the fixed policies and nine forms.
+- **[005I/005J Evidence Explorer](docs/task-005k.md#november-20-2026-explorer-live-observations):** 19/19 frozen offline assessment cases; an operator-captured November 20 LIVE contradiction with five retrieved sources and three citations. Screenshots/transcript preserve the displayed result; timeouts and incomplete outputs leave live reliability unresolved. Always `authorization=false`.
+
+The 005F figures are fixture outcomes and complete path differences, not real-world hallucination-detection rates or isolated plugin overhead. The Explorer observation is human-readable execution evidence, not protected authorization or a statistical accuracy result.
+
 ```mermaid
 flowchart LR
     C[Client] --> I[Protected ingress]
@@ -23,7 +31,7 @@ flowchart LR
 
 Genuine provider errors remain failures with their HTTP status and sanitized error fields; they are not verification verdicts.
 
-The separate [Experimental Evidence Explorer](services/evidence_assessment/README.md) accepts self-contained factual statements outside this grammar, retrieves bounded Tavily search excerpts and asks Gemini for an AI-assisted assessment when both live providers are explicitly enabled. It defaults to a clearly simulated offline packet at **127.0.0.1:8791**. Every result is `experimental-evidence`, `authorization=false`; it issues no gateway authorization. [005I measurements and limits](docs/task-005i.md) distinguish working offline plumbing from pending live semantic qualification.
+The separate [Experimental Evidence Explorer](services/evidence_assessment/README.md) accepts self-contained factual statements outside this grammar, retrieves bounded Tavily search excerpts and asks Gemini for an AI-assisted assessment when both live providers are explicitly enabled. It defaults to a clearly simulated offline packet at **127.0.0.1:8791**. Every result is `experimental-evidence`, `authorization=false`; it issues no gateway receipt or approval. [005I offline measurements](docs/task-005i.md) and the [dated live follow-up](docs/task-005k.md) distinguish implementation, observed execution and unqualified accuracy/reliability.
 
 ## Open the local Verification Lab
 
@@ -43,7 +51,7 @@ Open **http://127.0.0.1:8787**. Choose a scenario or edit the candidate, then ru
 py -3.12 tests/lab/manage.py down
 ```
 
-No virtual environment, host Node installation or API key is needed. First builds download public dependencies; runtime evidence stays simulated. Only the Lab publishes a loopback port. The helper bypasses `.env`, and gateway, verifier, provider and management remain private. See the [Lab guide](docs/verification-lab.md) for scenarios, limits, tests and video recording. The [operations guide](docs/operations.md) retains headless qualification workflows; default `compose.yaml` is a fixed-decision development fixture, not a factual verifier.
+No virtual environment, host Node installation or API key is needed. First builds download public dependencies; runtime evidence stays simulated. Within this stack, only the Lab publishes **127.0.0.1:8787**; the separate Explorer uses **127.0.0.1:8791**. Both applications are loopback-only. The helper bypasses `.env`, and gateway, verifier, provider and management remain private. See the [Lab guide](docs/verification-lab.md) for scenarios, limits, tests and video recording. The [operations guide](docs/operations.md) retains headless qualification workflows; default `compose.yaml` is a fixed-decision development fixture, not a factual verifier.
 
 ## Capability and qualification
 
@@ -54,8 +62,9 @@ No virtual environment, host Node installation or API key is needed. First build
 | Legacy single-claim mode: `003a.v1` | **Qualified live within a narrow scope.** November 8, 2026 maintainer-supplied gateway run, one Python policy and controlled provider |
 | Model-assisted claim planning | **Experimental, non-authorizing.** Draft annotations; model quality not independently qualified |
 | Claim-level freshness reporting | **Offline diagnostic reporting.** Per-claim evidence-relative 100/0/null scores for the existing two policies, explicit fixture/live modes and observation times. Local JSON/static HTML; no authorization or origin-freshness attestation. [Contract and evaluation](docs/task-005d.md) |
-| Native Gemini model qualification | **Narrow real-model enforcement qualification met with simulated evidence.** Reviewed November 19, 2026: four genuine Gemini candidates through strict adaptation, independent verification and protected ingress; all six expected client outcomes met. Real-model plus real-source execution and analysis quality remain unqualified. [Reviewed scope and evidence](docs/task-005c-t.md#reviewed-real-model-qualification--november-19-2026) |
-| Combined Gemini and live evidence | **Offline harness implemented; combined live qualification pending.** Separate 005E profile, dual authorization, bounded source sampling and strict adaptation; no live calls by default. Prior model and source runs do not establish combined execution. [Workflow and limits](docs/task-005e.md) |
+| Native Gemini model qualification | **Narrow real-model enforcement qualification met with simulated evidence.** Reviewed November 19, 2026: four genuine Gemini candidates through strict adaptation, independent verification and protected ingress; all six expected client outcomes met. Protected combined real-model/real-source execution and analysis quality remain unqualified. [Reviewed scope and evidence](docs/task-005c-t.md#reviewed-real-model-qualification--november-19-2026) |
+| Protected combined Gemini and live evidence | **Offline harness implemented; combined live qualification pending.** Separate 005E profile, dual authorization, bounded source sampling and strict adaptation; no live calls by default. The separate Explorer's live result does not qualify this gateway path. [Workflow and limits](docs/task-005e.md) |
+| Experimental Evidence Explorer | **Implemented, tested offline; operator-observed live execution.** Separate loopback service, optional real Tavily/Gemini, unsigned AI-assisted verdicts with `authorization=false`; general accuracy, independence and consistent availability unqualified. [Captured result and provenance limits](docs/task-005k.md#november-20-2026-explorer-live-observations) |
 | Protected cache and atomic revocation | **Proposed, not implemented.** Built-in caching stays disabled in protected profiles |
 
 The live multi-claim run recorded three attempted/completed application-level retrievals per source, not independent billing or origin-fetch counts. Its historical observations are not claims about today's versions. [Live evidence and measurement scope](docs/task-004e.md) and [security remediation evidence](docs/task-004gs.md) retain the exact results and limitations.

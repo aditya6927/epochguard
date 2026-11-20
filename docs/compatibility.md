@@ -22,7 +22,7 @@ The [005D-S security correction](task-005d-s.md) changes candidate admission ind
 | Other Bifrost versions, current `dev` | NOT TESTED | Rebuild both artifacts and rerun contracts, security and gateway tests before claiming compatibility |
 | Existing upstream plugins added to protected stack | REQUIRES INVESTIGATION | Ordering, request mutation, response conversion, logging and cache behavior can alter this boundary |
 | Streaming, arbitrary routes, background tasks, protected caching | UNSUPPORTED | Outside the qualified protected release contract |
-| Native Gemini generation / 005C | NARROW REAL-MODEL ENFORCEMENT QUALIFIED; SIMULATED EVIDENCE | [November 19 review](task-005c-t.md#reviewed-real-model-qualification--november-19-2026): `gemini-3.5-flash-lite`, `strict-005ct`, four real model cases and six expected protected outcomes. Default unadapted mode and strict typed eligibility remain. Other models/configurations and real-model plus real-source execution are unqualified |
+| Native Gemini generation / 005C | NARROW REAL-MODEL ENFORCEMENT QUALIFIED; SIMULATED EVIDENCE | [November 19 review](task-005c-t.md#reviewed-real-model-qualification--november-19-2026): `gemini-3.5-flash-lite`, `strict-005ct`, four real model cases and six expected protected outcomes. Default unadapted mode and strict typed eligibility remain. Other models/configurations and protected combined real-model/real-source execution are unqualified; the separate Explorer's [operator-observed live assessment](task-005k.md) does not qualify this path |
 
 ## Upstream sources and build equivalence
 

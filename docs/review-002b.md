@@ -7,7 +7,7 @@
 
 ## Follow-up status
 
-This is a historical source review. [Protected ingress](task-004d.md) and [bounded-prose hardening](task-004gs.md) now address missing/disabled-plugin delivery within their isolated client boundary. Direct gateways without ingress remain exposed to missing-plugin delivery. The [cache study](task-002c.md) completed the proposed investigation and demonstrated unsafe write/hit ordering and pending-write repopulation; protected caching remains unimplemented. The [route audit](task-003c.md) covers a finite matrix, not all routes/background execution. No tracked GitHub CI workflow or production authentication profile is present.
+This is a historical source review. [Protected ingress](task-004d.md) and [bounded-prose hardening](task-004gs.md) now address missing/disabled-plugin delivery within their isolated client boundary. Direct gateways without ingress remain exposed to missing-plugin delivery. The [cache study](task-002c.md) completed the proposed investigation and demonstrated unsafe write/hit ordering and pending-write repopulation; protected caching remains unimplemented. The [route audit](task-003c.md) covers a finite matrix, not all routes/background execution. As reconciled November 20, 2026, a tracked [offline CI workflow](../.github/workflows/checks.yaml) exists and all four jobs [succeeded at `3e7041b`](https://github.com/aditya6927/epochguard/actions/runs/44689491455); a production authentication profile remains unqualified. This updates current follow-up status, not the original review or its test execution.
 
 The original findings and verdict below retain their reviewed-revision scope. See [current architecture](architecture.md) and [operations](operations.md).
 

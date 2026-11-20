@@ -2,6 +2,14 @@
 
 A separate loopback-only FastAPI application for one self-contained, externally checkable English factual statement. Every response is `mode=experimental-evidence`, `authorization=false`. It issues no receipts and cannot authorize protected gateway content. The protected Lab remains at port 8787; this service uses port 8791 and no shared service/network/signing volume.
 
+The two applications are independently runnable and loopback-only: **127.0.0.1:8787** is the Verification Lab's actual protected gateway with simulated evidence/controlled provider; **127.0.0.1:8791** is this separate FastAPI/UI with simulated search/model replies by default and optionally live Tavily + Gemini. An Explorer result cannot approve arbitrary claims through protected ingress.
+
+## Live observations and result retention
+
+The [November 20, 2026 follow-up](../../docs/task-005k.md#november-20-2026-explorer-live-observations) reviews operator-supplied screenshots and a displayed-text transcript of a LIVE CONTRADICTED assessment for `Trump is Japan's prime minister.`: AI_EVIDENCE_ASSESSMENT, five retrieved sources, three cited sources and `authorization=false`. The operator reports completed real Tavily/Gemini execution and application structural/corroboration acceptance. The artifacts preserve the displayed result, not independently verified raw HTTP or provider attestations. Other live attempts timed out or ended incompletely; general factual accuracy, source independence and consistent availability remain unqualified. This does not qualify the protected 005E combined path.
+
+The backend currently does **not persist successful HTTP responses or assessment history**. The page holds only the current displayed result; editing clears it and reload loses it. The later screenshots/transcript are manual operator captures. 005J logs only safe structural failure metadata, not claims, snippets or response bodies. Result export/persistence is **future work**, with no implemented export endpoint, browser save button or database. The original [005I](../../docs/task-005i.md) and [005J](../../docs/task-005j.md) reports retain their execution-time evidence and limitations.
+
 ## Offline startup and cleanup
 
 Requires the existing Git, Python 3.12 and Docker Desktop Linux-container setup. No host Python packages, Node installation or credentials are required to use the page. From the repository root, in PowerShell:
@@ -42,7 +50,7 @@ The evaluator inserts its service import paths, pins the packet digest and refus
 
 ## Separately authorized live smoke
 
-**No live call was executed during implementation.** Obtain separate explicit authorization to make one Tavily Search request and at most one Gemini assessment request. Check current provider availability/prices and billing limits yourself; no price or model default is silently chosen. Live startup performs no provider calls. A button click can incur cost, including calls that time out or are cancelled.
+**005I/005J development checks made no live calls; later operator execution is recorded above.** Any new smoke still requires separate explicit authorization for one Tavily Search request and at most one Gemini assessment request. Check current provider availability/prices and billing limits yourself; no price or model default is silently chosen. Live startup performs no provider calls. A button click can incur cost, including calls that time out or are cancelled.
 
 Create three distinct owner-readable private files **outside the checkout**: Gemini key, Tavily key, and a copy of [settings.example.json](settings.example.json). Key files contain only the ASCII key plus an optional newline. On POSIX use mode 0600; on Windows restrict ACLs to the operator and inspect them privately. The launcher verifies POSIX permissions; Windows ACL restriction is an operator prerequisite, not automatically attested. Set every null setting explicitly: an available Gemini model ID, current input/output USD per million token rates, search price per basic request, and request/run cost ceilings. Keep `max_requests=1`; live validation permits at most three. Both credentials remain backend-only, mounted read-only, never placed in `.env`, browser fields, tracked JSON or command arguments.
 

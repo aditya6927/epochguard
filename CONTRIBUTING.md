@@ -21,6 +21,7 @@ The test removes the stack/signing volume. Builder selection and sanitized failu
 | `services/verifier/verifier/` | Fixed-source retrieval, strict evidence validation, version comparison and finite claim coverage |
 | `services/claim_analysis/` | Experimental, non-authorizing planning and evaluation |
 | `internal/lab/`, `web/lab/` | Local presentation and fixed protected requests; no verification authority |
+| `services/evidence_assessment/` | Separate loopback Evidence Explorer; unsigned AI-assisted assessments with `authorization=false`, no protected release authority |
 | `tests/`, `dev/`, Compose files | Private qualification stacks, controlled providers and negative controls |
 
 Inspect actual pinned Bifrost source before relying on a hook or configuration field. Gateway and plugin must retain the same Go toolchain and module graph. An ordinary hook error is not an enforcement refusal. Use the existing typed error/short-circuit contracts and test the real gateway.
@@ -41,7 +42,7 @@ py -3.12 -m unittest discover -s scripts -p 'test_*.py'
 py -3.12 scripts/check_docs.py
 ```
 
-For actual native loading and protected lifecycle checks, run the [operations suites](docs/operations.md#protected-offline-qualifications), including G and G-L offline. CI compiles a `.so`; it does not replace these gateway qualifications. The [evaluation index](docs/evaluation.md) separates local execution, inspected successful baseline hosted checks and unexecuted checks on later changes.
+For actual native loading and protected lifecycle checks, run the [operations suites](docs/operations.md#protected-offline-qualifications), including G and G-L offline. CI compiles a `.so`; it does not replace these gateway qualifications. The [evaluation index](docs/evaluation.md#reproduction-and-ci-scope) identifies successful hosted checks by revision and distinguishes them from local execution and qualifications CI does not perform.
 
 The 005C tests in `tests/modelqualification/` are included in the network-disabled Python CI stage. Its host diagnostics reuse the same locked Python dependencies and require the documented virtual environment. [Native model qualification](docs/real-model-qualification.md) has a separate private profile and explicit operator authorization; never enable paid models in CI or Lab. Preserve frozen analysis packets and historical held-out labels; agent-authored annotations remain drafts until actual independent review.
 
@@ -49,4 +50,4 @@ The 005C tests in `tests/modelqualification/` are included in the network-disabl
 
 Describe the concrete problem, resulting behavior, contract changes, test commands actually executed and remaining limitations. Include relevant negative controls and update canonical documentation; preserve historical evidence with its original scope. Keep unrelated refactors separate. Record dependencies/toolchain changes explicitly and rerun native ABI/load checks when they change. Do not describe fixture evidence as live or draft annotations as human-reviewed gold.
 
-There is no chosen repository license yet. The [third-party audit](docs/third-party.md) describes the pending maintainer decision and dependency obligations. Contributions and upstream submission need an agreed licensing basis before distribution. Do not submit credentials or private vulnerability details in public pull requests; see [SECURITY.md](SECURITY.md).
+The repository's original code is licensed under [Apache-2.0](LICENSE). The [third-party audit](docs/third-party.md) records that selection and the separate dependency, notice and binary/image redistribution obligations that remain to be verified before distribution. The project license does not relicense third-party components or certify redistribution clearance. Do not submit credentials or private vulnerability details in public pull requests; see [SECURITY.md](SECURITY.md).

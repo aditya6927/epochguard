@@ -4,6 +4,8 @@ The Lab is a local React/TypeScript web application backed by the actual EpochGu
 
 **Runtime mode: offline fixtures.** The controlled provider returns your submitted candidate verbatim. Existing Python.org/PyPI HTTP transports are simulated, while source parsing, independent Go validation, request-bound `004g.receipt.v2` signing and ingress validation are real. There are no commercial model calls, source credentials, live evidence calls or verified cache. The separately reviewed [November 15 real-source qualification](task-004gl.md#reviewed-live-qualification--november-15-2026) is historical evidence, not this interactive session's source data.
 
+This Lab uses **127.0.0.1:8787**. The separate [Experimental Evidence Explorer](../services/evidence_assessment/README.md) uses **127.0.0.1:8791**, defaults to simulated Tavily/Gemini transports and can use both live only with explicit authorization. Both applications are loopback-only. Explorer assessments always have `authorization=false`, never produce gateway receipts and cannot approve arbitrary prose through this Lab's protected ingress. Its [captured live outcome](task-005k.md) is separate evidence.
+
 ## Start on Windows
 
 Requires Git, Docker Desktop running Linux containers with Compose/Buildx, and Python 3.12. The host helper uses only the standard library; no virtual environment, host Node installation or API key is needed.
@@ -88,7 +90,7 @@ flowchart LR
     Lab --> Browser
 ```
 
-Only the Lab publishes `127.0.0.1:8787`. Docker Desktop requires a non-internal host-entry bridge for that port mapping; only the Lab joins it. The Lab also joins the internal client network, while ingress alone bridges client/private networks. Gateway, management, provider and verifier are private and unpublished; the verifier has no external evidence network. The Lab is not on the private network and has only two fixed ingress targets. The host-entry bridge is not a packet-level egress firewall; the trusted Lab binary has no arbitrary outbound URL interface.
+Within the Lab stack, only the Lab publishes `127.0.0.1:8787`; the Explorer's separate stack publishes `127.0.0.1:8791`. Docker Desktop requires a non-internal host-entry bridge for the Lab port mapping; only the Lab joins that bridge. The Lab also joins the internal client network, while ingress alone bridges client/private networks. Gateway, management, provider and verifier are private and unpublished; the verifier has no external evidence network. The Lab is not on the private network and has only two fixed ingress targets. The host-entry bridge is not a packet-level egress firewall; the trusted Lab binary has no arbitrary outbound URL interface.
 
 Only `GET /api/demo/info` and `POST /api/demo/verify` are application APIs. A source-free `/healthz` checks the Lab process, not verifier/source health. Static `/` and built `/assets/` are served without directory listing. Unknown paths, alternate methods, encoded/query API variants and management/proxy paths are refused. There is no generic proxy, client-selected policy/model/URL/auth token, streaming, fallback selector or browser-accessible fault control.
 

@@ -6,17 +6,17 @@
 
 ## Follow-up status
 
-The observations below describe the reviewed revision, not current defects. Current source inspection establishes these updates; it does not rerun the original review's tests.
+The original observations describe the reviewed revision, not current defects. This follow-up was reconciled on November 20, 2026 against `3e7041b90ceca589cf7e51c2071094cd1bf11608` and hosted check metadata. It does not rerun the original review's tests or imply these facilities existed at the reviewed commit.
 
 | Original finding | Current disposition |
 | --- | --- |
 | Module declarations | **Resolved:** root and plugin manifests use `github.com/aditya6927/epochguard` and its plugin subpath |
 | Nil HTTP response | **Resolved:** `HTTPTransportPostHook` explicitly checks `resp == nil` |
 | Accidental ignore entry | **Resolved:** `.gitignore` no longer contains the stray `git ` line |
-| Race/format checks and CI | **Partly resolved:** native Docker build runs format/vet/unit/race checks; no tracked GitHub CI workflow exists |
+| Race/format checks and CI | **Implemented and hosted checks observed:** the [workflow](../.github/workflows/checks.yaml) runs pinned format/vet/unit/race/plugin compilation, Python, frontend and documentation jobs; all four jobs [succeeded November 20](https://github.com/aditya6927/epochguard/actions/runs/44689491455) at `3e7041b`. CI does not run the full native loading/lifecycle qualification |
 | Missing-plugin startup | **Mitigated within protected ingress:** per-response authenticated release and readiness are implemented. Direct gateway deployments still retain this risk |
 | Route/cache/fallback qualification | **Follow-up completed within finite scope:** [typed enforcement](task-002b.md), [cache hazards](task-002c.md) and [route audit](task-003c.md). Safe streaming and protected caching remain unimplemented |
-| Licensing/release policy | **Open maintainer decisions:** no tracked license, dedicated security policy or contributor guide is present |
+| Licensing/release policy | **Project facilities present:** [Apache-2.0 LICENSE](../LICENSE), [security reporting policy](../SECURITY.md) and [contributor guide](../CONTRIBUTING.md) are tracked. [Third-party redistribution/notice clearance](third-party.md) remains separate; the security policy does not promise a private contact or response SLA |
 
 See [architecture](architecture.md) for current boundaries and [operations](operations.md) for reproducible checks.
 
