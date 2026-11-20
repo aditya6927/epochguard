@@ -23,6 +23,8 @@ flowchart LR
 
 Genuine provider errors remain failures with their HTTP status and sanitized error fields; they are not verification verdicts.
 
+The separate [Experimental Evidence Explorer](services/evidence_assessment/README.md) accepts self-contained factual statements outside this grammar, retrieves bounded Tavily search excerpts and asks Gemini for an AI-assisted assessment when both live providers are explicitly enabled. It defaults to a clearly simulated offline packet at **127.0.0.1:8791**. Every result is `experimental-evidence`, `authorization=false`; it issues no gateway authorization. [005I measurements and limits](docs/task-005i.md) distinguish working offline plumbing from pending live semantic qualification.
+
 ## Open the local Verification Lab
 
 The React/TypeScript Lab sends editable candidates through the **actual protected ingress, Bifrost, native Go plugin and Python verifier**. It uses synthetic evidence and a controlled provider that returns the submitted candidate verbatim. It makes no model or live-source calls. The response inspector distinguishes released content from input and preserves policy, ingress and provider-error outcomes.

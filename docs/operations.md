@@ -2,6 +2,12 @@
 
 Run commands from the repository root. These are workflows to execute deliberately, not claims of new test execution. Historical outcomes remain in the linked reports; [architecture](architecture.md) defines the current guarantees.
 
+## Separate Experimental Evidence Explorer
+
+`py -3.12 services/evidence_assessment/manage.py up --build` starts the isolated UI at **http://127.0.0.1:8791** with simulated Tavily/Gemini transports. `py -3.12 services/evidence_assessment/manage.py test --build` runs three actual offline HTTP demonstrations and verifies cleanup. Stop interactive use with `py -3.12 services/evidence_assessment/manage.py down`. This mode always has `authorization=false` and does not alter the Lab at 8787 or its protected stack.
+
+The [Explorer guide](../services/evidence_assessment/README.md) documents frozen-packet evaluation, optional browser qualification and a separately authorized live smoke with private external files, independent provider opt-ins and explicit costs. No normal startup or test command makes paid calls. [005I](task-005i.md) records actual measurements and known semantic/source limitations. The existing protected five-case smoke can be reproduced with `py -3.12 tests/evidence_assessment/protected_smoke.py` after building the documented native/004G images; it uses a separate private project, records immutable local image IDs and removes its signing volume.
+
 ## Interactive offline Lab
 
 Use the [Verification Lab guide](verification-lab.md) for the actual React/Go browser application and its separate loopback-only Compose stack. From PowerShell, `py -3.12 tests/lab/manage.py up --build` builds/starts it and `py -3.12 tests/lab/manage.py down` removes it. The helper bypasses `.env`; no credential or live evidence is used. The headless qualifications below remain separate from judge interaction.

@@ -4,6 +4,8 @@ This is the canonical index of implemented and measured scope. [Architecture](ar
 
 ## Evidence provenance
 
+[005I](task-005i.md) adds a separate unsigned AI-assisted assessment path and a frozen 19-case simulated packet: **19/19** expected outcomes, **16 simulated search invocations / 11 simulated model invocations**, with 2 SUPPORTED, 2 CONTRADICTED and 15 INSUFFICIENT_EVIDENCE results. Actual local container HTTP and headless Edge each passed the target contradiction, an unrelated supported statement and an unanswerable statement. These are agent-authored transport/schema/abstention fixtures, not Gemini factual-accuracy measurements or live Tavily observations. Existing protected five-case regression, Go checks and 1,315 Python tests passed; live assessment quality remains pending. This mode always has `authorization=false` and does not change the protected qualification combinations below.
+
 | Category | Revision and source mode | Observation and limits |
 | --- | --- | --- |
 | [005B compatibility and packaging](task-005b.md) | Baseline `f7a7cd6f7a386b9079e34e666920ca1296f0a36f` plus uncommitted 005B changes; simulated/offline | Dated local commands and cold-input installation evidence; hosted execution was pending at report time, with subsequent baseline checks recorded below |

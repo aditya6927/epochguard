@@ -17,10 +17,13 @@ EpochGuard buffers AI gateway answers, checks fixed evidence policies, and refus
 | 005E combined qualification | Isolated offline harness for Gemini → strict adapter → native gateway/plugin → bounded verifier → receipt-v2 ingress. Live implementation requires separate model/evidence authorization and a current offline suite; **combined live qualification pending**. [Architecture, budgets and evidence](task-005e.md) |
 | EpochGuard-owned protected cache / atomic revocation | Proposed in [ADR 0003](decisions/0003-protected-cache-ownership.md); not implemented |
 | 005D-S singleton consistency | Each candidate may assert each fixed policy once. Python and Go independently refuse repeated policies before evidence authorization; eight remains the transport bound. [Security correction and corrected offline qualification](task-005d-s.md) |
+| `experimental-evidence` / 005I Explorer | Separate FastAPI/UI at loopback 8791; bounded Tavily Search plus a dedicated Gemini semantic assessor. SUPPORTED/CONTRADICTED/INSUFFICIENT_EVIDENCE are unsigned AI interpretations with `authorization=false`. Frozen simulated HTTP, actual container/UI and existing gateway regressions tested; live assessment quality pending. [Contract and results](task-005i.md) |
 
 The live multi-claim runner printed `LIVE RUN COLLECTED: independent result review required`. Subsequent inspection found its five client expectations met; three attempted/completed application-level retrievals per source were recorded, not billing or origin-fetch counts. See [004E evidence](task-004e.md), [legacy live evidence](task-003b.md) and [current security regression evidence](task-004gs.md). These reports qualify their stated revisions and finite test cases, not arbitrary provider/model compatibility or production readiness.
 
 ## Components and responsibilities
+
+The [Evidence Explorer](../services/evidence_assessment/README.md) runs separately from all protected components. Its fixed `/api/assess` accepts one original claim, validates up to five search excerpts, then validates a single structured model assessment and source IDs. A conclusive assessment requires two cited publisher groups, consistent model-assessed stances, verbatim evidence quotes and resolved independence; conflicting/missing/malformed evidence abstains. Domain grouping and model interpretation are fallible heuristics, not independently verified semantics or ownership. It never calls the fixed-policy verifier, handles signing keys, changes ingress, or consumes a receipt. Retrieval time and unverified publication metadata remain separate. See [security limits](security.md#experimental-evidence-explorer).
 
 | Component | Responsibility and owned state |
 | --- | --- |

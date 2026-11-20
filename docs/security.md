@@ -48,6 +48,20 @@ Runtime receipt keys are private files/volumes mounted only where needed. Qualif
 
 ## Unsupported and residual behavior
 
+The separate [005I assessment path](#experimental-evidence-explorer) does not enlarge this protected scope.
+
+## Experimental Evidence Explorer
+
+The separate [005I Explorer](task-005i.md) is an unsigned assessment service, outside the protected release boundary. Every application JSON response identifies `experimental-evidence`, `authorization=false`; errors abstain and malformed requests have a null claim. Accepted requests retain the exact original claim. It cannot issue an ALLOW, generate a receipt, choose evidence-policy modes or fall back to the protected verifier. Its Tavily `/search` client and dedicated Gemini instructions do not alter the existing `/extract` retriever or claim planner.
+
+Search/model content is untrusted. Fixed HTTPS provider endpoints, no redirects/tools/arbitrary fetching, bounded JSON with duplicate/nonfinite-key refusal, complete source-set validation, numbered citation binding, exhaustive per-source assessment and exact snippet quotes limit structural misuse. At least two cited publisher groups and mutually consistent relevant stances are required for a conclusive result. Bundled PSL grouping, a small common-owner map and copy checks are heuristics; model relevance, factual scope, independence and entailment can still be wrong or prompt-injected. A valid schema/citation or two domains is not independent semantic proof. Publication dates are unverified metadata; retrieval today is not origin freshness.
+
+Offline mode uses only explicitly simulated transports, no credential mounts or provider requests. Live startup requires independent Gemini/Tavily opt-ins and three distinct private files outside the repository. One reservation precedes search, counters survive failure/cancellation within the process, and no retry/fallback is configured. These are application planning limits, not provider billing attestation or restart-persistent spend controls. Operators must restrict credential-file ACLs and container readability; Windows ACLs are not inspected automatically. Timeout/cancellation can leave billed provider work.
+
+Only loopback 8791 is published. Strict Host/Origin, Fetch Metadata and non-simple JSON header checks, no CORS, no-store/CSP, bounded body/admission and disconnect cancellation reduce local browser misuse. The UI renders untrusted content using text nodes and binds displayed results to the unchanged claim. This is no local identity/tenant authentication; trusted local processes can invoke it and its bridge is not an egress firewall. Live operation sends the claim to Tavily and the claim/excerpts to Google. The original Lab remains independently runnable at 8787. No public deployment, general accuracy, injection immunity or combined protected qualification follows from these tests.
+
+## Protected residual scope
+
 Streaming, arbitrary prose/sources, alternate routes, passthrough, Warp background work and production providers are outside this release boundary. API routes can skip transport hooks; some Warp errors are HTTP 200 envelopes. Route-audit findings are narrower than an all-route security claim. Built-in caching remains disabled: asynchronous writes can precede enforcement or follow deletion. An owned verified cache and atomic revocation are proposals only.
 
 Source hashes attest checked content within the trusted verifier, not independent origin freshness, billing, or provider honesty. The November 15 real-source qualification used a controlled provider; the November 19 real-Gemini qualification used simulated evidence and tightly controlled prompts. Neither establishes general correctness or a combined real-model/real-source execution. Model planning remains non-authorizing and unqualified for real-model quality. Other Bifrost versions or plugin combinations need fresh conversion/order/ABI/security tests. See [compatibility](compatibility.md) and [disclosure instructions](../SECURITY.md).

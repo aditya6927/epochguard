@@ -1,0 +1,22 @@
+name: epochguard-005i
+services:
+  explorer:
+    image: epochguard-explorer:005i
+    build:
+      context: .
+      dockerfile: services/evidence_assessment/Dockerfile
+    platform: linux/amd64
+    ports: ["127.0.0.1:8791:8791"]
+    environment: {EPOCHGUARD_005I_MODE: offline}
+    networks: [local-entry]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs: ["/tmp:uid=10001,gid=10001,mode=1777,size=16m"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8791/health',timeout=2)"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+networks:
+  local-entry: {}

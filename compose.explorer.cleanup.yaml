@@ -1,0 +1,7 @@
+name: epochguard-005i
+services:
+  explorer:
+    image: epochguard-explorer:005i
+    networks: [local-entry]
+networks:
+  local-entry: {}

@@ -1,0 +1,14 @@
+# Requires explicit dual authorization and operator-owned files outside checkout.
+services:
+  explorer:
+    environment:
+      EPOCHGUARD_005I_MODE: live
+      EPOCHGUARD_005I_ALLOW_GEMINI: ${EPOCHGUARD_005I_ALLOW_GEMINI:?separate authorization required}
+      EPOCHGUARD_005I_ALLOW_TAVILY: ${EPOCHGUARD_005I_ALLOW_TAVILY:?separate authorization required}
+      EPOCHGUARD_005I_SETTINGS_FILE: /run/005i/settings.json
+      EPOCHGUARD_005I_GEMINI_SECRET_FILE: /run/005i/gemini.key
+      EPOCHGUARD_005I_TAVILY_SECRET_FILE: /run/005i/tavily.key
+    volumes:
+      - "${EPOCHGUARD_005I_SETTINGS_HOST:?private settings required}:/run/005i/settings.json:ro"
+      - "${EPOCHGUARD_005I_GEMINI_SECRET_HOST:?private Gemini key file required}:/run/005i/gemini.key:ro"
+      - "${EPOCHGUARD_005I_TAVILY_SECRET_HOST:?private Tavily key file required}:/run/005i/tavily.key:ro"

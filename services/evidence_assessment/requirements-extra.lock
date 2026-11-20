@@ -1,0 +1,2 @@
+# Offline PSL parsing only; never downloads a list at runtime.
+publicsuffix2==2.20191221

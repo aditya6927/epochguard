@@ -1,0 +1,12 @@
+{
+  "model": null,
+  "max_requests": 1,
+  "max_output_tokens": 1536,
+  "search_seconds": 8.0,
+  "model_seconds": 25.0,
+  "input_usd_per_million": null,
+  "output_usd_per_million": null,
+  "search_request_usd": null,
+  "max_request_usd": null,
+  "max_run_usd": null
+}

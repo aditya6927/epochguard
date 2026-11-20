@@ -16,6 +16,7 @@ The EpochGuard repository's original code is licensed under [Apache-2.0](../LICE
 | Full npm lock | 150 packages: MIT 99, Apache-2.0 28, MPL-2.0 12, other permissive/CC0 licenses 11 | Metadata inventory is not a file-level legal audit; inspect transitive MPL files and distributed bundles before release |
 | Python and Go transitive dependencies / Alpine and Debian image packages | Pinned graphs/lock files; heterogeneous upstream licenses | Complete binary/image attribution and license inventory remain a distribution prerequisite |
 | Lab artwork and interface assets | Repository-owned SVG/CSS/UI; no stock photography, copied upstream dashboard or external font service | Project licensing decision still applies; the API-only embed placeholder is identified in the Dockerfile |
+| [publicsuffix2 2.20191221](https://pypi.org/project/publicsuffix2/) | MIT Python code; MPL-2.0 bundled Public Suffix List data (2019 snapshot) | New isolated Explorer dependency for offline grouping; preserve installed license/data notices and inspect redistribution obligations. No runtime PSL download; grouping is not ownership proof |
 
 The npm count is from `web/lab/package-lock.json` license metadata at the 005B baseline, including development dependencies, not an inventory of code actually shipped in the browser bundle. No missing npm license fields were observed. The repository does not bundle upstream dashboard assets. OS/toolchain dependencies can differ in obligations from application source.
 
