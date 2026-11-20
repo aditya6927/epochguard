@@ -10,6 +10,15 @@ The [November 20, 2026 follow-up](../../docs/task-005k.md#november-20-2026-explo
 
 The backend currently does **not persist successful HTTP responses or assessment history**. The page holds only the current displayed result; editing clears it and reload loses it. The later screenshots/transcript are manual operator captures. 005J logs only safe structural failure metadata, not claims, snippets or response bodies. Result export/persistence is **future work**, with no implemented export endpoint, browser save button or database. The original [005I](../../docs/task-005i.md) and [005J](../../docs/task-005j.md) reports retain their execution-time evidence and limitations.
 
+## Safeguards and semantic limits
+
+Strict schemas, exact claim retention, complete source-ID coverage, citation binding, verbatim snippet quotes and at least two cited publisher groups with matching model-assigned stances constrain conclusive results. Missing/invalid evidence and detected disagreement abstain. These safeguards coexist with semantic reliance on Gemini:
+
+- **Quotation versus entailment:** a verbatim substring check prevents some invented quotations; it does not prove that the quote logically supports or contradicts the claim. Relevance and entailment remain model judgments.
+- **IRRELEVANT classifications:** the disagreement check excludes sources labelled `IRRELEVANT` by the model. A truly contradictory source incorrectly given that label may be excluded from this check. Two-publisher corroboration still applies but cannot eliminate semantic errors. This is a source-inspected limitation, not a demonstrated successful exploit.
+- **Freshness:** retrieval time and unverified search publication metadata are distinct. The prompt asks Gemini to consider current roles/dates, but there is no universal deterministic maximum publication age for conclusive assessments. Retrieval today does not prove current underlying information.
+- **Independence:** publisher grouping and duplicate/near-copy checks are heuristics. Different groups can share ownership, syndication or underlying reporting; they do not independently establish factual authority.
+
 ## Offline startup and cleanup
 
 Requires the existing Git, Python 3.12 and Docker Desktop Linux-container setup. No host Python packages, Node installation or credentials are required to use the page. From the repository root, in PowerShell:
@@ -32,25 +41,34 @@ The helper suppresses subprocess output so paths/environment values cannot enter
 
 ```powershell
 py -3.12 services/evidence_assessment/manage.py test --build
-docker build --target python -t epochguard-checks:005i-python -f dev/Dockerfile.checks .
-docker build --target go -t epochguard-checks:005i-go -f dev/Dockerfile.checks .
-py -3.12 scripts/check_docs.py
 ```
 
-The first command starts the actual service, checks three HTTP outcomes and exact claim retention, then verifies cleanup. Builds install public locked dependencies; test RUN steps have `--network=none`. Python checks include existing verifier/claim-analysis suites and the new assessment tests. Go checks retain pinned format/vet/unit/race execution; race detection does not instrument the running gateway.
+This builds the Explorer image (including its selected service tests), starts the actual offline service, checks three HTTP outcomes and exact claim retention, then verifies cleanup. It is not the full historical qualification suite. Omit `--build` only when the matching image already exists; `up` leaves the service running, whereas `test` cleans its owned project. Startup/tests refuse existing project resources. `down` removes only this project's resources and retains operator credential files. Builds install public locked dependencies; test RUN steps have `--network=none`. See [CI-equivalent selections and documentation checks](../../CONTRIBUTING.md#validation) for separate Go/Python/frontend build targets; unit race detection does not instrument a running gateway.
 
-For the frozen packet evaluator, use a private virtual environment with `services/verifier/requirements.lock` and `services/evidence_assessment/requirements-extra.lock` installed, then:
+For the frozen 19-case evaluator and focused regressions, activate a Python 3.12 virtual environment with `services/verifier/requirements.lock` and `services/evidence_assessment/requirements-extra.lock` installed. Dependency installation is a separate online setup step. From the repository root in PowerShell:
 
 ```powershell
 python -B tests/evidence_assessment/evaluate.py artifacts/005i/my-new-packet-run
+$env:PYTHONPATH = 'services/evidence_assessment;services/claim_analysis'
+python -B -m pytest services/evidence_assessment/tests -q
 python -B -m unittest discover -s tests/evidence_assessment -p test_explorer_manage.py
 ```
 
-The evaluator inserts its service import paths, pins the packet digest and refuses an existing output directory. It never enables live transports. Optional real-browser checks reuse the existing Lab's locked Playwright installation and local Edge: start the offline Explorer, run `node tests/evidence_assessment/browser.cjs artifacts/005i/my-new-browser-run`, then run `manage.py down`. The browser script refuses a live service and blocks external page requests. This is UI plumbing evidence only.
+The evaluator inserts its own import paths, pins the packet digest, refuses an existing output directory and never selects live transports. Pytest needs the explicit import paths above (use the platform's path separator outside PowerShell/Windows). The lifecycle unittest uses only the standard library. These are focused selections, not every Python regression; the broader CI selection is in `dev/Dockerfile.checks`. Results go under ignored `artifacts/`; reports retain their execution revision and simulated provenance. Neither the evaluator nor the following two runners has an argparse `--help` mode; supply their documented arguments only.
+
+### Optional browser checks
+
+Requires Node (the Lab's locked toolchain uses 24.13.0), the Lab's npm dependencies installed with `npm ci --prefix web/lab --ignore-scripts`, and locally installed Microsoft Edge. Start the **offline** Explorer, run `node tests/evidence_assessment/browser.cjs artifacts/005i/my-new-browser-run`, then run `py -3.12 services/evidence_assessment/manage.py down`. Use a new output directory. The script uses locked Playwright, refuses a LIVE page and blocks external page requests. It checks three actual browser/HTTP outcomes plus stale-result/mobile behavior; this is simulated-provider UI plumbing, distinct from CI component tests. These optional prerequisites are not required for ordinary startup.
+
+### Optional protected gateway smoke
+
+`py -3.12 tests/evidence_assessment/protected_smoke.py` uses standard-library host Python and Docker, with matching, locally built `epochguard-dev:002a` and `epochguard-verifier:004g` images already present. It does not build images; use the existing [native → 004C → 004E → 004G build procedure](../../docs/compatibility.md#builder-and-abi-diagnostics) when needed. It tests five outcomes through actual protected ingress/Bifrost/plugin/Python/receipt validation with a controlled provider and simulated evidence. Its separate `epochguard-005i-protected` project refuses existing resources, records immutable image IDs and removes its own disposable signing volume. Coordinate the inherited G subnet with other active G profiles. This is an optional runtime check, not an Explorer test or prerequisite for the judge quick-start.
 
 ## Separately authorized live smoke
 
 **005I/005J development checks made no live calls; later operator execution is recorded above.** Any new smoke still requires separate explicit authorization for one Tavily Search request and at most one Gemini assessment request. Check current provider availability/prices and billing limits yourself; no price or model default is silently chosen. Live startup performs no provider calls. A button click can incur cost, including calls that time out or are cancelled.
+
+`EPOCHGUARD_005I_ALLOW_GEMINI=1` and `EPOCHGUARD_005I_ALLOW_TAVILY=1` are separate **technical execution opt-ins** against accidental live calls. Even if a guard/help message calls them authorization, setting them does not prove account ownership, permission to incur charges or approval of a spending amount. Live use additionally requires a deliberate operator decision, authorized account/key usage and review of current pricing, quotas and possible costs. Application reservations are planning limits, not guaranteed provider-side billing caps; timeout/cancellation can still be charged and restarting resets process-local counters. This documentation grants no permission for a new live call.
 
 Create three distinct owner-readable private files **outside the checkout**: Gemini key, Tavily key, and a copy of [settings.example.json](settings.example.json). Key files contain only the ASCII key plus an optional newline. On POSIX use mode 0600; on Windows restrict ACLs to the operator and inspect them privately. The launcher verifies POSIX permissions; Windows ACL restriction is an operator prerequisite, not automatically attested. Set every null setting explicitly: an available Gemini model ID, current input/output USD per million token rates, search price per basic request, and request/run cost ceilings. Keep `max_requests=1`; live validation permits at most three. Both credentials remain backend-only, mounted read-only, never placed in `.env`, browser fields, tracked JSON or command arguments.
 

@@ -53,6 +53,8 @@ py -3.12 tests/lab/manage.py down
 
 No virtual environment, host Node installation or API key is needed. First builds download public dependencies; runtime evidence stays simulated. Within this stack, only the Lab publishes **127.0.0.1:8787**; the separate Explorer uses **127.0.0.1:8791**. Both applications are loopback-only. The helper bypasses `.env`, and gateway, verifier, provider and management remain private. See the [Lab guide](docs/verification-lab.md) for scenarios, limits, tests and video recording. The [operations guide](docs/operations.md) retains headless qualification workflows; default `compose.yaml` is a fixed-decision development fixture, not a factual verifier.
 
+For offline lifecycle checks, use `py -3.12 tests/lab/manage.py test --build`; it refuses an existing project rather than taking ownership. See [test isolation](docs/verification-lab.md#tests-and-demonstration-recording). [005G published-checkout evidence](docs/task-005g.md) records commit `871a7cbe55782a4a514c036cdcf31a413dba57f7` on Windows/Docker Desktop Linux/amd64: actual Lab/protected lifecycle, all five judge outcomes, browser and cleanup checks; a later UI-help correction was separately tested. Docker/BuildKit/dependency caches were retained. This was not a cache-free, clean-daemon installation or qualification of future HEADs, other environments or production.
+
 ## Capability and qualification
 
 | Capability | Status and limits |
@@ -76,6 +78,12 @@ The protected route is buffered `POST /openai/v1/chat/completions`. Ingress hold
 The host, pinned gateway/plugin, Python verifier, clock, configuration, signing key and isolated network remain trusted. The private gateway-to-verifier hop is unauthenticated HTTP. Grammar coverage does not prove general semantic completeness; local observation age does not attest origin freshness. Direct gateways without ingress can serve unchecked content if the plugin is absent.
 
 Streaming, arbitrary prose or sources, production providers/authentication, safe background execution, general route protection and production readiness remain unqualified. The native plugin requires the pinned dynamic Linux/amd64 build; stock static Bifrost binaries cannot load it as-is. See [architecture and trust boundaries](docs/architecture.md) for the complete contract and residual risks.
+
+## How AI was used
+
+- **Development assistance:** Codex and other agent-based coding/review assistants supported implementation, tests, documentation and review. Source inspection, deterministic tests and offline evaluations are engineering checks, not proof of defect-free code or universal independent human review. No AI-authorship percentage is claimed.
+- **Runtime assessment:** In the [Explorer](services/evidence_assessment/README.md), Tavily Search retrieves bounded excerpts; Gemini proposes source assessments, quotations, citations and a verdict. Code checks structure, exact claim retention, source coverage, citation IDs, snippet quotations and specified corroboration conditions. These checks do not independently prove semantic truth; every result has `authorization=false`. The [captured live contradiction](docs/task-005k.md#november-20-2026-explorer-live-observations) is one operator-observed example, not an accuracy/reliability benchmark.
+- **Protected enforcement:** The [bounded-prose Bifrost path](docs/architecture.md) uses a native Go plugin, separate Python verifier, finite grammar, two fixed evidence policies, independent validation, request-bound authenticated receipts and protected ingress to control release/refusal. Model answers and [004A/004F analysis/planning](services/claim_analysis/README.md) have no automatic authority. [005C](docs/task-005c-t.md#reviewed-real-model-qualification--november-19-2026) used Gemini candidates with simulated evidence; deterministic code enforced release. [Protected 005E combined live execution](docs/task-005e.md) remains unqualified.
 
 ## Documentation
 
